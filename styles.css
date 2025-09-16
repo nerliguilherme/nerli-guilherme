@@ -1,0 +1,81 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Arial", sans-serif;
+  color: #000000;
+}
+
+.cima {
+  background-color: hsl(208, 73%, 60%); 
+  padding: 30px 20px;
+}
+
+.info {
+  max-width: 400px;
+}
+
+.info h1 {
+  margin: 0 0 5px;
+  font-size: 40px;
+  font-weight: bold;
+}
+
+.info h2 {
+  margin: 0;
+  font-style: italic;
+  color: #282828;
+}
+
+.info hr {
+  width: 10000px;
+  margin: 10px 0;
+  border: 1px solid #ffffff;
+}
+
+.info p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+main {
+  padding: 20px;
+}
+
+section {
+  margin-bottom: 25px;
+}
+
+section h3 {
+  font-size: 18px;
+  font-weight: bold;
+  border-bottom: 1px solid #aaa;
+  padding-bottom: 3px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+
+.habilidades {
+  background-color: hsl(208, 73%, 60%);
+  padding: 20px;
+}
+
+.habilidades h3 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.habilidades ul {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.habilidades li::before {
+  content: "● ";
+  color: #ffffff;
+}
