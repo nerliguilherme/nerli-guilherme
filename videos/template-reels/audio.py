@@ -55,7 +55,8 @@ def boom(): x=tt(1.0); return np.sin(2*np.pi*(40+60*np.exp(-x*12))*x)*np.exp(-x*
 def riser(d=1.0): x=tt(d); return bp(rng.standard_normal(len(x)),2000,10000)*(x/d)**2
 FX={'whoosh':(whoosh,.35),'pop':(pop,.16),'click':(click,.25),'chime':(chime,.25),'ding':(ding,.22),'boom':(boom,.6),'riser':(riser,.18)}
 for e in ev:
-  fn,g=FX[e[1]]; add(fn(),e[0],g*(e[2] if len(e)>2 else 1))
-mix=np.tanh(mix*1.2)/np.tanh(1.2); mix/=np.abs(mix).max()/0.9
+  fn,g=FX[e[1]]; add(fn(),e[0],g*(e[2] if len(e)>2 else 1)*float(os.environ.get('SFX_GAIN','1')))
+mix=np.tanh(mix*1.2)/np.tanh(1.2)
+if os.environ.get('NO_NORM')!='1': mix/=np.abs(mix).max()/0.9
 pcm=(mix*32767).astype(np.int16)
 with wave.open(out,'wb') as f: f.setnchannels(2);f.setsampwidth(2);f.setframerate(sr);f.writeframes(pcm.tobytes())

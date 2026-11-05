@@ -29,7 +29,7 @@
 #home .apps b{display:block;height:74px;border-radius:20px;background:rgba(255,255,255,.18)}
 #notif{position:absolute;left:16px;right:16px;top:58px;height:108px;border-radius:30px;background:rgba(245,246,250,.96);z-index:8;
   display:flex;align-items:center;gap:16px;padding:0 20px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
-#notif .ic{width:62px;height:62px;border-radius:16px;background:#1e3f99;flex:none;position:relative;overflow:hidden}
+#notif .ic{width:62px;height:62px;border-radius:16px;background:#fff;box-shadow:inset 0 0 0 2px #e3e6f0;flex:none;position:relative;overflow:hidden}
 #notif .tx{font:700 23px/1.2 IT;color:#111}#notif .tx small{display:block;font:500 20px IT;color:#555}
 #menu{position:absolute;inset:0;background:linear-gradient(180deg,#0e2563 0%,#1e3f99 55%,#2a5bd6 100%);z-index:7}
 #menu .av{position:absolute;left:50%;top:84px;width:132px;height:132px;margin-left:-66px;border-radius:50%;background:#fff;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.3)}
@@ -60,10 +60,10 @@
  </div>
   <div id="phone"><div id="screen"><div id="island"></div>
    <div id="home"><div class="apps"></div></div>
-   <div id="notif"><div class="ic"><img src="assets/n_mag.png" style="position:absolute;left:-6px;top:4px;width:340px"><img src="assets/n_blu.png" style="position:absolute;left:-6px;top:4px;width:340px"><img src="assets/n_ora.png" style="position:absolute;left:-6px;top:4px;width:340px"></div>
+   <div id="notif"><div class="ic"><img src="assets/n_sym.png" style="position:absolute;left:50%;top:50%;height:40px;transform:translate(-50%,-50%)"></div>
      <div class="tx">NGraph<small>Toque para abrir o menu</small></div></div>
    <div id="menu">
-     <div class="av"><img src="assets/n_mag.png" style="position:absolute;left:18px;top:14px;width:460px"><img src="assets/n_blu.png" style="position:absolute;left:18px;top:14px;width:460px"><img src="assets/n_ora.png" style="position:absolute;left:18px;top:14px;width:460px"></div>
+     <div class="av"><img src="assets/n_sym.png" style="position:absolute;left:50%;top:50%;height:76px;transform:translate(-50%,-50%)"></div>
      <h4>NGraph</h4><h5>Gráfica &amp; Comunicação Visual</h5>
      <div class="btn" id="m0" style="top:340px"><span class="em">💬</span>WhatsApp</div>
      <div class="btn" id="m1" style="top:440px"><span class="em">📸</span>Instagram</div>
@@ -146,11 +146,11 @@ render(0);
 </script>
 <script>
 // Sincronia com a narração: tempo do áudio -> tempo da animação
-const MAP=[[0, 0], [3.36, 2.5], [4.32, 2.8], [4.96, 4.4], [6.27, 6.0], [7.07, 6.85], [7.52, 7.65], [8.84, 8.5], [9.84, 10.0], [11.28, 11.1], [12.4, 12.3], [14.12, 12.9], [15.36, 13.9], [16.0, 14.6], [22.5, 21.1]];
-const CAPS_V=[[0, 1.15, "OLHA SÓ *ISSO AQUI*"], [1.2, 1.95, "O SEU *CLIENTE*"], [2.0, 2.75, "SÓ *APROXIMA*"], [2.8, 4.18, "O CELULAR DA *PLACA*"], [4.2, 4.9, "E *PRONTO!*"], [4.96, 5.7, "ABRE NA *HORA*"], [5.76, 6.6, "SEU *WHATSAPP*"], [6.64, 7.42, "O *INSTAGRAM*"], [7.44, 8.2, "O *CATÁLOGO*"], [8.24, 9.7, "E ATÉ A *LOCALIZAÇÃO*"], [9.84, 11.24, "SEM BAIXAR *APLICATIVO*"], [11.28, 12.55, "SEM DIGITAR *NADA*"], [12.64, 14.05, "E QUEM NÃO TEM *NFC*?"], [14.12, 14.98, "APONTA A CÂMERA"], [15.04, 15.95, "PRO *QR CODE*"], [16.0, 17.0, "ESSA É A PLACA"], [17.04, 18.6, "*NFC* DA *NGRAPH*"], [18.64, 19.8, "QUER UMA NA *SUA EMPRESA*?"], [19.84, 21.6, "CHAMA A GENTE NO *DIRECT!*"]];
-const HOOKS_V=[{"t0": 0, "t1": 16.0, "lines": ["Isso tá substituindo", "o cartão de visita 😱"]}, {"t0": 16.0, "t1": 99, "lines": ["Chama no direct", "e peça a sua 📲"]}];
+const MAP=[[0, 0], [3.52, 2.5], [4.4, 2.8], [5.12, 4.4], [6.08, 6.0], [6.88, 6.85], [7.76, 7.65], [8.96, 8.5], [10.0, 10.0], [11.44, 11.1], [12.8, 12.3], [14.24, 12.9], [15.68, 13.9], [16.16, 14.6], [22.6, 21.04]];
+const CAPS_V=[[0.0, 1.32, "OLHA SÓ *ISSO AQUI*"], [1.36, 2.12, "O SEU *CLIENTE*"], [2.16, 2.8, "SÓ *APROXIMA*"], [2.84, 4.24, "O CELULAR DA *PLACA*"], [4.28, 5.08, "E *PRONTO!*"], [5.12, 5.76, "ABRE NA *HORA*"], [5.8, 6.76, "O SEU *WHATSAPP*"], [6.8, 7.6, "O *INSTAGRAM*"], [7.64, 8.44, "O *CATÁLOGO*"], [8.48, 9.96, "E ATÉ A *LOCALIZAÇÃO*"], [10.0, 11.4, "SEM BAIXAR *APLICATIVO*"], [11.44, 12.76, "SEM DIGITAR *NADA*"], [12.8, 14.2, "E QUEM NÃO TEM *NFC*?"], [14.24, 15.08, "APONTA A CÂMERA"], [15.12, 16.12, "PRO *QR CODE*"], [16.16, 17.16, "ESSA É A PLACA"], [17.2, 18.627, "*NFC* DA *NGRAPH*"], [18.667, 19.8, "QUER UMA NA *SUA EMPRESA*?"], [19.84, 22.3, "CHAMA A GENTE NO *DIRECT!*"]];
+const HOOKS_V=[{"t0": 0, "t1": 16.16, "lines": ["Isso tá substituindo", "o cartão de visita 😱"]}, {"t0": 16.16, "t1": 99, "lines": ["Chama no direct", "e peça a sua 📲"]}];
 function remap(t){for(let i=1;i<MAP.length;i++){const [a0,b0]=MAP[i-1],[a1,b1]=MAP[i];if(t<=a1)return b0+(b1-b0)*(t-a0)/(a1-a0);}return MAP[MAP.length-1][1];}
-window.DUR=22.5;
+window.DUR=22.6;
 const _render=window.render;
 window.render=function(ta){_render(remap(ta));E.hook(ta,HOOKS_V);E.caption(ta,CAPS_V);};
 render(0);
