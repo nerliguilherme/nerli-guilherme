@@ -142,11 +142,11 @@ render(0);
 </script>
 <script>
 // Sincronia com a narração: tempo do áudio -> tempo da animação
-const MAP=[[0, 0], [1.68, 1.5], [3.28, 2.75], [3.92, 3.2], [5.52, 4.4], [6.24, 4.9], [6.28, 6.0], [7.2, 6.4], [8.36, 7.45], [8.56, 7.8], [10.6, 9.7], [10.88, 10.0], [12.4, 10.2], [13.2, 11.4], [14.04, 11.6], [15.4, 12.9], [15.6, 13.0], [16.24, 13.9], [17.2, 14.6], [18.72, 15.5], [20.16, 17.1], [23.04, 18.7], [25.56, 21.22]];
-const CAPS_V=[[0.0, 1.16, "PRESTA *ATENÇÃO*"], [1.2, 2.2, "QUANDO ALGUÉM *PRECISA*"], [2.24, 3.24, "DO QUE VOCÊ *VENDE*"], [3.28, 4.12, "A PRIMEIRA COISA"], [4.16, 4.92, "QUE FAZ É"], [4.96, 6.24, "*PESQUISAR* NO *GOOGLE*"], [6.28, 7.0, "SE A SUA EMPRESA"], [7.04, 8.32, "*NÃO APARECE*..."], [8.36, 9.08, "ESSE CLIENTE VAI"], [9.12, 10.84, "DIRETO PRO *CONCORRENTE*"], [10.88, 11.8, "UM SITE *TRABALHA*"], [11.84, 12.36, "POR VOCÊ"], [12.4, 14.0, "*24 HORAS* POR DIA"], [14.04, 15.56, "*7 DIAS* POR SEMANA"], [15.6, 16.88, "MOSTRA SEUS *SERVIÇOS*"], [16.92, 17.92, "SEU *PORTFÓLIO*"], [17.96, 18.68, "E LEVA O CLIENTE"], [18.72, 20.12, "DIRETO PRO *WHATSAPP*"], [20.16, 21.4, "A *NGRAPH* CRIA O SITE"], [21.44, 23.08, "DA SUA EMPRESA *DO ZERO*"], [23.12, 25.26, "MANDA *SITE* NO DIRECT!"]];
-const HOOKS_V=[{"t0": 0, "t1": 23.04, "lines": ["Sua empresa aparece", "quando te procuram? 🔎"]}, {"t0": 23.04, "t1": 99, "lines": ["Manda “SITE” no direct", "que a gente te explica 📩"]}];
+const MAP=[[0, 0], [1.68, 1.5], [3.36, 2.75], [4.0, 3.2], [5.68, 4.4], [6.24, 4.9], [6.28, 6.0], [7.28, 6.4], [8.32, 7.45], [8.48, 7.8], [10.8, 9.7], [10.88, 10.0], [12.4, 10.2], [13.2, 11.4], [14.0, 11.6], [15.52, 12.9], [15.56, 13.0], [16.16, 13.9], [16.96, 14.6], [18.72, 15.5], [19.96, 17.1], [22.88, 18.7], [25.32, 21.14]];
+const CAPS_V=[[0.0, 1.16, "PRESTA *ATENÇÃO*"], [1.2, 2.16, "QUANDO ALGUÉM *PRECISA*"], [2.2, 3.32, "DO QUE VOCÊ *VENDE*"], [3.36, 4.2, "A PRIMEIRA COISA"], [4.24, 5.0, "QUE FAZ É"], [5.04, 6.24, "*PESQUISAR* NO *GOOGLE*"], [6.28, 7.0, "SE A SUA EMPRESA"], [7.04, 8.28, "*NÃO APARECE*..."], [8.32, 9.24, "ESSE CLIENTE VAI"], [9.28, 10.84, "DIRETO PRO *CONCORRENTE*"], [10.88, 11.72, "UM SITE *TRABALHA*"], [11.76, 12.36, "POR VOCÊ"], [12.4, 13.96, "*24 HORAS* POR DIA"], [14.0, 15.52, "*7 DIAS* POR SEMANA"], [15.56, 16.76, "MOSTRA SEUS *SERVIÇOS*"], [16.8, 17.76, "SEU *PORTFÓLIO*"], [17.8, 18.68, "E LEVA O CLIENTE"], [18.72, 19.92, "DIRETO PRO *WHATSAPP*"], [19.96, 21.24, "A *NGRAPH* CRIA O SITE"], [21.28, 22.92, "DA SUA EMPRESA *DO ZERO*"], [22.96, 25.02, "MANDA *SITE* NO DIRECT!"]];
+const HOOKS_V=[{"t0": 0, "t1": 22.88, "lines": ["Sua empresa aparece", "quando te procuram? 🔎"]}, {"t0": 22.88, "t1": 99, "lines": ["Manda “SITE” no direct", "que a gente te explica 📩"]}];
 function remap(t){for(let i=1;i<MAP.length;i++){const [a0,b0]=MAP[i-1],[a1,b1]=MAP[i];if(t<=a1)return b0+(b1-b0)*(t-a0)/(a1-a0);}return MAP[MAP.length-1][1];}
-window.DUR=25.56;
+window.DUR=25.32;
 const _render=window.render;
 window.render=function(ta){_render(remap(ta));E.hook(ta,HOOKS_V);E.caption(ta,CAPS_V);};
 render(0);
