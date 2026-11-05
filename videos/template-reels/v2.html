@@ -1,0 +1,142 @@
+<!doctype html><html><head><meta charset="utf-8">
+<script src="engine.js"></script>
+<style>
+#bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 55% at 50% 50%,#121a33 0%,#0a0f1f 55%,#04060c 100%)}
+#scan{position:absolute;inset:0;opacity:.35;background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 2px,transparent 2px 5px)}
+#glare{position:absolute;left:-400px;top:-200px;width:900px;height:2400px;transform:rotate(18deg);
+  background:linear-gradient(90deg,transparent,rgba(170,200,255,.07),transparent)}
+#scene{position:absolute;inset:0}
+.dot{position:absolute;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:9px;background:#e9edf7}
+.lbl{position:absolute;color:#fff;text-align:center;font:800 34px IT;letter-spacing:.5px;opacity:0}
+.lbl small{display:block;font:500 24px IT;color:#9aa6c7;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+#att{position:absolute;left:0;right:0;top:560px;text-align:center;font:700 34px IT;color:#9aa6c7;opacity:0}
+#search{position:absolute;left:110px;width:860px;top:640px;opacity:0}
+#sbar{height:120px;border-radius:60px;background:#fff;display:flex;align-items:center;padding:0 40px;gap:24px;
+  font:500 40px IT;color:#1a1f33;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+#sbar svg{flex:none}
+#cursor{display:inline-block;width:3px;height:44px;background:#1e3f99;margin-left:2px;vertical-align:middle}
+.res{margin-top:22px;height:118px;border-radius:24px;background:#141c36;border:2px solid #24305a;padding:20px 28px;color:#fff}
+.res b{display:block;font:700 32px IT}.res span{font:500 24px IT;color:#8fb6ff}
+.res.no{background:#2a0f1c;border-color:#e0245e}.res.no b{color:#ff8fb1}.res.no span{color:#ff8fb1}
+#big{position:absolute;left:0;right:0;top:640px;height:560px;text-align:center;opacity:0}
+#big svg{position:absolute;left:290px;top:30px}
+#bignum{position:absolute;left:0;right:0;top:170px;font:200px/1 Anton;color:#fff}
+#bigsub{position:absolute;left:0;right:0;top:390px;font:700 25px IT;color:#9aa6c7;letter-spacing:3px}
+#site{position:absolute;left:130px;width:820px;top:440px;height:980px;border-radius:30px;background:#fff;overflow:hidden;opacity:0;
+  box-shadow:0 40px 100px rgba(0,0,0,.6)}
+#site .chrome{height:64px;background:#eef0f6;display:flex;align-items:center;gap:12px;padding:0 24px;position:relative;z-index:2}
+#site .chrome i{width:18px;height:18px;border-radius:50%;background:#d0d4e0}
+#site .url{flex:1;height:38px;border-radius:19px;background:#fff;font:500 22px/38px IT;color:#667;padding-left:20px}
+#page{position:absolute;left:0;right:0;top:64px}
+.hero{height:520px;background:linear-gradient(135deg,#cf2c6b,#1e3f99 55%,#2f6bff);color:#fff;padding:70px 56px;position:relative}
+.hero h1{margin:0;font:900 74px/1.02 Mont}.hero p{font:500 30px/1.3 IT;opacity:.9;margin:22px 0 34px}
+.hero .cta{display:inline-block;background:#f0a13a;color:#111;font:800 30px IT;padding:22px 36px;border-radius:18px}
+.sec{padding:46px 56px 10px}.sec h2{margin:0 0 24px;font:900 44px Mont;color:#0e2563}
+.cards{display:flex;gap:18px}.cards div{flex:1;height:190px;border-radius:20px;background:#f1f3fa;padding:22px;font:700 26px IT;color:#0e2563}
+.cards div i{display:block;width:56px;height:56px;border-radius:14px;margin-bottom:18px}
+.port{display:grid;grid-template-columns:1fr 1fr;gap:18px}.port div{height:230px;border-radius:20px}
+#wa{position:absolute;right:34px;bottom:40px;width:120px;height:120px;border-radius:50%;background:#25d366;z-index:3;
+  box-shadow:0 12px 30px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;font:64px 'Noto Color Emoji';opacity:0}
+#wapulse{position:absolute;right:34px;bottom:40px;width:120px;height:120px;border-radius:50%;border:6px solid #25d366;z-index:2;opacity:0}
+</style></head><body><div id="stage">
+<div id="bg"></div><div id="scan"></div><div id="glare"></div>
+<div id="scene">
+ <div id="att">presta atenção.</div>
+ <div id="dots"></div>
+ <div class="lbl" id="lblC" style="left:540px;top:1210px;width:500px;margin-left:-250px"><small>100 pessoas</small>procurando o que você vende</div>
+ <div class="lbl" id="lblY" style="left:110px;top:1150px;width:380px"><small>sua empresa</small><span id="ny">0</span> clientes</div>
+ <div class="lbl" id="lblR" style="left:590px;top:1150px;width:380px"><small>concorrente</small><span id="nr">0</span> clientes</div>
+ <div id="search">
+   <div id="sbar"><svg width="44" height="44" viewBox="0 0 44 44" fill="none" stroke="#1e3f99" stroke-width="6" stroke-linecap="round"><circle cx="18" cy="18" r="13"/><path d="M28 28 L40 40"/></svg>
+     <span id="q"></span><span id="cursor"></span></div>
+   <div class="res" id="r0"><b>Concorrente A</b><span>site • fotos • WhatsApp</span></div>
+   <div class="res" id="r1"><b>Concorrente B</b><span>site • avaliações • rota</span></div>
+   <div class="res no" id="r2"><b>Sua empresa</b><span>não encontrada</span></div>
+ </div>
+ <div id="big"><svg width="500" height="500" viewBox="0 0 500 500"><circle cx="250" cy="250" r="220" stroke="#1b2647" stroke-width="26" fill="none"/>
+   <circle id="ring" cx="250" cy="250" r="220" stroke="#2f7bff" stroke-width="26" fill="none" stroke-linecap="round" transform="rotate(-90 250 250)" stroke-dasharray="1382" stroke-dashoffset="1382"/></svg>
+   <div id="bignum">0H</div><div id="bigsub">POR DIA</div></div>
+ <div id="site"><div class="chrome"><i></i><i></i><i></i><div class="url">suaempresa.com.br</div></div>
+   <div id="page">
+     <div class="hero"><h1>Sua marca<br>no topo.</h1><p>Serviços, portfólio e atendimento<br>num lugar só.</p><span class="cta">Pedir orçamento</span></div>
+     <div class="sec"><h2>Serviços</h2><div class="cards">
+       <div><i style="background:#cf2c6b"></i>Fachadas</div><div><i style="background:#1e3f99"></i>Adesivos</div><div><i style="background:#f0a13a"></i>Impressos</div></div></div>
+     <div class="sec"><h2>Portfólio</h2><div class="port">
+       <div style="background:linear-gradient(135deg,#1e3f99,#2f6bff)"></div><div style="background:linear-gradient(135deg,#f0a13a,#cf2c6b)"></div>
+       <div style="background:linear-gradient(135deg,#cf2c6b,#6b2bd6)"></div><div style="background:linear-gradient(135deg,#0e2563,#1fa2c9)"></div></div></div>
+   </div>
+   <div id="wapulse"></div><div id="wa">💬</div>
+ </div>
+</div>
+<div id="end"></div>
+<div id="hook"></div><div id="cap" style="top:1440px"></div>
+</div>
+<script>
+const {p,eo,eio,eb,lerp,$}=E;
+E.buildEnd('Sites profissionais • do zero, com a sua cara');
+const HOOKS=[{t0:0,t1:18.7,lines:['Sua empresa aparece','quando te procuram? 🔎']},{t0:18.7,t1:99,lines:['Manda “SITE” no direct','que a gente te explica 📩']}];
+const CAPS=[[0.3,1.5,'PRESTA *ATENÇÃO*'],[1.5,2.7,'ISSO SÃO *100 CLIENTES*'],[2.8,4.4,'QUEM PRECISA, *PESQUISA*'],[4.4,5.9,'ANTES DE *COMPRAR*'],
+ [6.0,7.5,'SE VOCÊ *NÃO APARECE*'],[7.6,9.9,'ELE VAI PRO *CONCORRENTE*'],[10.1,11.6,'UM SITE TRABALHA *24H*'],[11.6,13.0,'*7 DIAS* POR SEMANA'],
+ [13.2,14.4,'SEUS *SERVIÇOS*'],[14.4,15.6,'SEU *PORTFÓLIO*'],[15.6,17.1,'DIRETO NO *WHATSAPP*'],[17.3,18.7,'SEU SITE DO *ZERO*']];
+window.DUR=22;
+const D=[];const box=$('dots');
+for(let i=0;i<100;i++){const d=document.createElement('div');d.className='dot';box.appendChild(d);D.push(d);}
+const BR=['#cf2c6b','#2f6bff','#f0a13a'];
+const q='gráfica perto de mim';
+function mix(a,b,k){const h=s=>[1,3,5].map(i=>parseInt(s.substr(i,2),16));const A=h(a),B=h(b);return `rgb(${A.map((v,i)=>Math.round(lerp(v,B[i],k))).join(',')})`;}
+window.render=function(t){
+ $('scene').style.transform=`translate(${Math.sin(t*1.3)*4}px,${Math.cos(t*1.1)*5}px) rotate(${Math.sin(t*.7)*.3}deg)`;
+ $('glare').style.left=(-500+((t*40)%1600))+'px';
+ $('att').style.opacity=p(t,.2,.5)*(1-p(t,2.4,2.7));
+ // pontos
+ for(let i=0;i<100;i++){const r=Math.floor(i/10),c=i%10,d=D[i];
+  const gx=540+(c-4.5)*56, gy=900+(r-4.5)*56;
+  const rx=780+(c-4.5)*30, ry=900+(r-4.5)*30;
+  const lx=300+(c-4.5)*30, ly=900+(r-4.5)*30;
+  let x=gx,y=gy,s=1,o=0,col='#e9edf7';
+  // S1 aparecer
+  const ka=eb(p(t,.4+(r+c)*.035,.75+(r+c)*.035)); s=ka; o=p(t,.4+(r+c)*.035,.5+(r+c)*.035);
+  o*=1-p(t,2.6,2.9);
+  // S3 grade volta e migra para concorrente (exceto nenhum)
+  if(t>=7.3){o=p(t,7.3,7.6);s=1;
+   const t0=7.8+i/100*1.4, km=eio(p(t,t0,t0+.5));
+   const sx=lerp(lx,lx,0); // origem: lado "sua empresa"
+   x=lerp(lx,rx,km); y=lerp(ly,ry,km)-Math.sin(Math.PI*km)*120; s=lerp(.75,.75,km);
+   col=mix('#e9edf7','#5c6788',km);
+   o*=1-p(t,9.9,10.2);
+  }
+  // S6 voltam pra você, coloridos
+  if(t>=17.1){const t0=17.2+i/100*.8, kb=eio(p(t,t0,t0+.45));
+   o=p(t,17.1,17.3)*(1-p(t,18.6,18.75)); x=lerp(rx,gx,kb); y=lerp(ry,gy,kb)-Math.sin(Math.PI*kb)*140; s=lerp(.75,1,kb);
+   col=kb>0?BR[(r+c)%3]:'#5c6788';}
+  d.style.transform=`translate(${x}px,${y}px) scale(${s})`;d.style.left='0';d.style.top='0';d.style.opacity=o;d.style.background=col;
+ }
+ $('lblC').style.opacity=p(t,1.5,1.8)*(1-p(t,2.5,2.8));
+ // contadores
+ const lo=p(t,7.5,7.8)*(1-p(t,9.9,10.2));$('lblY').style.opacity=lo;$('lblR').style.opacity=lo;
+ const moved=Math.round(100*p(t,7.8+.25,7.8+1.4+.5));$('ny').textContent=100-moved;$('nr').textContent=moved;
+ $('ny').style.color=moved>50?'#ff6b98':'#fff';
+ // S2 busca
+ const ks=eo(p(t,2.8,3.2));$('search').style.opacity=p(t,2.8,3.0)*(1-p(t,7.0,7.3));$('search').style.transform=`translateY(${(1-ks)*60}px)`;
+ const n=Math.round(q.length*p(t,3.2,4.4));$('q').textContent=q.slice(0,n);
+ $('cursor').style.opacity=(Math.floor(t*3)%2||t<4.4)?1:0;
+ ['r0','r1','r2'].forEach((id,i)=>{const t0=i<2?4.6+i*.25:6.0;const k=eb(p(t,t0,t0+.4));$(id).style.opacity=p(t,t0,t0+.1);
+  $(id).style.transform=`translateY(${(1-k)*40}px)`+(i==2?` translateX(${Math.sin(t*50)*10*(p(t,6.4,6.5)-p(t,7.0,7.1))}px)`:'');});
+ // S4 24h / 7 dias
+ const kg=p(t,10.0,10.3)*(1-p(t,12.9,13.2));$('big').style.opacity=kg;$('big').style.transform=`scale(${.9+.1*eo(p(t,10,10.4))})`;
+ const k24=eio(p(t,10.2,11.4));
+ if(t<11.6){$('bignum').textContent=Math.round(24*k24)+'H';$('bigsub').textContent='POR DIA';$('ring').setAttribute('stroke-dashoffset',1382*(1-k24));$('ring').setAttribute('stroke','#2f7bff');}
+ else{const k7=eio(p(t,11.6,12.5));$('bignum').textContent=Math.max(1,Math.round(7*k7))+'/7';$('bigsub').textContent='DIAS POR SEMANA';$('ring').setAttribute('stroke-dashoffset',1382*(1-k7));$('ring').setAttribute('stroke','#f0a13a');}
+ $('bignum').style.transform=`scale(${1+.06*Math.sin(Math.PI*p(t,11.6,11.9))})`;
+ // S5 site
+ const kw=eb(p(t,13.0,13.5));$('site').style.opacity=p(t,13.0,13.15)*(1-p(t,17.0,17.2));
+ $('site').style.transform=`translateY(${(1-kw)*120}px) scale(${.92+.08*kw})`;
+ const sc=eio(p(t,13.9,14.6))*560+eio(p(t,14.6,15.3))*230;$('page').style.transform=`translateY(${-sc}px)`;
+ const kwa=eb(p(t,15.5,15.9));$('wa').style.opacity=p(t,15.5,15.6);$('wa').style.transform=`scale(${kwa})`;
+ const pu=((t-15.9)%0.8)/0.8;$('wapulse').style.opacity=t>15.9?(1-pu)*.9:0;$('wapulse').style.transform=`scale(${1+pu*.8})`;
+ // vinheta final
+ if(t>=18.7)E.renderEnd(t,18.7); else $('end').style.opacity=0;
+ E.hook(t,HOOKS);E.caption(t,CAPS);
+};
+render(0);
+</script></body></html>

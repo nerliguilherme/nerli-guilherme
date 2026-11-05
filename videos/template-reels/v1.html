@@ -1,0 +1,146 @@
+<!doctype html><html><head><meta charset="utf-8">
+<script src="engine.js"></script>
+<style>
+#bg{position:absolute;inset:0;background:
+  radial-gradient(ellipse 70% 45% at 50% 52%,rgba(255,236,210,.20),transparent 70%),
+  linear-gradient(180deg,#2a211c 0%,#1d1714 45%,#120e0c 100%)}
+#grain{position:absolute;inset:0;opacity:.18;background:repeating-linear-gradient(95deg,rgba(255,255,255,.04) 0 3px,rgba(0,0,0,.05) 3px 9px)}
+#scene{position:absolute;inset:0;perspective:1600px}
+#plate{position:absolute;left:240px;top:560px;width:600px;height:820px;border-radius:40px;transform-origin:50% 50%;
+  background:linear-gradient(150deg,#2f6bff 0%,#1e3f99 55%,#132a6e 100%);
+  box-shadow:0 60px 90px rgba(0,0,0,.6),inset 0 2px 0 rgba(255,255,255,.35),inset 0 -6px 18px rgba(0,0,0,.35)}
+#plate .gloss{position:absolute;inset:0;border-radius:40px;background:linear-gradient(120deg,rgba(255,255,255,.28) 0%,rgba(255,255,255,0) 35%,rgba(255,255,255,0) 70%,rgba(255,255,255,.08) 100%)}
+#plogo{position:absolute;left:50%;top:70px;width:920px;height:240px;margin-left:-460px;transform:scale(.52);transform-origin:50% 0}
+#plogo .txt{filter:brightness(0) invert(1)}
+#nfc{position:absolute;left:0;right:0;top:250px;text-align:center;color:#fff;font:800 40px IT}
+#nfc svg{display:block;margin:0 auto 12px}
+#qrbox{position:absolute;left:180px;top:470px;width:240px;height:240px;background:#fff;border-radius:22px;padding:14px}
+#qrbox img{width:100%;height:100%}
+#plabel{position:absolute;left:0;right:0;top:730px;text-align:center;color:rgba(255,255,255,.85);font:500 26px IT}
+#ripple{position:absolute;left:540px;top:880px}
+#ripple i{position:absolute;border:6px solid #8fb6ff;border-radius:50%;opacity:0}
+/* phone */
+#phone{position:absolute;left:320px;top:520px;width:440px;height:900px;border-radius:66px;background:#0b0b0e;padding:14px;
+  box-shadow:0 50px 100px rgba(0,0,0,.65),inset 0 0 0 3px #2b2b30;transform-origin:50% 50%}
+#screen{position:relative;width:100%;height:100%;border-radius:54px;overflow:hidden;background:#000}
+#island{position:absolute;left:50%;top:14px;width:120px;height:34px;margin-left:-60px;border-radius:20px;background:#000;z-index:9}
+#home{position:absolute;inset:0;background:linear-gradient(160deg,#4b5b8a,#1d2340 60%,#0d0f1c)}
+#home .apps{position:absolute;left:34px;right:34px;top:120px;display:grid;grid-template-columns:repeat(4,1fr);gap:26px}
+#home .apps b{display:block;height:74px;border-radius:20px;background:rgba(255,255,255,.18)}
+#notif{position:absolute;left:16px;right:16px;top:58px;height:108px;border-radius:30px;background:rgba(245,246,250,.96);z-index:8;
+  display:flex;align-items:center;gap:16px;padding:0 20px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+#notif .ic{width:62px;height:62px;border-radius:16px;background:#1e3f99;flex:none;position:relative;overflow:hidden}
+#notif .tx{font:700 23px/1.2 IT;color:#111}#notif .tx small{display:block;font:500 20px IT;color:#555}
+#menu{position:absolute;inset:0;background:linear-gradient(180deg,#0e2563 0%,#1e3f99 55%,#2a5bd6 100%);z-index:7}
+#menu .av{position:absolute;left:50%;top:84px;width:132px;height:132px;margin-left:-66px;border-radius:50%;background:#fff;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+#menu h4{position:absolute;left:0;right:0;top:232px;margin:0;text-align:center;color:#fff;font:800 36px IT}
+#menu h5{position:absolute;left:0;right:0;top:278px;margin:0;text-align:center;color:rgba(255,255,255,.75);font:500 20px IT}
+.btn{position:absolute;left:30px;right:30px;height:82px;border-radius:24px;background:#fff;color:#0e2563;font:700 28px IT;
+  display:flex;align-items:center;gap:18px;padding:0 24px;box-shadow:0 6px 16px rgba(0,0,0,.18)}
+.btn .em{font:34px 'Noto Color Emoji'}
+.tap{position:absolute;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.55);opacity:0;z-index:9}
+.chip{position:absolute;z-index:30;background:#fff;color:#0e2563;font:800 46px IT;padding:22px 34px;border-radius:24px;
+  box-shadow:0 20px 50px rgba(0,0,0,.45);display:flex;gap:16px;align-items:center}
+.chip b{display:inline-flex;width:56px;height:56px;border-radius:50%;background:#e0245e;color:#fff;align-items:center;justify-content:center;font:900 34px IT}
+#scan{position:absolute;z-index:20;opacity:0}
+#scan i{position:absolute;width:70px;height:70px;border:9px solid #fff}
+#laser{position:absolute;left:0;right:0;height:6px;background:#2f7bff;box-shadow:0 0 22px 6px #2f7bff}
+#check{position:absolute;z-index:21;left:440px;width:200px;height:200px;border-radius:50%;background:#1fbf5b;color:#fff;
+  font:900 120px/200px IT;text-align:center;opacity:0}
+</style></head><body><div id="stage">
+<div id="bg"></div><div id="grain"></div>
+<div id="scene">
+ <div id="plate"><div class="gloss"></div>
+   <div id="plogo"><img class="abs" src="assets/n_mag.png"><img class="abs" src="assets/n_blu.png"><img class="abs" src="assets/n_ora.png"><img class="abs txt" src="assets/text.png"></div>
+   <div id="nfc"><svg width="110" height="90" viewBox="0 0 110 90" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round">
+     <path d="M30 20 Q45 45 30 70"/><path d="M50 10 Q72 45 50 80"/><path d="M70 2 Q99 45 70 88"/><circle cx="14" cy="45" r="6" fill="#fff"/></svg>
+     Aproxime seu celular</div>
+   <div id="qrbox"><img src="assets/qr.png"></div>
+   <div id="plabel">ou aponte a câmera para o QR Code</div>
+ </div>
+  <div id="phone"><div id="screen"><div id="island"></div>
+   <div id="home"><div class="apps"></div></div>
+   <div id="notif"><div class="ic"><img src="assets/n_mag.png" style="position:absolute;left:-6px;top:4px;width:340px"><img src="assets/n_blu.png" style="position:absolute;left:-6px;top:4px;width:340px"><img src="assets/n_ora.png" style="position:absolute;left:-6px;top:4px;width:340px"></div>
+     <div class="tx">NGraph<small>Toque para abrir o menu</small></div></div>
+   <div id="menu">
+     <div class="av"><img src="assets/n_mag.png" style="position:absolute;left:18px;top:14px;width:460px"><img src="assets/n_blu.png" style="position:absolute;left:18px;top:14px;width:460px"><img src="assets/n_ora.png" style="position:absolute;left:18px;top:14px;width:460px"></div>
+     <h4>NGraph</h4><h5>Gráfica &amp; Comunicação Visual</h5>
+     <div class="btn" id="m0" style="top:340px"><span class="em">💬</span>WhatsApp</div>
+     <div class="btn" id="m1" style="top:440px"><span class="em">📸</span>Instagram</div>
+     <div class="btn" id="m2" style="top:540px"><span class="em">📒</span>Catálogo</div>
+     <div class="btn" id="m3" style="top:640px"><span class="em">📍</span>Como chegar</div>
+     <div class="btn" id="m4" style="top:740px"><span class="em">🧾</span>Pedir orçamento</div>
+     <div class="tap" id="tap"></div>
+   </div>
+ </div></div>
+ <div id="ripple"><i></i><i></i><i></i></div>
+ <div class="chip" id="c1" style="left:120px;top:700px"><b>✕</b>Sem baixar app</div>
+ <div class="chip" id="c2" style="left:300px;top:880px"><b>✕</b>Sem digitar nada</div>
+ <div id="scan"><i style="left:0;top:0;border-right:0;border-bottom:0"></i><i style="right:0;top:0;border-left:0;border-bottom:0"></i>
+   <i style="left:0;bottom:0;border-right:0;border-top:0"></i><i style="right:0;bottom:0;border-left:0;border-top:0"></i><div id="laser"></div></div>
+ <div id="check">✓</div>
+</div>
+<div id="end"></div>
+<div id="hook"></div><div id="cap" style="top:1440px"></div>
+</div>
+<script>
+document.querySelector('#home .apps').innerHTML='<b></b>'.repeat(20);
+const {p,eo,eio,eb,lerp,$}=E;
+E.buildEnd('Placa NFC • feita sob medida pra sua empresa');
+const HOOKS=[{t0:0,t1:14.6,lines:['Isso tá substituindo','o cartão de visita 😱']},{t0:14.6,t1:99,lines:['Chama no direct','e peça a sua 📲']}];
+const CAPS=[[0.3,1.2,'O SEU *CLIENTE*'],[1.2,2.0,'SÓ *APROXIMA*'],[2.0,2.7,'O CELULAR'],[2.7,3.8,'E *PRONTO!*'],
+ [4.4,5.7,'ABRE NA *HORA*'],[5.9,6.8,'SEU *WHATSAPP*'],[6.8,7.6,'*INSTAGRAM*'],[7.6,8.4,'*CATÁLOGO*'],[8.4,9.7,'E A *LOCALIZAÇÃO*'],
+ [10.0,11.1,'SEM BAIXAR *APP*'],[11.1,12.3,'SEM DIGITAR *NADA*'],[12.6,13.5,'NÃO TEM NFC?'],[13.5,14.6,'VAI PELO *QR CODE*']];
+window.DUR=18.5;
+window.render=function(t){
+ // câmera na mão: leve tremida
+ const sh=`translate(${Math.sin(t*1.7)*5+Math.sin(t*4.3)*2}px,${Math.cos(t*1.3)*6+Math.sin(t*3.7)*2}px) rotate(${Math.sin(t*0.9)*.4}deg)`;
+ $('scene').style.transform=sh;
+ // placa
+ const ke=eb(p(t,0,.6));
+ let pS=.85+.15*ke, pX=0,pY=(1-ke)*60, rX=18, rZ=-4, pBlur=0, pDim=0;
+ const kAway=eio(p(t,3.8,4.6)), kBack=eio(p(t,12.3,13.0)), kAway2=eio(p(t,14.2,14.6));
+ pS*=lerp(1,.8,kAway); pDim=kAway*.6; pBlur=kAway*6;
+ pS=lerp(pS,1.25,kBack); pY=lerp(pY,-20,kBack); rX=lerp(rX,6,kBack); rZ=lerp(rZ,0,kBack); pDim=lerp(pDim,0,kBack); pBlur=lerp(pBlur,0,kBack);
+ $('plate').style.transform=`translate(${pX}px,${pY}px) rotateX(${rX}deg) rotateZ(${rZ}deg) scale(${pS})`;
+ $('plate').style.filter=`blur(${pBlur}px) brightness(${1-pDim})`;
+ $('plate').style.opacity=p(t,0,.3);
+ // celular
+ const kIn=eo(p(t,.8,2.4)), kCenter=eio(p(t,3.8,4.6)), kOut=eio(p(t,12.0,12.6));
+ let x=lerp(520,40,kIn), y=lerp(-700,-60,kIn), r=lerp(25,-12,kIn), s=.95;
+ const bob=Math.sin(t*6)*4*p(t,2.4,2.6)*(1-p(t,3.6,3.8));
+ x=lerp(x,0,kCenter); y=lerp(y+bob,-30,kCenter); r=lerp(r,0,kCenter); s=lerp(s,1.04,kCenter);
+ x=lerp(x,0,kOut); y=lerp(y,1500,kOut); r=lerp(r,-8,kOut);
+ $('phone').style.transform=`translate(${x}px,${y}px) rotate(${r}deg) scale(${s})`;
+ // ondas NFC no contato
+ [...$('ripple').children].forEach((el,i)=>{const k=p(t,2.5+i*.25,3.5+i*.25);const d=60+k*420;
+  el.style.width=el.style.height=d+'px';el.style.left=el.style.top=(-d/2)+'px';el.style.opacity=(k>0&&k<1)?(1-k)*.9:0;});
+ // notificação
+ const kn=eb(p(t,2.8,3.2)); $('notif').style.transform=`translateY(${(1-kn)*-160}px)`; $('notif').style.opacity=p(t,2.8,2.9)*(1-p(t,4.4,4.6));
+ // menu
+ const km=eo(p(t,4.3,4.9)); $('menu').style.transform=`translateY(${(1-km)*100}%)`;
+ for(let i=0;i<5;i++){const k=eb(p(t,4.8+i*.12,5.25+i*.12));$('m'+i).style.transform=`translateX(${(1-k)*-420}px)`;}
+ // toques nos botões
+ const taps=[[6.0,0],[6.85,1],[7.65,2],[8.5,3]]; let tp=null;
+ taps.forEach(([t0,i])=>{if(t>=t0&&t<t0+.7)tp=[t0,i]});
+ for(let i=0;i<5;i++){$('m'+i).style.background='#fff';$('m'+i).style.color='#0e2563';}
+ if(tp){const [t0,i]=tp,k=p(t,t0,t0+.45);const b=$('m'+i);
+  b.style.background='#ffd34d';const tap=$('tap');tap.style.top=(340+i*100-4)+'px';tap.style.left=(250)+'px';
+  tap.style.opacity=(1-k)*.9;tap.style.transform=`scale(${.5+k*1.4})`;
+  b.style.transform+=` scale(${1-.05*Math.sin(Math.PI*p(t,t0,t0+.25))})`;
+ } else $('tap').style.opacity=0;
+ // chips "sem app / sem digitar"
+ [['c1',10.0],['c2',11.1]].forEach(([id,t0])=>{const k=eb(p(t,t0,t0+.4));const o=1-p(t,12.0,12.3);
+  $(id).style.opacity=p(t,t0,t0+.1)*o;$(id).style.transform=`scale(${.6+.4*k}) rotate(${(1-k)*-8}deg)`;});
+ // leitura do QR
+ const kq=p(t,12.9,13.2)*(1-p(t,14.3,14.5));
+ const qs=$('scan');const S=390;qs.style.left=(540-S/2)+'px';qs.style.top=(1195-S/2)+'px';qs.style.width=qs.style.height=S+'px';
+ qs.style.opacity=kq;qs.style.transform=`scale(${1.25-.25*eo(p(t,12.9,13.3))})`;
+ $('laser').style.top=(Math.abs(((t-12.9)*1.6)%2-1)*S)+'px';
+ const kc=eb(p(t,13.9,14.2));$('check').style.top=(1195-100)+'px';$('check').style.opacity=p(t,13.9,14)*(1-p(t,14.3,14.5));$('check').style.transform=`scale(${kc})`;
+ // vinheta
+ if(t>=14.6){E.renderEnd(t,14.6)} else $('end').style.opacity=0;
+ E.hook(t,HOOKS); E.caption(t,CAPS);
+};
+render(0);
+</script></body></html>
