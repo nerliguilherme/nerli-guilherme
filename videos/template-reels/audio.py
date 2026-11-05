@@ -39,6 +39,8 @@ for b in range(nb):
 # fade da trilha e "ducking" leve em eventos
 env=np.ones(N); env*=np.clip(t/1.0,0,1); env*=np.clip((dur-t)/1.5,0,1)
 mix*=env[:,None]
+import os
+mix*=float(os.environ.get('MUSIC_GAIN','1'))
 ev=json.load(open(evf))
 def whoosh(d=.6):
   x=tt(d); n=rng.standard_normal(len(x)); s=np.zeros(len(x))

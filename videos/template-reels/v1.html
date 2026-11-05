@@ -143,4 +143,15 @@ window.render=function(t){
  E.hook(t,HOOKS); E.caption(t,CAPS);
 };
 render(0);
+</script>
+<script>
+// Sincronia com a narração: tempo do áudio -> tempo da animação
+const MAP=[[0, 0], [3.36, 2.5], [4.32, 2.8], [4.96, 4.4], [6.27, 6.0], [7.07, 6.85], [7.52, 7.65], [8.84, 8.5], [9.84, 10.0], [11.28, 11.1], [12.4, 12.3], [14.12, 12.9], [15.36, 13.9], [16.0, 14.6], [22.5, 21.1]];
+const CAPS_V=[[0, 1.15, "OLHA SÓ *ISSO AQUI*"], [1.2, 1.95, "O SEU *CLIENTE*"], [2.0, 2.75, "SÓ *APROXIMA*"], [2.8, 4.18, "O CELULAR DA *PLACA*"], [4.2, 4.9, "E *PRONTO!*"], [4.96, 5.7, "ABRE NA *HORA*"], [5.76, 6.6, "SEU *WHATSAPP*"], [6.64, 7.42, "O *INSTAGRAM*"], [7.44, 8.2, "O *CATÁLOGO*"], [8.24, 9.7, "E ATÉ A *LOCALIZAÇÃO*"], [9.84, 11.24, "SEM BAIXAR *APLICATIVO*"], [11.28, 12.55, "SEM DIGITAR *NADA*"], [12.64, 14.05, "E QUEM NÃO TEM *NFC*?"], [14.12, 14.98, "APONTA A CÂMERA"], [15.04, 15.95, "PRO *QR CODE*"], [16.0, 17.0, "ESSA É A PLACA"], [17.04, 18.6, "*NFC* DA *NGRAPH*"], [18.64, 19.8, "QUER UMA NA *SUA EMPRESA*?"], [19.84, 21.6, "CHAMA A GENTE NO *DIRECT!*"]];
+const HOOKS_V=[{"t0": 0, "t1": 16.0, "lines": ["Isso tá substituindo", "o cartão de visita 😱"]}, {"t0": 16.0, "t1": 99, "lines": ["Chama no direct", "e peça a sua 📲"]}];
+function remap(t){for(let i=1;i<MAP.length;i++){const [a0,b0]=MAP[i-1],[a1,b1]=MAP[i];if(t<=a1)return b0+(b1-b0)*(t-a0)/(a1-a0);}return MAP[MAP.length-1][1];}
+window.DUR=22.5;
+const _render=window.render;
+window.render=function(ta){_render(remap(ta));E.hook(ta,HOOKS_V);E.caption(ta,CAPS_V);};
+render(0);
 </script></body></html>
