@@ -1,0 +1,216 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="fonts/fonts.css">
+<script src="words.js"></script>
+<style>
+html,body{margin:0;background:#FAFAFA}
+#stage{--ink:#18181B;--key:#1E3A8A;--mut:#71717A;position:relative;width:1080px;height:1920px;overflow:hidden;background:#FAFAFA;font-family:Inter,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;letter-spacing:-.025em}
+.abs{position:absolute;left:0;top:0}
+.w{display:inline-block;white-space:pre}
+.k{color:var(--key)}
+.cap{position:absolute;left:0;width:1080px;top:1296px;text-align:center;font-size:66px;font-weight:700;line-height:1}
+svg.ln{position:absolute;left:0;top:0;overflow:visible}
+svg.ln .s{fill:none;stroke:var(--ink);stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round}
+svg.ln .b{fill:none;stroke:var(--key);stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round}
+#frame{position:absolute;box-sizing:border-box;border:3.5px solid var(--ink);overflow:hidden}
+.tile{position:absolute;border-radius:26px;overflow:hidden;box-shadow:0 24px 50px -28px rgba(24,24,27,.45)}
+.tile img{width:100%;height:100%;object-fit:cover;display:block}
+.pill{position:absolute;border:3.5px solid var(--ink);border-radius:999px;font-size:52px;font-weight:700;padding:14px 34px;transform:translate(-50%,-50%)}
+.row{position:absolute;left:200px;font-size:64px;font-weight:600;display:flex;align-items:center;gap:30px;transform:translateY(-50%)}
+</style></head><body>
+<div id="stage">
+ <div id="bigQ" class="abs" style="width:1080px;top:690px;text-align:center;font-size:150px;font-weight:800;letter-spacing:-.04em"></div>
+ <svg class="ln" id="clock" width="1080" height="1920"><circle id="clkC" class="s" cx="540" cy="1050" r="90" pathLength="1"/>
+   <path id="clkH" class="s" d="M540 1050 L540 1000"/><path id="clkM" class="b" d="M540 1050 L540 982"/></svg>
+ <!-- moldura que se transforma: relógio -> fachada -> câmera -> foto 1 ... -> fachada -->
+ <div id="frame"><img id="frImg" src="img/foto_longe.jpg" style="position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;opacity:0"></div>
+ <svg class="ln" id="fac" width="1080" height="1920"><g id="facG">
+   <rect id="fBand" class="s" x="-250" y="-160" width="500" height="90" rx="10" pathLength="1"/>
+   <rect id="fWinL" class="s" x="-230" y="-20" width="140" height="130" rx="8" pathLength="1"/>
+   <rect id="fWinR" class="s" x="90" y="-20" width="140" height="130" rx="8" pathLength="1"/>
+   <rect id="fDoor" class="s" x="-55" y="30" width="110" height="160" rx="6" pathLength="1"/>
+   <g id="glow"><rect x="-250" y="-160" width="500" height="90" rx="10" fill="#FFE8B0"/><text x="0" y="-100" text-anchor="middle" font-size="50" font-weight="800" fill="#3B2A05" font-family="Inter" letter-spacing="2">SUA MARCA</text></g>
+ </g></svg>
+ <!-- trena -->
+ <svg class="ln" id="tape" width="1080" height="1920">
+   <path id="tH" class="b" d=""/><path id="tHt" class="b" d=""/><path id="tV" class="b" d=""/><path id="tVt" class="b" d=""/>
+   <g id="tCase"><rect class="s" x="-26" y="-26" width="52" height="52" rx="12"/><circle class="s" cx="0" cy="0" r="10"/></g></svg>
+ <div id="tHl" class="abs" style="font-size:64px;font-weight:700;color:var(--key);white-space:nowrap"></div>
+ <div id="tVl" class="abs" style="font-size:64px;font-weight:700;color:var(--key);white-space:nowrap;transform-origin:0 0"></div>
+ <!-- câmera -->
+ <svg class="ln" id="cam" width="1080" height="1920"><circle id="camL" class="s" cx="540" cy="810" r="62" pathLength="1"/><path id="camT" class="s" d="M480 695 L498 668 L582 668 L600 695" pathLength="1"/><circle id="camF" class="b" cx="645" cy="735" r="9" pathLength="1"/>
+   <g id="rays"></g></svg>
+ <div id="flash" class="abs" style="width:1080px;height:1920px;background:#fff;opacity:0"></div>
+ <div class="tile" id="ph2" style="left:390px;top:670px;width:300px;height:300px"><img src="img/foto_perto.jpg"></div>
+ <div class="tile" id="ph3" style="left:720px;top:670px;width:300px;height:300px"><img src="img/foto_dia.jpg"></div>
+ <!-- logo vetorial -->
+ <svg class="ln" id="logo" width="1080" height="1920">
+   <path id="lgFill" d="M540 600 C600 690 660 760 660 840 C660 915 605 970 540 970 C475 970 420 915 420 840 C420 760 480 690 540 600 Z" style="fill:var(--ink)" opacity="0"/>
+   <path id="lgCut" d="M540 760 C575 800 590 830 590 860 C590 890 568 912 540 912" fill="none" stroke="#FAFAFA" stroke-width="22" stroke-linecap="round" opacity="0"/>
+   <path id="lgPath" class="b" style="stroke-width:3" d="M540 600 C600 690 660 760 660 840 C660 915 605 970 540 970 C475 970 420 915 420 840 C420 760 480 690 540 600 Z" pathLength="1"/>
+   <g id="lgH"></g>
+ </svg>
+ <div class="pill" id="pPDF" style="left:430px;top:1110px">PDF</div>
+ <div class="pill" id="pCDR" style="left:650px;top:1110px">CDR</div>
+ <svg class="ln" id="pen" width="1080" height="1920"><path id="penP" class="b" pathLength="1" d="M760 690 l60 -60 l28 28 l-60 60 z M760 690 l-14 42 l42 -14"/></svg>
+ <!-- referências -->
+ <div class="tile" id="r0" style="left:150px;top:460px;width:380px;height:380px"><img src="img/ref_weyne.jpg"></div>
+ <div class="tile" id="r1" style="left:550px;top:460px;width:380px;height:380px"><img src="img/ref_mrv.jpg"></div>
+ <div class="tile" id="r2" style="left:150px;top:860px;width:380px;height:380px"><img src="img/ref_rei.jpg"></div>
+ <div class="tile" id="r3" style="left:550px;top:860px;width:380px;height:380px"><img src="img/ref_dpaleteiros.jpg"></div>
+ <svg class="ln" id="heart" width="1080" height="1920"><path id="hP" pathLength="1" d="M860 1196 C860 1196 812 1166 812 1136 C812 1120 824 1108 839 1108 C849 1108 856 1114 860 1121 C864 1114 871 1108 881 1108 C896 1108 908 1120 908 1136 C908 1166 860 1196 860 1196 Z" style="fill:#fff;stroke:#1E3A8A;stroke-width:4;stroke-linejoin:round"/></svg>
+ <!-- toggle e calendário -->
+ <div id="tog" class="abs" style="width:170px;height:92px;border-radius:46px;background:#D4D4D8"><div id="knob" class="abs" style="top:8px;width:76px;height:76px;border-radius:38px;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.25)">
+   <svg id="sunI" class="abs" width="76" height="76" viewBox="0 0 24 24" style="fill:none;stroke:#18181B;stroke-width:1.7;stroke-linecap:round"><circle cx="12" cy="12" r="3.6"/><path d="M12 4.5v1.8M12 17.7v1.8M4.5 12h1.8M17.7 12h1.8M6.7 6.7l1.3 1.3M16 16l1.3 1.3M6.7 17.3L8 16M16 8l1.3-1.3"/></svg>
+   <svg id="moonI" class="abs" width="76" height="76" viewBox="0 0 24 24" style="fill:none;stroke:#1E3A8A;stroke-width:1.7;stroke-linejoin:round"><path d="M17 14.2A6 6 0 0 1 9.8 7a6 6 0 1 0 7.2 7.2z"/></svg></div></div>
+ <svg class="ln" id="cal" width="1080" height="1920"><g transform="translate(610 1040)">
+   <rect id="cR" class="s" x="0" y="10" width="170" height="150" rx="18" pathLength="1"/><path id="cH" class="s" d="M0 50 H170" pathLength="1"/><path id="cK" class="s" d="M45 0 V24 M125 0 V24" pathLength="1"/>
+   <g id="cD" style="fill:var(--ink)"></g><circle id="cC" class="b" cx="125" cy="128" r="20" pathLength="1"/></g></svg>
+ <!-- CTA -->
+ <div id="list"></div>
+ <img id="ngLogo" src="img/ngraph.svg" class="abs" style="width:680px;left:200px;top:664px">
+ <div id="at" class="abs" style="width:1080px;top:924px;text-align:center;font-size:64px;font-weight:600">@ngraph.pe</div>
+ <div id="btn" class="abs" style="left:190px;top:1040px;width:700px;height:136px;border-radius:68px;background:#18181B;color:#fff;display:flex;align-items:center;justify-content:center;gap:22px;font-size:46px;font-weight:600;transform-origin:50% 50%">
+   <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"><path d="M4.5 19.5l1.1-3.6A8 8 0 1 1 8.4 18.5z"/><path d="M9.2 8.6c.3-.5.7-.5 1-.1l.7 1.4c.1.3 0 .6-.2.8l-.4.4c.5 1.1 1.4 2 2.5 2.5l.4-.4c.2-.2.5-.3.8-.2l1.4.7c.4.3.4.7-.1 1-.9.7-2.2.7-3.6-.2a8.4 8.4 0 0 1-2.7-2.7c-.9-1.4-.9-2.6-.2-3.6z" fill="#fff" stroke="none"/></svg>Chama no WhatsApp</div>
+ <div id="caps"></div>
+ <div id="ctr" class="abs" style="left:880px;top:280px;width:120px;text-align:right;font-size:40px;font-weight:600;color:var(--mut);letter-spacing:0"></div>
+</div>
+<script>
+const T=40, SP=1.06, OFF=.15;               // narração acelerada 6% e deslocada 0,15 s
+const $=id=>document.getElementById(id);
+const cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)), lerp=(a,b,x)=>a+(b-a)*x;
+function bez(x1,y1,x2,y2){ return x=>{ x=cl(x); if(x<=0||x>=1)return x; let a=0,b=1,u=x; for(let i=0;i<28;i++){u=(a+b)/2; const X=3*(1-u)*(1-u)*u*x1+3*(1-u)*u*u*x2+u*u*u; if(X<x)a=u; else b=u;}
+  return 3*(1-u)*(1-u)*u*y1+3*(1-u)*u*u*y2+u*u*u; }; }
+const EZ=bez(.65,0,.35,1), seg=(t,a,b)=>EZ((t-a)/(b-a)), eo=x=>{x=cl(x);return 1-Math.pow(1-x,3)};
+function tw(t,init,K){ let v={...init}; for(const [a,b,to] of K){ if(t<=a)break; const e=seg(t,a,b); const nv={...v}; for(const k in to) nv[k]=lerp(v[k],to[k],e); v=nv; } return v; }
+// tempos da narração (Scribe) no tempo do vídeo
+const W=WORDS.map(([s,a,b])=>({s,a:OFF+a/SP,b:OFF+b/SP}));
+const norm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'');
+let cur=0; const at=(word)=>{ for(let i=cur;i<W.length;i++) if(norm(W[i].s)===norm(word)){cur=i+1;return W[i].a;} throw 'palavra não achada: '+word; };
+const EV=[]; function dash(el,p){ el.style.strokeDasharray='1 1'; el.style.strokeDashoffset=(1-cl(p)).toFixed(4); el.style.opacity=p>0?1:0; }
+// ---------- legendas: uma linha por vez, cada palavra entra quando é falada ----------
+// [palavras exibidas], com a âncora na narração (mesma palavra, ou outra indicada após "|")
+const CAPS=[
+ ['Orçamento','mais','<k>rápido</k>'],
+ ['<k>Medidas</k>'],['Largura','×|e','<k>altura</k>'],['Uma','<k>trena</k>','resolve'],
+ ['<k>Fotos</k>','da','frente'],['De','longe,','de','perto,','de','<k>dia</k>'],
+ ['Sua','<k>logo</k>'],['Vetor:|vetor','<k>PDF</k>','ou','CDR'],['Não','tem?','A','gente','<k>cria</k>'],
+ ['<k>Referências</k>'],['Prints','que','você','<k>curtiu</k>'],['Mostra','o','seu','<k>estilo</k>'],
+ ['Vai','acender','à','<k>noite?</k>'],['Pra','<k>quando</k>?|quando'],['Muda','o','<k>projeto</k>'],
+ ['Manda','no','<k>WhatsApp</k>'],['Sua','marca','merece','ser','<k>vista.</k>']];
+const CW=[]; let chtml='';
+CAPS.forEach((ln,li)=>{ chtml+=`<div class="cap" id="cap${li}">`; ln.forEach((w,wi)=>{ const [disp,anc]=w.split('|'); const txt=disp.replace(/<\/?k>/g,'');
+  const t=at(anc||txt); const id=`c${li}_${wi}`; chtml+=`<span class="w" id="${id}">${disp.replace('<k>','<span class="k">').replace('</k>','</span>')}${wi<ln.length-1?' ':''}</span>`;
+  CW.push({id,li,a:t}); if(disp.includes('<k>'))EV.push(['tick',t]); }); chtml+='</div>'; });
+$('caps').innerHTML=chtml;
+const LS=CAPS.map((_,li)=>Math.min(...CW.filter(c=>c.li==li).map(c=>c.a)));
+const LE=LS.map((s,i)=>i<LS.length-1?LS[i+1]-.3:99);
+// marcos (usam a mesma busca sequencial, então chamamos na ordem)
+cur=0;
+const M={fachada:at('fachada?'),rapido:at('rápido.'),primeiro:at('Primeiro:'),largura:at('Largura'),altura:at('altura'),trena:at('trena'),
+ segundo:at('Segundo:'),loja:at('loja.'),longe:at('longe,'),perto:at('perto,'),dia:at('dia.'),terceiro:at('Terceiro:'),vetor:at('vetor,'),pdf:at('PDF'),cdr:at('CDR.'),cria:at('cria'),
+ quarto:at('Quarto:'),manda1:at('Manda'),curtiu:at('curtiu.'),quinto:at('Quinto:'),acender:at('acender'),quando:at('quando'),precisa:at('precisa?'),projeto:at('projeto,'),
+ com:at('Com'),whats:at('WhatsApp.'),ngrafi:at('Ngráfi:'),vista:at('vista.')};
+// ---------- gancho ----------
+$('bigQ').innerHTML='FACHADA?'.split('').map((c,i)=>`<span class="w" id="q${i}">${c}</span>`).join('');
+EV.push(['swoosh',M.fachada-.1]);
+// ---------- moldura ----------
+const FAC={x:540,y:800,w:560,h:380,r:14};
+const F0={x:540,y:1050,w:180,h:180,r:90,o:0,img:0};
+const FK=[[M.rapido-.15,M.rapido-.14,{o:1}],[M.rapido,M.primeiro+.35,FAC],
+ [M.segundo-.1,M.segundo+.5,{x:540,y:800,w:300,h:210,r:40}],
+ [M.longe-.35,M.longe+.15,{x:210,y:820,w:300,h:300,r:26,img:1}],
+ [M.terceiro-.15,M.terceiro+.25,{o:0}],
+ [M.quinto-.3,M.quinto-.29,{x:740,y:1050,w:380,h:380,r:26,o:1,img:0}],[M.quinto-.25,M.quinto+.45,{x:540,y:760,w:560,h:380,r:14}],
+ [M.com-.35,M.com+.05,{o:0}]];
+// ---------- logo vetorial: âncoras e alças estilo Illustrator ----------
+const ANC=[[540,600,[[480,690],[600,690]]],[660,840,[[660,760],[660,915]]],[540,970,[[605,970],[475,970]]],[420,840,[[420,915],[420,760]]]];
+$('lgH').innerHTML=ANC.map(([x,y,hs],i)=>hs.map(([hx,hy],j)=>`<line id="hl${i}${j}" x1="${x}" y1="${y}" x2="${hx}" y2="${hy}" stroke="#1E3A8A" stroke-width="2"/><circle id="hc${i}${j}" cx="${hx}" cy="${hy}" r="7" fill="#FAFAFA" stroke="#1E3A8A" stroke-width="2.5"/>`).join('')+
+  `<rect id="ha${i}" x="${x-9}" y="${y-9}" width="18" height="18" fill="#FAFAFA" stroke="#1E3A8A" stroke-width="3"/>`).join('');
+// ---------- câmera: raios do flash ----------
+$('rays').innerHTML=[...Array(8)].map((_,i)=>{const a=i*Math.PI/4;return `<path id="ry${i}" class="b" d="M${645+Math.cos(a)*22} ${735+Math.sin(a)*22} L${645+Math.cos(a)*44} ${735+Math.sin(a)*44}"/>`}).join('');
+// ---------- calendário ----------
+$('cD').innerHTML=[...Array(12)].map((_,i)=>{const c=i%4,r=Math.floor(i/4);return `<circle cx="${32+c*36}" cy="${78+r*30}" r="4.5"/>`}).join('');
+// ---------- lista final ----------
+const ITEMS=['Medidas','Fotos','Logo','Referências','Luz e prazo'];
+$('list').innerHTML=ITEMS.map((s,i)=>`<div class="row" id="li${i}" style="top:${560+i*120}px"><svg width="64" height="64" viewBox="0 0 64 64"><circle cx="32" cy="32" r="29" fill="none" stroke="#D4D4D8" stroke-width="3.5"/>
+  <circle id="lcf${i}" cx="32" cy="32" r="30" fill="#1E3A8A" opacity="0"/><path id="lck${i}" d="M19 33 L28 42 L46 23" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" pathLength="1"/></svg>${s}</div>`).join('');
+const CK=ITEMS.map((_,i)=>M.com+.35+i*.3); CK.forEach(x=>EV.push(['check',x]));
+[[M.rapido,'swoosh'],[M.segundo,'swoosh'],[M.loja,'flash'],[M.longe,'pop'],[M.perto,'pop'],[M.dia,'pop'],[M.terceiro,'swoosh'],[M.vetor,'draw'],[M.pdf,'pop'],[M.cdr,'pop'],
+ [M.quarto,'swoosh'],[M.curtiu,'pop'],[M.quinto,'swoosh'],[M.acender,'toggle'],[M.quando,'draw'],[M.com,'swoosh'],[M.ngrafi,'chime']].forEach(([t,k])=>EV.push([k,t]));
+const ctr=[[M.primeiro,'1/5'],[M.segundo,'2/5'],[M.terceiro,'3/5'],[M.quarto,'4/5'],[M.quinto,'5/5']];
+function fadeEl(el,o,dy=20,pre='',sc=true){ el.style.opacity=o.toFixed(3); el.style.visibility=o>0.001?'visible':'hidden'; el.style.transform=`${pre} translateY(${((1-o)*dy).toFixed(2)}px)${sc?` scale(${(.96+.04*o).toFixed(4)})`:''}`; }
+const win=(t,a,b,din=.45,dout=.35)=>seg(t,a,a+din)*(1-seg(t,b,b+dout));
+const hexmix=(a,b,x)=>{const p=s=>[1,3,5].map(i=>parseInt(s.slice(i,i+2),16)); const A=p(a),B=p(b); return '#'+A.map((v,i)=>Math.round(lerp(v,B[i],x)).toString(16).padStart(2,'0')).join('');};
+function seek(t){
+  const S=$('stage');
+  // noite: o fundo escurece suavemente no item 5 e volta antes do CTA
+  const nt=seg(t,M.acender+.05,M.acender+.75)*(1-seg(t,M.projeto-.2,M.projeto+.4));
+  S.style.background=hexmix('#FAFAFA','#1C2230',nt); S.style.setProperty('--ink',hexmix('#18181B','#F4F4F5',nt));
+  S.style.setProperty('--key',hexmix('#1E3A8A','#9DB7FF',nt)); S.style.setProperty('--mut',hexmix('#71717A','#A1A1AA',nt));
+  // legendas
+  for(const c of CW){ const li=c.li; const i=seg(t,c.a,c.a+.42), o=seg(t,LE[li],LE[li]+.26); const e=$(c.id); e.style.opacity=(i*(1-o)).toFixed(3); e.style.transform=`translateY(${((1-i)*20-o*14).toFixed(2)}px)`; }
+  // contador
+  const ci=ctr.filter(([a])=>t>=a).length; const ce=$('ctr'); ce.textContent=ci?ctr[ci-1][1]:''; ce.style.opacity=(seg(t,M.primeiro,M.primeiro+.4)*(1-seg(t,M.com+1.6,M.com+2.0))).toFixed(3);
+  // gancho
+  [...'FACHADA?'].forEach((c,i)=>{const a=M.fachada-.25+i*.05; fadeEl($('q'+i),win(t,a,M.rapido-.35+i*.02,.4,.3),24,'',false);});
+  const ck=win(t,.05,M.rapido-.15,.5,.05); dash($('clkC'),seg(t,.05,.6)); $('clkC').style.opacity=t<M.rapido-.15?1:0;
+  const u=cl((t-.2)/(M.rapido-.2)), ang=2160*(1-Math.pow(1-u,3));
+  $('clkM').setAttribute('transform',`rotate(${ang} 540 1050)`); $('clkH').setAttribute('transform',`rotate(${ang/12} 540 1050)`);
+  ['clkH','clkM'].forEach(id=>$(id).style.opacity=(seg(t,.3,.7)*(1-seg(t,M.rapido-.4,M.rapido-.15))).toFixed(3));
+  // moldura
+  const f=tw(t,F0,FK); const fr=$('frame'); Object.assign(fr.style,{left:(f.x-f.w/2)+'px',top:(f.y-f.h/2)+'px',width:f.w+'px',height:f.h+'px',borderRadius:f.r+'px',opacity:f.o,visibility:f.o>0?'visible':'hidden'});
+  $('frImg').style.opacity=f.img.toFixed(3); fr.style.borderColor=f.img>.5?'transparent':'';
+  // desenho da fachada acompanha a moldura (escala pela largura)
+  const fs=f.w/560; $('facG').setAttribute('transform',`translate(${f.x} ${f.y}) scale(${fs.toFixed(4)} ${(f.h/380).toFixed(4)})`);
+  const fa1=seg(t,M.primeiro+.2,M.primeiro+1.0)*(1-seg(t,M.segundo-.3,M.segundo)), fa2=seg(t,M.quinto+.3,M.quinto+1.0)*(1-seg(t,M.com-.4,M.com-.1));
+  const fa=Math.max(fa1,fa2); ['fBand','fWinL','fWinR','fDoor'].forEach((id,i)=>{const e=$(id); dash(e,Math.max(seg(t,M.primeiro+.2+i*.12,M.primeiro+.9+i*.12)*(t<M.segundo?1:0),seg(t,M.quinto+.3+i*.1,M.quinto+.9+i*.1)*(t>M.quinto?1:0)));
+    e.style.opacity=(t<M.segundo?1-seg(t,M.segundo-.3,M.segundo):t>M.quinto?1-seg(t,M.com-.4,M.com-.1):0).toFixed(3); e.style.strokeWidth=(3.5/fs).toFixed(2);});
+  const gl=$('glow'); const gv=seg(t,M.acender+.3,M.acender+1.0)*(1-seg(t,M.projeto-.1,M.projeto+.4));
+  gl.style.opacity=gv.toFixed(3); gl.style.filter=`drop-shadow(0 0 ${(26*gv).toFixed(1)}px rgba(255,214,130,.85))`;
+  // trena: estica na horizontal e na vertical, com números contando
+  const hx=seg(t,M.largura-.05,M.largura+.85), vy=seg(t,M.altura-.05,M.altura+.8), to=1-seg(t,M.segundo-.35,M.segundo);
+  const x0=260,x1=820,yb=1050, H=hx*(x1-x0);
+  $('tH').setAttribute('d',`M${x0} ${yb} L${x0+H} ${yb}`); $('tHt').setAttribute('d',`M${x0} ${yb-14} V${yb+14}`+(hx>.98?` M${x1} ${yb-14} V${yb+14}`:''));
+  $('tV').setAttribute('d',`M880 990 L880 ${990-vy*380}`); $('tVt').setAttribute('d',`M866 990 H894`+(vy>.98?` M866 610 H894`:''));
+  ['tH','tHt'].forEach(id=>$(id).style.opacity=(hx>0?1:0)*to); ['tV','tVt'].forEach(id=>$(id).style.opacity=(vy>0?1:0)*to);
+  const tc=$('tCase'); tc.setAttribute('transform',`translate(${x0+H+(hx<.98?26:0)} ${yb})`); tc.style.opacity=(seg(t,M.largura-.3,M.largura)*(1-seg(t,M.altura+.9,M.altura+1.2))*to).toFixed(3);
+  const hl=$('tHl'); hl.textContent=(4.2*hx).toFixed(2).replace('.',',')+' m'; hl.style.left=(540-hl.offsetWidth/2)+'px'; hl.style.top='1080px'; hl.style.opacity=(hx>0?seg(t,M.largura,M.largura+.3):0)*to;
+  const vl=$('tVl'); vl.textContent=(1.5*vy).toFixed(2).replace('.',',')+' m'; vl.style.left='975px'; vl.style.top=(800+vl.offsetWidth/2)+'px'; vl.style.transform='rotate(-90deg)'; vl.style.opacity=(vy>0?seg(t,M.altura,M.altura+.3):0)*to;
+  // câmera + flash
+  const cv=t>M.segundo&&t<M.longe; dash($('camL'),seg(t,M.segundo+.45,M.segundo+.95)); dash($('camT'),seg(t,M.segundo+.55,M.segundo+1.0)); dash($('camF'),seg(t,M.segundo+.8,M.segundo+1.05));
+  const co=1-seg(t,M.longe-.45,M.longe-.2); ['camL','camT','camF'].forEach(id=>{ if(t>M.segundo) $(id).style.opacity=(cv?co:0).toFixed(3); else $(id).style.opacity=0; });
+  const fl=cl((t-M.loja)/.35); $('flash').style.opacity=(fl>0&&fl<1?.85*Math.pow(1-fl,2):0).toFixed(3);
+  [...Array(8)].forEach((_,i)=>{const e=$('ry'+i),r=cl((t-M.loja+.05)/.4); e.style.opacity=(r>0&&r<1?Math.sin(Math.PI*r):0).toFixed(3);});
+  // fotos 2 e 3
+  [['ph2',M.perto],['ph3',M.dia]].forEach(([id,a])=>fadeEl($(id),win(t,a-.2,M.terceiro-.15,.45,.35),30));
+  // logo vetorial
+  const lv=win(t,M.terceiro+.2,M.quarto-.3,.3,.3); $('logo').style.opacity=lv; $('pen').style.opacity=lv;
+  dash($('lgPath'),seg(t,M.terceiro+.25,M.terceiro+1.2)); const sol=seg(t,M.vetor+.1,M.vetor+.7);
+  $('lgFill').setAttribute('opacity',sol.toFixed(3)); $('lgCut').setAttribute('opacity',sol.toFixed(3)); $('lgPath').style.opacity=t>M.terceiro?(1-sol*.9):0;
+  ANC.forEach(([x,y,hs],i)=>{const a=seg(t,M.terceiro+.5+i*.15,M.terceiro+.8+i*.15)*(1-sol); $('ha'+i).setAttribute('opacity',a.toFixed(3));
+    hs.forEach((h,j)=>{const b=seg(t,M.terceiro+.7+i*.15,M.terceiro+1.0+i*.15)*(1-sol); $('hl'+i+j).setAttribute('opacity',b.toFixed(3)); $('hc'+i+j).setAttribute('opacity',b.toFixed(3));});});
+  fadeEl($('pPDF'),win(t,M.pdf-.1,M.quarto-.3,.4,.3),20,'translate(-50%,-50%)'); fadeEl($('pCDR'),win(t,M.cdr-.1,M.quarto-.3,.4,.3),20,'translate(-50%,-50%)');
+  dash($('penP'),seg(t,M.cria-.1,M.cria+.45));
+  // referências (mood board) + coração
+  [0,1,2,3].forEach(i=>{const e=$('r'+i); const o=win(t,M.manda1-.6+i*.18,i==3?M.quinto-.3:M.quinto-.35,.45,i==3?.5:.35); fadeEl(e,o,40);});
+  const hp=$('hP'); dash(hp,seg(t,M.curtiu-.15,M.curtiu+.3)); const hf=seg(t,M.curtiu+.25,M.curtiu+.5);
+  hp.style.fill=hf>0?`rgba(30,58,138,${hf.toFixed(3)})`:'#fff'; hp.style.opacity=(t>M.curtiu-.15?1-seg(t,M.quinto-.4,M.quinto-.2):0).toFixed(3);
+  const hs=1+.18*Math.sin(Math.PI*cl((t-M.curtiu-.25)/.35)); hp.setAttribute('transform',`translate(860 1150) scale(${hs.toFixed(3)}) translate(-860 -1150)`);
+  // toggle sol -> lua e calendário
+  const tg=$('tog'); const tv=win(t,M.quinto+.6,M.com-.4,.4,.3); tg.style.left='300px'; tg.style.top='1074px'; fadeEl(tg,tv,20);
+  const kx=seg(t,M.acender-.05,M.acender+.35); $('knob').style.left=(8+kx*78)+'px'; tg.style.background=hexmix('#D4D4D8','#1E3A8A',kx);
+  $('sunI').style.opacity=(1-kx).toFixed(3); $('moonI').style.opacity=kx.toFixed(3);
+  const cv2=win(t,M.quinto+.75,M.com-.4,.4,.3); $('cal').style.opacity=cv2.toFixed(3);
+  dash($('cR'),seg(t,M.quinto+.8,M.quinto+1.4)); dash($('cH'),seg(t,M.quinto+1.1,M.quinto+1.5)); dash($('cK'),seg(t,M.quinto+1.2,M.quinto+1.6));
+  $('cD').setAttribute('opacity',seg(t,M.quinto+1.3,M.quinto+1.7).toFixed(3)); dash($('cC'),seg(t,M.quando,M.quando+.5));
+  // CTA: lista com checks -> logo + @ + botão com pulso
+  ITEMS.forEach((s,i)=>{ fadeEl($('li'+i),win(t,M.com-.05+i*.08,M.whats-.25,.4,.35),20,'translateY(-50%)');
+    const c=seg(t,CK[i],CK[i]+.25); $('lcf'+i).setAttribute('opacity',c.toFixed(3)); dash($('lck'+i),seg(t,CK[i]+.08,CK[i]+.35)); });
+  fadeEl($('ngLogo'),seg(t,M.whats+.15,M.whats+.65),20); fadeEl($('at'),seg(t,M.whats+.45,M.whats+.9),20);
+  const bo=seg(t,M.whats+.7,M.whats+1.15), ph=t>M.ngrafi+.8?((t-M.ngrafi-.8)/1.1)%1:0, pu=t>M.ngrafi+.8?(1-Math.cos(2*Math.PI*ph))/2:0;
+  const bt=$('btn'); bt.style.opacity=bo; bt.style.transform=`translateY(${(1-bo)*20}px) scale(${((.96+.04*bo)*(1+.03*pu)).toFixed(4)})`;
+}
+window.seek=seek; window.T=T; window.EV=EV; window.M=M;
+window.ready=Promise.all([document.fonts.ready,...[...document.images].map(i=>i.decode().catch(()=>0))]).then(()=>{seek(0);return true});
+</script></body></html>
