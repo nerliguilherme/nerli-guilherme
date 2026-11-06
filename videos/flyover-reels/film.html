@@ -1,0 +1,134 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="fonts/fonts.css">
+<script src="layers.js"></script>
+<style>
+html,body{margin:0;background:#EEF2F6}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#EEF2F6;font-family:Geist,sans-serif;font-weight:500;
+  -webkit-font-smoothing:antialiased;perspective:1500px;perspective-origin:540px 560px}
+#plane{position:absolute;left:0;top:0;width:1440px;height:7442px;transform-origin:0 0;transform-style:preserve-3d}
+.slice{position:absolute;left:0;width:1440px;background-repeat:no-repeat;background-size:1440px 3721px}
+.pc{position:absolute;transform-origin:50% 50%}
+.pc img{display:block;width:100%;height:100%}
+.sh{position:absolute;border-radius:18px;background:#1a2133}
+.blob{position:absolute;border-radius:50%}
+.ov{position:absolute;left:0;width:1080px;pointer-events:none}
+.w{display:inline-block;white-space:pre}
+</style></head><body>
+<div id="stage">
+ <div class="blob" id="blobO" style="left:-420px;top:1180px;width:900px;height:900px;background:radial-gradient(closest-side,rgba(255,138,0,.55),rgba(255,138,0,0))"></div>
+ <div class="blob" id="blobP" style="left:760px;top:760px;width:760px;height:760px;background:radial-gradient(closest-side,rgba(219,0,116,.45),rgba(219,0,116,0))"></div>
+ <div id="plane"></div>
+ <div class="ov" style="top:0;height:560px;background:linear-gradient(#EEF2F6 0%,#EEF2F6 30%,rgba(238,242,246,0) 100%)" id="fadeTop"></div>
+ <div class="ov" style="top:1640px;height:280px;background:linear-gradient(rgba(238,242,246,0),#EEF2F6)" id="fadeBot"></div>
+ <div class="ov" style="top:1138px;height:782px;background:linear-gradient(rgba(238,242,246,0) 0px,#EEF2F6 130px)" id="fadeEnd"></div>
+ <div class="ov" id="title" style="top:300px;height:240px;text-align:center;color:#0B1220">
+   <div id="l1" style="font-size:66px;letter-spacing:-.03em;line-height:1"></div>
+   <div id="l2" style="font-family:'Instrument Serif';font-style:italic;font-size:86px;line-height:1.05;margin-top:14px;color:#1D4ED8"></div>
+ </div>
+ <div class="ov" id="cta" style="top:1236px;height:260px">
+   <div id="btn" style="position:absolute;left:210px;top:0;width:660px;height:128px;transform-origin:50% 50%">
+     <div id="ring" style="position:absolute;inset:0;border-radius:64px;box-shadow:0 0 0 3px #1D4ED8;opacity:0"></div>
+     <div style="position:absolute;inset:0;border-radius:64px;background:#0B1220;display:flex;align-items:center;justify-content:center;gap:22px;color:#fff;font-size:42px;box-shadow:0 18px 40px -16px rgba(11,18,32,.45)">
+       <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"><path d="M4.5 19.5l1.1-3.6A8 8 0 1 1 8.4 18.5z"/><path d="M9.2 8.6c.3-.5.7-.5 1-.1l.7 1.4c.1.3 0 .6-.2.8l-.4.4c.5 1.1 1.4 2 2.5 2.5l.4-.4c.2-.2.5-.3.8-.2l1.4.7c.4.3.4.7-.1 1-.9.7-2.2.7-3.6-.2a8.4 8.4 0 0 1-2.7-2.7c-.9-1.4-.9-2.6-.2-3.6z" fill="#fff" stroke="none"/></svg>
+       Peça seu orçamento</div>
+   </div>
+   <div id="at" style="position:absolute;left:0;width:1080px;top:166px;text-align:center;font-size:38px;color:#475569;letter-spacing:-.01em">@ngraph.pe</div>
+ </div>
+</div>
+<script>
+const T=15, AY=1180, D=LAYERS;
+const $=id=>document.getElementById(id);
+const cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)), lerp=(a,b,x)=>a+(b-a)*x;
+const sm=x=>{x=cl(x);return x*x*(3-2*x)}, eo=x=>{x=cl(x);return 1-Math.pow(1-x,3)};
+// cubic-bezier(.65,0,.35,1) pedido
+function bez(x1,y1,x2,y2){ return x=>{ x=cl(x); let a=0,b=1,u=x; for(let i=0;i<30;i++){u=(a+b)/2; const X=3*(1-u)*(1-u)*u*x1+3*(1-u)*u*u*x2+u*u*u; if(X<x)a=u; else b=u;}
+  return 3*(1-u)*(1-u)*u*y1+3*(1-u)*u*u*y2+u*u*u; }; }
+const EZ=bez(.65,0,.35,1);
+// PCHIP (velocidade contínua, sem paradas)
+function pchip(K){ const n=K.length,h=[],dl=[],m=new Array(n);
+  for(let i=0;i<n-1;i++){h[i]=K[i+1][0]-K[i][0]; dl[i]=(K[i+1][1]-K[i][1])/h[i];}
+  m[0]=dl[0]; m[n-1]=dl[n-2];
+  for(let i=1;i<n-1;i++){ if(dl[i-1]*dl[i]<=0)m[i]=0; else {const w1=2*h[i]+h[i-1],w2=h[i]+2*h[i-1]; m[i]=(w1+w2)/(w1/dl[i-1]+w2/dl[i]);} }
+  return t=>{ if(t<=K[0][0])return K[0][1]+m[0]*(t-K[0][0]); if(t>=K[n-1][0])return K[n-1][1]+m[n-1]*(t-K[n-1][0]);
+    let i=0; while(K[i+1][0]<t)i++; const u=(t-K[i][0])/h[i],u2=u*u,u3=u2*u;
+    return (2*u3-3*u2+1)*K[i][1]+(u3-2*u2+u)*h[i]*m[i]+(-2*u3+3*u2)*K[i+1][1]+(u3-u2)*h[i]*m[i+1]; }; }
+// voo: posição da página sob o ponto de mira (AY) ao longo do tempo
+const FY=pchip([[0,330],[1.5,880],[2.75,1450],[4.0,2200],[5.0,2780],[6.0,3360],[7.0,3960],[8.0,4740],[8.75,5800],[9.5,6640],[10.2,6860]]);
+const FX=pchip([[0,615],[1.5,705],[3,720],[15,720]]);
+const FS=pchip([[0,.95],[1.5,.9],[4,.84],[8,.84],[9.5,.86],[11,.86]]);
+const TH0=50;
+const S_END=.75, FY_END=(AY-560)/S_END;
+// transição: zoom-pan suave (van Wijk) do voo até o hero de frente
+function wijk(u0,w0,u1,w1,rho=.85){ const du=Math.abs(u1-u0),sg=Math.sign(u1-u0)||1;
+  const b=(i)=>{const wi=i?w1:w0; return (w1*w1-w0*w0+(i?-1:1)*rho**4*du*du)/(2*wi*rho*rho*du);};
+  const r0=Math.log(-b(0)+Math.sqrt(b(0)**2+1)), r1=Math.log(-b(1)+Math.sqrt(b(1)**2+1)), S=(r1-r0)/rho;
+  return {S, at:e=>{ const s=e*S; const u=w0/(rho*rho)*Math.cosh(r0)*Math.tanh(rho*s+r0)-w0/(rho*rho)*Math.sinh(r0);
+    return [u0+sg*u, w0*Math.cosh(r0)/Math.cosh(rho*s+r0)]; }}; }
+const T0=9.5,T1=11.0;
+const W=wijk(FY(T0),1080/FS(T0),FY_END,1080/S_END);
+function cam(t){
+  if(t<T0) return {fy:FY(t),fx:FX(t),s:FS(t),th:TH0,E:0};
+  const E=EZ((t-T0)/(T1-T0));
+  if(t<T1){ const [u,w]=W.at(E); const bl=sm((t-T0)/.45);
+    return {fy:lerp(FY(t),u,bl), fx:lerp(FX(t),720,E), s:Math.exp(lerp(Math.log(FS(t)),Math.log(1080/w),bl)), th:TH0*(1-E), E}; }
+  const c=sm((t-T1)/4); return {fy:FY_END, fx:720, s:S_END*(1+.024*c), th:0, E:1};   // avanço lento: a câmera nunca para
+}
+// ---------- monta a página: fatias + peças ----------
+const P=$('plane'); let html='';
+for(let y=0;y<7442;y+=620){ const h=Math.min(620,7442-y), k=y<3721?0:1, off=y-(k?3721:0);
+  html+=`<div class="slice" data-y="${y}" style="top:${y}px;height:${h}px;background-image:url(img/page_${k}.png);background-position:0 ${-off}px"></div>`;
+  if(k==0&&y+h>3721){ /* fatia que cruza a emenda */ html+=`<div class="slice" style="top:3721px;height:${y+h-3721}px;background-image:url(img/page_1.png);background-position:0 0"></div>`; } }
+const PAD=D.pad, PIECES=D.layers.map(l=>({...l,cy:l.y+l.h/2}));
+for(const p of PIECES){
+  html+=`<div class="sh" id="sh_${p.id}" style="left:${p.x}px;top:${p.y}px;width:${p.w}px;height:${p.h}px"></div>`;
+  if(p.id=='hero_img'){
+    html+=`<div class="pc" id="pc_${p.id}" style="left:${p.x}px;top:${p.y}px;width:${p.w}px;height:${p.h}px;border-radius:18px;overflow:hidden;background:#222">
+      <img src="img/hero_day.jpg" style="position:absolute;left:0;top:0"><img id="heroNight" src="img/hero_night.jpg" style="position:absolute;left:0;top:0;clip-path:inset(0 100% 0 0)">
+      <div id="wipeLine" style="position:absolute;top:0;width:3px;height:100%;background:#fff;opacity:0"></div></div>`;
+  } else html+=`<div class="pc" id="pc_${p.id}" style="left:${p.x-PAD}px;top:${p.y-PAD}px;width:${p.w+2*PAD}px;height:${p.h+2*PAD}px"><img src="img/pieces/${p.id}.png"></div>`;
+}
+P.innerHTML=html;
+// fatia da emenda: corrige a primeira fatia que passa de 3721
+document.querySelectorAll('.slice').forEach(s=>{const y=+s.dataset.y; if(y<3721&&y+620>3721){s.style.height=(3721-y)+'px';}});
+// elevação: peças perto da mira sobem; tudo assenta na transição
+const ZMAX={hero_img:46,hero_chip:28,hero_btn0:30,hero_btn1:30,testimonial:70,cta0:40,cta1:40,loc_btn:30};
+function lift(p,c){ if(['sobre0','serv0','work0','work12'].includes(p.id))return 0;
+  const zm=ZMAX[p.id]??(p.kind=='work'?52:p.kind=='info'?26:40);
+  const d=(p.cy-c.fy)/900; const pr=Math.exp(-d*d*1.6);
+  return zm*pr*(1-c.E); }
+// legenda final palavra a palavra
+const L1='Sua marca merece ser vista.'.split(' '), L2='de dia e de noite.'.split(' ');
+$('l1').innerHTML=L1.map((w,i)=>`<span class="w" id="a${i}">${w}${i<L1.length-1?' ':''}</span>`).join('');
+$('l2').innerHTML=L2.map((w,i)=>`<span class="w" id="b${i}">${w}${i<L2.length-1?' ':''}</span>`).join('');
+const WT=[...L1.map((w,i)=>['a'+i,10.25+i*.09]),...L2.map((w,i)=>['b'+i,10.62+i*.09])];
+function seek(t){
+  const c=cam(t);
+  P.style.transform=`translate3d(${(540-c.fx).toFixed(3)}px,${(AY-c.fy).toFixed(3)}px,0) translate(${c.fx.toFixed(3)}px,${c.fy.toFixed(3)}px) rotateX(${c.th.toFixed(4)}deg) scale3d(${c.s.toFixed(5)},${c.s.toFixed(5)},${c.s.toFixed(5)}) translate(${(-c.fx).toFixed(3)}px,${(-c.fy).toFixed(3)}px)`;
+  // fatias fora do alcance ficam ocultas (evita polígonos atrás da câmera)
+  const lo=c.fy-2600/Math.max(c.s,.2)-400, hi=c.fy+(c.E>0?99999:1700);
+  document.querySelectorAll('.slice').forEach(s=>{const y=parseFloat(s.style.top),h=parseFloat(s.style.height); s.style.visibility=(y+h>lo&&y<hi)?'visible':'hidden';});
+  for(const p of PIECES){ const z=lift(p,c), e=$('pc_'+p.id), sh=$('sh_'+p.id); const vis=(p.y+p.h>lo&&p.y<hi);
+    e.style.visibility=sh.style.visibility=vis?'visible':'hidden'; if(!vis)continue;
+    e.style.transform=`translateZ(${z.toFixed(2)}px)`;
+    sh.style.opacity=(z<.5?0:Math.min(.26,.06+.004*z)).toFixed(3); sh.style.filter=`blur(${(6+.45*z).toFixed(1)}px)`;
+    sh.style.transform=`translate(${(.08*z).toFixed(1)}px,${(4+.34*z).toFixed(1)}px)`; }
+  // bordas: leve fade em cima/baixo; no fim, a página abaixo do hero some
+  const fe=sm((t-10.55)/.6); $('fadeEnd').style.opacity=fe; $('fadeBot').style.opacity=1-fe;
+  $('fadeTop').style.opacity=1;
+  ['blobO','blobP'].forEach((id,i)=>{$(id).style.opacity=(.55*sm((t-10.8-i*.15)/.7)).toFixed(3);});
+  // título
+  for(const [id,a] of WT){ const o=eo((t-a)/.5),e=$(id); e.style.opacity=o.toFixed(3); e.style.transform=`translateY(${((1-o)*26).toFixed(2)}px)`; }
+  // wipe dia -> noite na foto do hero
+  const wp=sm((t-11.7)/.85); $('heroNight').style.clipPath=`inset(0 ${((1-wp)*100).toFixed(3)}% 0 0)`;
+  const wl=$('wipeLine'); wl.style.left=(wp*584-1.5)+'px'; wl.style.opacity=(wp>0&&wp<1)?.95:0;
+  // CTA com pulso leve
+  const co=eo((t-13.5)/.45); const ct=$('cta'); ct.style.opacity=co; ct.style.transform=`translateY(${(1-co)*30}px)`;
+  const ph=t>14.0?((t-14.0)/1.1)%1:0, pu=t>14.0?(1-Math.cos(2*Math.PI*ph))/2:0;
+  $('btn').style.transform=`scale(${(1+.03*pu).toFixed(4)})`;
+  $('ring').style.opacity=t>14.0?(.5*(1-ph)).toFixed(3):0; $('ring').style.transform=`scale(${1+.06*eo(ph)},${1+.28*eo(ph)})`;
+}
+window.seek=seek; window.T=T;
+window.ready=Promise.all([document.fonts.ready,...[...document.images].map(i=>i.decode().catch(()=>0)),
+  ...['img/page_0.png','img/page_1.png'].map(s=>new Promise(r=>{const i=new Image();i.onload=r;i.onerror=r;i.src=s;}))]).then(()=>{seek(0);return true});
+</script></body></html>
