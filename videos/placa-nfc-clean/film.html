@@ -1,0 +1,190 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="fonts/fonts.css">
+<script src="qr.js"></script>
+<style>
+html,body{margin:0;background:#FAFAFA}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#FAFAFA;font-family:Inter,sans-serif;color:#18181B;-webkit-font-smoothing:antialiased;letter-spacing:-.025em}
+.ph{position:absolute;left:0;width:1080px;text-align:center;font-weight:700;line-height:1}
+.w{display:inline-block;white-space:pre}
+.k{color:#1E3A8A}
+.abs{position:absolute;left:0;top:0}
+svg.ln{position:absolute;left:0;top:0;overflow:visible}
+svg.ln *{fill:none;stroke:#18181B;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round}
+#frame{position:absolute;box-sizing:border-box;border:3.5px solid #18181B;overflow:hidden;background:#fff}
+.scr{position:absolute;left:0;top:0;width:300px;height:620px;transform-origin:0 0}
+.scr *{box-sizing:border-box}
+.qm{position:absolute;background:#18181B;border-radius:2px}
+</style></head><body>
+<div id="stage">
+ <div id="shadow" class="abs" style="width:380px;height:46px;border-radius:50%;background:rgba(24,24,27,.28);filter:blur(16px)"></div>
+ <div id="plateWrap" class="abs" style="perspective:1400px;width:1080px;height:1920px">
+   <img id="plate" src="img/placa.png" class="abs" style="transform-origin:50% 50%">
+ </div>
+ <!-- moldura que se transforma: círculo NFC -> celular -> pílula -> placa -> câmera -> QR -->
+ <div id="frame">
+   <div class="scr" id="scrChat">
+     <div style="position:absolute;left:0;top:0;width:300px;height:620px;background:#fff"></div>
+     <div style="position:absolute;left:118px;top:14px;width:64px;height:18px;border-radius:9px;background:#18181B"></div>
+     <div style="position:absolute;left:0;top:44px;width:300px;height:66px;background:#F4F4F5;border-bottom:1px solid #E4E4E7"></div>
+     <svg class="ln" style="left:14px;top:66px" width="22" height="22" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" style="stroke-width:2"/></svg>
+     <div style="position:absolute;left:42px;top:56px;width:42px;height:42px;border-radius:21px;background:#fff;border:1px solid #E4E4E7;display:flex;align-items:center;justify-content:center"><img src="img/ngraph_sym.svg" style="height:26px"></div>
+     <div style="position:absolute;left:94px;top:58px;font-size:19px;font-weight:600;letter-spacing:-.01em">Ngraph</div>
+     <div style="position:absolute;left:94px;top:82px;font-size:13px;color:#71717A;letter-spacing:0">WhatsApp · online</div>
+     <div id="b1" style="position:absolute;left:16px;top:140px;max-width:220px;padding:11px 14px;border-radius:16px 16px 16px 4px;background:#F4F4F5;font-size:16px;line-height:1.3;letter-spacing:-.005em">Olá! Como podemos ajudar?</div>
+     <div id="b2" style="position:absolute;right:16px;top:212px;max-width:220px;padding:11px 14px;border-radius:16px 16px 4px 16px;background:#18181B;color:#fff;font-size:16px;line-height:1.3;letter-spacing:-.005em">Quero um orçamento</div>
+     <div style="position:absolute;left:14px;top:548px;width:220px;height:46px;border-radius:23px;border:1.5px solid #D4D4D8;font-size:15px;color:#A1A1AA;padding:13px 16px;letter-spacing:0">Mensagem</div>
+     <div style="position:absolute;left:242px;top:548px;width:46px;height:46px;border-radius:23px;background:#18181B"></div>
+     <svg class="ln" style="left:253px;top:559px" width="24" height="24" viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6" style="stroke:#fff;stroke-width:2"/></svg>
+   </div>
+   <div class="scr" id="scrLinks">
+     <div style="position:absolute;left:0;top:0;width:300px;height:620px;background:#fff"></div>
+     <div style="position:absolute;left:118px;top:14px;width:64px;height:18px;border-radius:9px;background:#18181B"></div>
+     <div style="position:absolute;left:110px;top:62px;width:80px;height:80px;border-radius:40px;border:1.5px solid #E4E4E7;display:flex;align-items:center;justify-content:center"><img src="img/ngraph_sym.svg" style="height:46px"></div>
+     <div style="position:absolute;left:0;width:300px;top:154px;text-align:center;font-size:22px;font-weight:700">Ngraph</div>
+     <div style="position:absolute;left:0;width:300px;top:184px;text-align:center;font-size:14px;color:#71717A;letter-spacing:0">@ngraph.pe</div>
+     <div id="lbtns"></div>
+   </div>
+   <div id="pill" class="abs" style="width:860px;height:190px">
+     <div id="pillA" style="position:absolute;left:0;width:860px;top:62px;text-align:center;font-size:66px;font-weight:600">Promo de outubro</div>
+     <div id="pillB" style="position:absolute;left:0;width:860px;top:62px;text-align:center;font-size:66px;font-weight:600">Promo de novembro</div>
+     <svg class="ln" width="860" height="190"><path id="strike" d="M150 97 L710 97" pathLength="1" style="stroke:#1E3A8A;stroke-width:6"/></svg>
+   </div>
+ </div>
+ <!-- ícones de traço -->
+ <svg class="ln" id="nfcIco" width="1080" height="1920"><circle id="nfcC" cx="760" cy="1000" r="90" pathLength="1"/>
+   <path id="nfcA1" d="M738 972a40 40 0 0 1 0 56" pathLength="1"/><path id="nfcA2" d="M758 952a68 68 0 0 1 0 96" pathLength="1"/><path id="nfcA3" d="M778 934a94 94 0 0 1 0 132" pathLength="1"/></svg>
+ <svg class="ln" id="waves" width="1080" height="1920"></svg>
+ <svg class="ln" id="camIco" width="1080" height="1920">
+   <circle id="camL" cx="540" cy="1018" r="72" pathLength="1"/><path id="camT" d="M478 885 L496 858 L584 858 L602 885" pathLength="1"/><circle id="camF" cx="650" cy="925" r="7" pathLength="1"/></svg>
+ <svg class="ln" id="qrB" width="1080" height="1920"></svg>
+ <div id="qr" class="abs"></div>
+ <img id="logo" src="img/ngraph.svg" class="abs" style="width:680px">
+ <svg class="ln" id="typeLine" width="1080" height="1920"><path id="uline" d="M300 1010 L780 1010" pathLength="1" style="stroke:#D4D4D8;stroke-width:3"/></svg>
+ <div id="typed" class="abs" style="font-size:72px;font-weight:500;color:#52525B;letter-spacing:-.02em;white-space:pre"></div>
+ <div id="caret" class="abs" style="width:5px;height:80px;border-radius:3px;background:#1E3A8A"></div>
+ <div id="phr"></div>
+ <svg class="ln" id="arrow" width="90" height="60" viewBox="0 0 90 60"><path d="M6 30 H78 M58 10 L80 30 L58 50" style="stroke:#1E3A8A;stroke-width:6"/></svg>
+</div>
+<script>
+const T=22,CX=540;
+const $=id=>document.getElementById(id);
+const cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)), lerp=(a,b,x)=>a+(b-a)*x;
+function bez(x1,y1,x2,y2){ return x=>{ x=cl(x); if(x<=0||x>=1)return x; let a=0,b=1,u=x; for(let i=0;i<28;i++){u=(a+b)/2; const X=3*(1-u)*(1-u)*u*x1+3*(1-u)*u*u*x2+u*u*u; if(X<x)a=u; else b=u;}
+  return 3*(1-u)*(1-u)*u*y1+3*(1-u)*u*u*y2+u*u*u; }; }
+const EZ=bez(.65,0,.35,1);           // easing pedido, em tudo
+const seg=(t,a,b)=>EZ((t-a)/(b-a));
+// tween por segmentos: [[t0,t1,{...alvo}],...] a partir de um estado inicial
+function tw(t,init,K){ let v={...init}; for(const [a,b,to] of K){ if(t<=a)break; const e=seg(t,a,b); const nv={...v}; for(const k in to) nv[k]=lerp(v[k],to[k],e); v=nv; } return v; }
+const EV=[]; // eventos de som (lidos pelo script de áudio)
+// ---------- frases: palavra por palavra (fade + 20px, 80ms) ----------
+const PH=[
+ {lines:['Seu cliente ainda','digita o seu <k>@</k>?'],y:[600,700],a:.15,b:2.75},
+ {lines:['Tem um jeito','mais <k>fácil.</k>'],y:[480,580],a:3.0,b:4.85},
+ {lines:['Um <k>toque</k>','e pronto.'],y:[380,480],a:5.05,b:8.7},
+ {lines:['Tudo num','<k>lugar</k> só.'],y:[360,460],a:9.05,b:12.6},
+ {lines:['Mudou a','<k>promoção?</k>'],y:[420,520],a:12.95,b:14.7},
+ {lines:['A placa continua','a <k>mesma.</k>'],y:[420,520],a:14.85,b:15.95},
+ {lines:['Funciona em','<k>qualquer</k> celular.'],y:[420,520],a:16.05,b:18.8},
+ {lines:['@ngraph.pe'],y:[1090],a:20.05,b:99,size:64,weight:600},
+ {lines:['<k>Manda NFC no direct</k>'],y:[1225],a:20.45,b:99,size:68,weight:700,id:'cta'}];
+let html=''; const WORDS=[];
+PH.forEach((p,pi)=>{ let wi=0; p.lines.forEach((ln,li)=>{ html+=`<div class="ph" style="top:${p.y[li]-(p.size||84)/2}px;font-size:${p.size||84}px;font-weight:${p.weight||700}" ${p.id?`id="${p.id}"`:''}>`;
+   const ws=ln.split(' '); ws.forEach((w,k)=>{ const id=`w${pi}_${wi}`; const inner=w.replace(/<k>/g,'<span class="k">').replace(/<\/k>/g,'</span>');
+     html+=`<span class="w" id="${id}">${inner}${k<ws.length-1?' ':''}</span>`; WORDS.push({id,a:p.a+wi*.08,b:p.b+wi*.035}); EV.push(['tick',p.a+wi*.08]); wi++; });
+   html+='</div>'; }); });
+// palavras-chave que atravessam a tag <k> em várias palavras (CTA)
+$('phr').innerHTML=html.replace(/<span class="k">Manda/,'<span class="k">Manda');
+document.querySelectorAll('#cta .w').forEach(e=>e.classList.add('k'));
+// ---------- digitação do @ com erro ----------
+const TYPED='@ngrafh'; const TK=[...TYPED].map((c,i)=>1.0+i*.11); const DEL=[...TYPED].map((c,i)=>2.05+i*.065);
+TK.forEach(x=>EV.push(['key',x])); DEL.forEach(x=>EV.push(['key2',x]));
+// ---------- botões do link ----------
+const BTN=[['Instagram','<rect x="4" y="4" width="16" height="16" rx="4.5"/><circle cx="12" cy="12" r="3.6"/><circle cx="16.6" cy="7.4" r=".4"/>'],
+ ['Catálogo','<path d="M4 5.5c2.8-1 5.4-.9 8 .8 2.6-1.7 5.2-1.8 8-.8V19c-2.8-1-5.4-.9-8 .8-2.6-1.7-5.2-1.8-8-.8z"/><path d="M12 6.3v13.5"/>'],
+ ['Avaliar no Google','<path d="M12 4l2.4 5 5.4.6-4 3.7 1.1 5.4L12 16l-4.9 2.7 1.1-5.4-4-3.7 5.4-.6z"/>'],
+ ['Pix','<path d="M12 3.5l8.5 8.5-8.5 8.5L3.5 12z"/><path d="M8.6 9.2l3.4 3.4 3.4-3.4"/>']];
+const BT=[9.65,10.05,10.45,10.85]; BT.forEach(x=>EV.push(['pop',x]));
+$('lbtns').innerHTML=BTN.map((b,i)=>`<div id="lb${i}" style="position:absolute;left:28px;top:${226+i*70}px;width:244px;height:56px;border-radius:28px;background:#F4F4F5;display:flex;align-items:center;gap:12px;padding-left:20px;font-size:17px;font-weight:500;letter-spacing:-.01em">
+  <svg width="24" height="24" viewBox="0 0 24 24" style="overflow:visible"><g fill="none" stroke="#18181B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${b[1].replace(/<(rect|circle|path)/g,'<$1 pathLength="1" class="bi'+i+'"')}</g></svg>${b[0]}</div>`).join('');
+// ---------- ondas NFC ----------
+$('waves').innerHTML=[0,1,2].map(i=>`<path id="wv${i}" d="" style="stroke:#1E3A8A"/>`).join('');
+const WC=[470,985];
+// ---------- QR ----------
+const N=QR.length, QS=520/N, Q0=[540-260,1040-260];
+const hash=(i)=>{let x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x)};
+const MODS=[]; QR.forEach((r,y)=>r.forEach((v,x)=>{ if(v) MODS.push({x,y,h:hash(y*N+x)}); }));
+const order=MODS.map((m,i)=>i).sort((a,b)=>(MODS[a].h*.65+MODS[a].y/N*.35)-(MODS[b].h*.65+MODS[b].y/N*.35));
+order.forEach((mi,r)=>MODS[mi].ta=17.4+r/MODS.length*1.05);
+$('qr').innerHTML=MODS.map((m,i)=>`<div class="qm" id="q${i}" style="left:${Q0[0]+m.x*QS}px;top:${Q0[1]+m.y*QS}px;width:${QS+.6}px;height:${QS+.6}px"></div>`).join('');
+for(let k=0;k<12;k++) EV.push(['qtick',17.4+k*.088]);
+$('qrB').innerHTML=[[-1,-1],[1,-1],[1,1],[-1,1]].map(([sx,sy],i)=>{const x=540+sx*300,y=1040+sy*300;return `<path id="qb${i}" pathLength="1" d="M${x} ${y-sy*90} L${x} ${y} L${x-sx*90} ${y}"/>`}).join('');
+// ---------- estados da moldura ----------
+const FR0={x:760,y:1000,w:180,h:180,r:90,o:0,bo:1};
+const FK=[[6.2,6.21,{o:1}],[6.2,6.8,{x:780,y:1060,w:300,h:620,r:48}],[6.85,7.3,{x:600,y:1010}],[8.2,9.0,{x:540,y:1040,w:420,h:868,r:67}],
+ [12.8,13.4,{y:980,w:860,h:190,r:95}],[14.9,15.5,{y:1080,w:406,h:720,r:24}],[15.3,15.6,{bo:0}],[16.0,16.5,{y:1010,w:340,h:250,r:48,bo:1}],
+ [16.95,17.4,{y:1040,w:600,h:600,r:30}],[17.0,17.4,{bo:0,o:0}]];
+const PL0={x:540,y:1120,h:720,ry:42,rz:-5,o:0};
+const PK=[[3.55,4.45,{y:1080,ry:0,rz:0,o:1}],[5.0,5.6,{x:320,y:1100,h:560}],[8.2,8.8,{x:200,o:0}],[15.05,15.06,{x:540,y:1080,h:720}],[15.3,15.6,{o:1}],[16.0,16.25,{o:0}]];
+[[4.0,'swoosh'],[5.5,'draw'],[6.2,'swoosh'],[7.3,'beep'],[8.2,'swoosh'],[12.8,'swoosh'],[13.75,'strike'],[14.3,'pop'],[14.9,'swoosh'],[16.0,'swoosh'],[16.4,'draw'],[18.95,'swoosh'],[19.5,'chime']].forEach(e=>EV.push([e[1],e[0]]));
+function dash(el,p){ el.style.strokeDasharray='1 1'; el.style.strokeDashoffset=(1-cl(p)).toFixed(4); el.style.opacity=p>0?1:0; }
+function seek(t){
+  // frases
+  for(const w of WORDS){ const i=seg(t,w.a,w.a+.5), o=seg(t,w.b,w.b+.35), e=$(w.id);
+    e.style.opacity=(i*(1-o)).toFixed(3); e.style.transform=`translateY(${((1-i)*20-o*20).toFixed(2)}px)`; }
+  // digitação
+  const n=TK.filter(x=>t>=x).length-DEL.filter(x=>t>=x).length; const tx=$('typed'); tx.textContent=TYPED.slice(0,Math.max(0,n));
+  const tw_=tx.offsetWidth, x0=540-200; const ty=seg(t,.85,1.1)*(1-seg(t,2.65,2.95));
+  tx.style.left=x0+'px'; tx.style.top=(970-44)+'px'; tx.style.opacity=ty;
+  dash($('uline'),seg(t,.8,1.2)); $('uline').style.opacity=1-seg(t,2.65,2.95);
+  const blink=(t>=1.0&&t<1.8)||(t>=2.0&&t<2.6)?1:(Math.floor(t*2.2)%2==0?1:0);
+  const cr=$('caret'); cr.style.left=(x0+tw_+6)+'px'; cr.style.top=(970-40)+'px'; cr.style.opacity=(t>.9&&t<2.85?blink:0)*ty;
+  // placa (com leve vida em 3D) e sombra de contato
+  const pl=tw(t,PL0,PK); const sway=t>4.45&&t<8.2?Math.sin((t-4.45)*1.3)*3.2*seg(t,4.45,5.2):0;
+  const pw=pl.h*928/1647; const P=$('plate'); Object.assign(P.style,{width:pw+'px',height:pl.h+'px',left:(pl.x-pw/2)+'px',top:(pl.y-pl.h/2)+'px',opacity:pl.o,
+    transform:`rotateY(${(pl.ry+sway).toFixed(3)}deg) rotateZ(${pl.rz.toFixed(3)}deg)`,filter:'drop-shadow(0 18px 24px rgba(24,24,27,.14))'});
+  const sh=$('shadow'); Object.assign(sh.style,{left:(pl.x-pw*.46)+'px',top:(pl.y+pl.h/2-12)+'px',width:(pw*.92)+'px',opacity:(pl.o*.55).toFixed(3)});
+  // ícone NFC
+  dash($('nfcC'),seg(t,5.5,5.95)*(t<6.2?1:0)); [1,2,3].forEach(i=>{const e=$('nfcA'+i); dash(e,seg(t,5.62+i*.08,6.0+i*.08)); e.style.opacity=t>5.62?1-seg(t,6.15,6.4):0;});
+  // moldura
+  const f=tw(t,FR0,FK); const F=$('frame'); Object.assign(F.style,{left:(f.x-f.w/2)+'px',top:(f.y-f.h/2)+'px',width:f.w+'px',height:f.h+'px',borderRadius:f.r+'px',
+    opacity:f.o,visibility:f.o>0?'visible':'hidden',borderColor:`rgba(24,24,27,${f.bo.toFixed(3)})`,background:t>14.9?`rgba(255,255,255,${(1-seg(t,15.3,15.6)+seg(t,16.0,16.3)).toFixed(3)})`:'#fff',
+    boxShadow:t>6.7&&t<12.9?'0 30px 60px -30px rgba(24,24,27,.35)':'none'});
+  const sc=(f.w-7)/300; ['scrChat','scrLinks'].forEach(id=>$(id).style.transform=`scale(${sc.toFixed(4)})`);
+  const chat=seg(t,7.45,7.85)*(1-seg(t,9.0,9.35)), links=seg(t,9.2,9.55)*(1-seg(t,12.7,12.95));
+  $('scrChat').style.opacity=chat; $('scrLinks').style.opacity=links;
+  $('scrChat').style.visibility=chat>0?'visible':'hidden'; $('scrLinks').style.visibility=links>0?'visible':'hidden';
+  $('b1').style.opacity=seg(t,7.6,7.95); $('b1').style.transform=`translateY(${(1-seg(t,7.6,7.95))*14}px)`;
+  $('b2').style.opacity=seg(t,7.95,8.3); $('b2').style.transform=`translateY(${(1-seg(t,7.95,8.3))*14}px)`;
+  BT.forEach((a,i)=>{const e=$('lb'+i),o=seg(t,a,a+.4); e.style.opacity=o; e.style.transform=`translateY(${((1-o)*20).toFixed(2)}px)`;
+    document.querySelectorAll('.bi'+i).forEach(p=>dash(p,seg(t,a+.1,a+.55)));});
+  // pílula da promoção
+  const pv=seg(t,13.3,13.6)*(1-seg(t,14.85,15.05)); const pill=$('pill'); pill.style.opacity=pv; pill.style.visibility=pv>0?'visible':'hidden';
+  pill.style.left=(f.w/2-430-3.5)+'px'; pill.style.top=(f.h/2-95-3.5)+'px';
+  const sw=seg(t,14.25,14.55); $('pillA').style.opacity=1-sw; $('pillB').style.opacity=sw;
+  $('pillB').style.transform=`translateY(${(1-sw)*20}px)`; $('pillA').style.transform=`translateY(${-sw*20}px)`;
+  const s=$('strike'); dash(s,seg(t,13.75,14.15)); s.style.opacity=t>13.75?1-seg(t,14.25,14.45):0;
+  // ondas do toque
+  [0,1,2].forEach(i=>{const u=cl((t-7.3-i*.16)/.75); const r=36+190*EZ(u); const e=$('wv'+i);
+    const a=Math.PI/3.2; e.setAttribute('d',`M${WC[0]+r*Math.cos(-a)} ${WC[1]+r*Math.sin(-a)} A${r} ${r} 0 0 1 ${WC[0]+r*Math.cos(a)} ${WC[1]+r*Math.sin(a)}`);
+    e.style.opacity=(u>0&&u<1)?(Math.sin(Math.PI*u)).toFixed(3):0;});
+  // câmera
+  dash($('camL'),seg(t,16.4,16.85)); dash($('camT'),seg(t,16.5,16.9)); dash($('camF'),seg(t,16.7,16.9));
+  const co=1-seg(t,17.0,17.35); ['camL','camT','camF'].forEach(id=>{ if(t>17)$(id).style.opacity=co; });
+  $('camL').setAttribute('r',(72*(1-.6*seg(t,16.95,17.35))).toFixed(2));
+  // QR: moldura de cantos + quadradinhos, depois convergem para o centro
+  [0,1,2,3].forEach(i=>{const e=$('qb'+i); dash(e,seg(t,17.05+i*.05,17.45+i*.05)); if(t>18.9)e.style.opacity=1-seg(t,18.9,19.2);});
+  MODS.forEach((m,i)=>{ const e=$('q'+i); const a=seg(t,m.ta,m.ta+.14); const g=seg(t,18.95+m.h*.25,19.55+m.h*.25);
+    const bx=Q0[0]+m.x*QS, by=Q0[1]+m.y*QS; const X=lerp(bx,540-QS/2,g), Y=lerp(by,880-QS/2,g);
+    e.style.transform=`translate(${(X-bx).toFixed(2)}px,${(Y-by).toFixed(2)}px) scale(${(a*(1-.7*g)).toFixed(4)})`; e.style.opacity=(a>0?1-seg(t,19.35+m.h*.25,19.7+m.h*.25):0).toFixed(3);});
+  // logo
+  const lo=seg(t,19.4,20.0); const L=$('logo'); L.style.left=(540-340)+'px'; L.style.top=(880-96)+'px'; L.style.opacity=lo;
+  L.style.transform=`translateY(${((1-lo)*20).toFixed(2)}px) scale(${(.92+.08*lo).toFixed(4)})`;
+  // seta do CTA
+  const ar=$('arrow'), cta=$('cta'); const cw=[...cta.querySelectorAll('.w')].reduce((s,e)=>s+e.offsetWidth,0);
+  const ao=seg(t,20.9,21.25), ad=t>21.1?12*(1-Math.cos(2*Math.PI*(t-21.1)/.9))/2:0;
+  ar.style.left=(540+cw/2-cw/2)+'px'; ar.style.top=(1225+50)+'px'; ar.style.left=(540-45+ad)+'px'; ar.style.opacity=ao; ar.style.transform=`translateX(${((1-ao)*-20).toFixed(2)}px)`;
+}
+window.seek=seek; window.T=T; window.EV=EV;
+window.ready=Promise.all([document.fonts.ready,...[...document.images].map(i=>i.decode().catch(()=>0))]).then(()=>{seek(0);return true});
+</script></body></html>
