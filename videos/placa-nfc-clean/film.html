@@ -19,8 +19,9 @@ svg.ln *{fill:none;stroke:#18181B;stroke-width:3.5;stroke-linecap:round;stroke-l
 <div id="stage">
  <div id="shadow" class="abs" style="width:380px;height:46px;border-radius:50%;background:rgba(24,24,27,.28);filter:blur(16px)"></div>
  <div id="plateWrap" class="abs" style="perspective:1400px;width:1080px;height:1920px">
-   <img id="plate" src="img/placa.png" class="abs" style="transform-origin:50% 50%">
+   <img id="plate" src="img/placa_google.png" class="abs" style="transform-origin:50% 50%">
  </div>
+ <svg class="ln" id="waves" width="1080" height="1920"></svg>
  <!-- moldura que se transforma: círculo NFC -> celular -> pílula -> placa -> câmera -> QR -->
  <div id="frame">
    <div class="scr" id="scrChat">
@@ -54,7 +55,6 @@ svg.ln *{fill:none;stroke:#18181B;stroke-width:3.5;stroke-linecap:round;stroke-l
  <!-- ícones de traço -->
  <svg class="ln" id="nfcIco" width="1080" height="1920"><circle id="nfcC" cx="760" cy="1000" r="90" pathLength="1"/>
    <path id="nfcA1" d="M738 972a40 40 0 0 1 0 56" pathLength="1"/><path id="nfcA2" d="M758 952a68 68 0 0 1 0 96" pathLength="1"/><path id="nfcA3" d="M778 934a94 94 0 0 1 0 132" pathLength="1"/></svg>
- <svg class="ln" id="waves" width="1080" height="1920"></svg>
  <svg class="ln" id="camIco" width="1080" height="1920">
    <circle id="camL" cx="540" cy="1018" r="72" pathLength="1"/><path id="camT" d="M478 885 L496 858 L584 858 L602 885" pathLength="1"/><circle id="camF" cx="650" cy="925" r="7" pathLength="1"/></svg>
  <svg class="ln" id="qrB" width="1080" height="1920"></svg>

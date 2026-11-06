@@ -33,12 +33,12 @@ def beep(): return mix(.6*tone(1568,.13,.003,.05),.25*tone(3136,.08,.002,.02))
 G={'tick':(lambda:tick(1.25),.16),'key':(lambda:tick(.9),.32),'key2':(lambda:tick(.75),.24),'pop':(pop,.42),'swoosh':(lambda:swoosh(.3),.3),
    'draw':(lambda:swoosh(.45,1500,7000),.22),'beep':(beep,.7),'strike':(lambda:swoosh(.35,2500,9000),.35),'chime':(success,.5),'qtick':(lambda:tick(1.4),.12)}
 EV=[]
-for k,t in json.load(open('audio/ev.json')):
+for k,t in json.load(open(__import__('os').environ.get('EVF','audio/ev.json'))):
     f,g=G[k]; EV.append((t,f(),g))
 out=np.zeros(int(T*SR)); log=[]
 for t,x,g in EV:
     pk=int(np.argmax(np.abs(x))); s=int(round(t*SR))-pk; x=x/np.max(np.abs(x))*g*.5
     a=max(s,0); b=min(s+len(x),len(out)); out[a:b]+=x[a-s:b-s]; log.append((t,round(pk/SR*1000,1)))
-w=wave.open('audio/sfx.wav','wb');w.setnchannels(1);w.setsampwidth(2);w.setframerate(SR)
+w=wave.open(__import__('os').environ.get('SFXO','audio/sfx.wav'),'wb');w.setnchannels(1);w.setsampwidth(2);w.setframerate(SR)
 w.writeframes((np.clip(out,-1,1)*32767).astype(np.int16).tobytes());w.close()
 print('eventos',len(EV),'picos(ms) ex.',log[:6])
