@@ -1,0 +1,297 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+html,body{margin:0;background:#E9E6DF}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#E9E6DF;font-family:Geist,sans-serif;font-weight:500;
+  -webkit-font-smoothing:antialiased;font-feature-settings:"tnum" 1;letter-spacing:-.01em;color:#0B0B0C}
+#shape{position:absolute;overflow:hidden;box-shadow:0 1px 2px rgba(30,25,15,.06),0 24px 56px -22px rgba(30,25,15,.32)}
+.g{position:absolute;left:0;top:0;width:0;height:0}
+.c{position:absolute;transform:translate(-50%,-50%);white-space:nowrap}
+.l{position:absolute;transform:translate(0,-50%);white-space:nowrap}
+.r{position:absolute;transform:translate(-100%,-50%);white-space:nowrap}
+.ico{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.cap{position:absolute;left:540px;top:325px;font-size:58px;font-weight:650;letter-spacing:-.025em;color:#0B0B0C;transform:translate(-50%,-50%);white-space:nowrap}
+img,canvas{display:block}
+#touch{position:absolute;left:0;top:0;width:0;height:0}
+#tDot{position:absolute;left:-42px;top:-42px;width:84px;height:84px;border-radius:42px;background:rgba(15,15,18,.24);
+  box-shadow:inset 0 0 0 3px rgba(255,255,255,.92),0 0 0 1.5px rgba(0,0,0,.10),0 6px 16px rgba(0,0,0,.16)}
+.rip{position:absolute;left:0;top:0;border-radius:50%;box-shadow:inset 0 0 0 3px rgba(255,255,255,.85),0 0 0 2px rgba(0,0,0,.14)}
+</style></head><body>
+<div id="stage">
+ <div id="shape">
+  <!-- gancho: fachada à noite acendendo -->
+  <div class="g" id="g_hook"><div class="c" style="left:0;top:0;width:1080px;height:1920px;overflow:hidden">
+    <canvas id="cvHook" width="1080" height="1920" style="position:absolute;left:0;top:0;transform-origin:540px 430px"></canvas>
+    <div style="position:absolute;left:0;top:0;width:1080px;height:1920px;background:linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(0,0,0,.55) 78%,rgba(0,0,0,.35) 100%)"></div>
+  </div></div>
+  <!-- botão -->
+  <div class="g" id="g_btn"><div class="c" style="left:0;top:0;color:#fff;font-size:48px">Solicitar orçamento</div></div>
+  <!-- loader -->
+  <div class="g" id="g_spin"><svg class="c" style="left:0;top:0" width="110" height="110" viewBox="-55 -55 110 110">
+    <circle r="38" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="9"/>
+    <circle id="spinArc" r="38" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" pathLength="100" stroke-dasharray="26 74"/></svg></div>
+  <!-- notificação -->
+  <div class="g" id="g_isl">
+    <img class="c" src="img/n_white.svg" style="left:-330px;top:0;height:60px">
+    <div class="l" style="left:-278px;top:-17px;color:#fff;font-size:38px">Novo pedido</div>
+    <div class="l" style="left:-278px;top:24px;color:#A19E97;font-size:28px">Fachada em ACM + LED</div>
+    <div class="r" style="left:345px;top:-17px;color:#8E8B85;font-size:28px">agora</div>
+    <div class="c" style="left:330px;top:24px;width:16px;height:16px;border-radius:8px;background:#2D5BE3"></div>
+  </div>
+  <!-- card do projeto -->
+  <div class="g" id="g_card">
+    <div class="c" style="left:0;top:-150px;width:762px;height:762px;border-radius:36px;overflow:hidden;background:#222">
+      <div id="photoZ" style="position:absolute;left:0;top:0;width:762px;height:762px;transform-origin:384px 215px">
+        <img src="img/card_day.png" style="position:absolute;left:0;top:0;width:762px;height:762px">
+        <canvas id="cvCard" width="762" height="762" style="position:absolute;left:0;top:0"></canvas>
+      </div>
+      <div id="wipeLine" style="position:absolute;top:0;width:3px;height:762px;background:#fff;opacity:0"></div>
+    </div>
+    <div class="l" style="left:-381px;top:279px;font-size:42px;font-weight:600;letter-spacing:-.02em">Fachada em ACM + LED</div>
+    <div class="l" style="left:-381px;top:322px;color:#8E8B85;font-size:30px">D’Paleteiros · sorveteria</div>
+    <div class="g" id="g_prog">
+      <div id="stLab"></div>
+      <div class="r" id="pct" style="left:381px;top:392px;color:#8E8B85;font-size:30px">0%</div>
+      <div class="l" style="left:-381px;top:446px;width:762px;height:12px;border-radius:6px;background:#ECE9E3"></div>
+      <div class="l" id="pFill" style="left:-381px;top:446px;width:0;height:12px;border-radius:6px;background:#2D5BE3"></div>
+    </div>
+    <div class="g" id="g_ctrl">
+      <svg class="c ico" style="left:-361px;top:392px" width="40" height="40" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+      <div class="l" style="left:-326px;top:392px;font-size:34px">Modo noite</div>
+      <div id="togTrack" class="c" style="left:325px;top:392px;width:112px;height:64px;border-radius:32px;background:#D6D2CA"></div>
+      <div id="togKnob" class="l" style="left:275px;top:392px;width:52px;height:52px;border-radius:26px;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.2)"></div>
+      <svg class="c ico" style="left:-361px;top:462px" width="40" height="40" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path id="rays"/></svg>
+      <div class="l" style="left:-326px;top:462px;font-size:34px">Brilho do letreiro</div>
+      <div class="r" id="bTxt" style="left:381px;top:462px;color:#8E8B85;font-size:32px">0%</div>
+      <div class="l" style="left:-381px;top:512px;width:762px;height:10px;border-radius:5px;background:#ECE9E3"></div>
+      <div class="l" id="bFill" style="left:-381px;top:512px;width:0;height:10px;border-radius:5px;background:#2D5BE3"></div>
+      <div class="c" id="bKnob" style="left:-359px;top:512px;width:44px;height:44px;border-radius:22px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.08),0 3px 8px rgba(0,0,0,.18)"></div>
+    </div>
+  </div>
+  <!-- seletor segmentado: rótulos escuros (por baixo do indicador) -->
+  <div class="g" id="g_seg">
+    <div class="c" style="left:-264.7px;top:0;font-size:36px">Fachada</div>
+    <div class="c" style="left:0;top:0;font-size:36px">Placa NFC</div>
+    <div class="c" style="left:264.7px;top:0;font-size:36px">Site</div>
+  </div>
+  <!-- gráfico -->
+  <div class="g" id="g_chart">
+    <div class="l" style="left:-357px;top:-305px;font-size:44px;font-weight:600;letter-spacing:-.02em">Acessos ao site</div>
+    <div class="l" style="left:-357px;top:-256px;color:#8E8B85;font-size:30px">Últimos 7 dias</div>
+    <svg style="position:absolute;left:-405px;top:-380px;overflow:visible" width="810" height="760" viewBox="-405 -380 810 760">
+      <g stroke="#EFECE6" stroke-width="2"><path d="M-345 -190H345M-345 -40H345M-345 110H345M-345 260H345"/></g>
+      <path id="area" fill="#2D5BE3" opacity="0"/>
+      <line id="guide" stroke="#C9C5BE" stroke-width="2.5" stroke-dasharray="6 8" opacity="0"/>
+      <path id="line" fill="none" stroke="#2D5BE3" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1 1"/>
+      <g id="dots"></g><g id="days" fill="#8E8B85" font-size="26" text-anchor="middle" font-family="Geist"></g>
+    </svg>
+    <div class="c" id="tip" style="background:#0B0B0C;color:#fff;font-size:30px;padding:16px 26px;border-radius:22px;opacity:0"><span style="color:#9F9C95">Sex</span>&nbsp; pico de acessos</div>
+  </div>
+  <!-- busca -->
+  <div class="g" id="g_cmd">
+    <div class="g" id="cmdTop">
+      <svg class="c ico" style="left:-350px;top:0" width="44" height="44" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+      <div class="l" id="ph" style="left:-302px;top:0;color:#A19E97;font-size:40px">Buscar serviço…</div>
+      <div class="l" id="typed" style="left:-302px;top:0;font-size:40px"></div>
+      <div class="l" id="caret" style="left:-302px;top:0;width:3px;height:48px;background:#2D5BE3;border-radius:2px"></div>
+      <div class="l" style="left:-405px;top:75px;width:810px;height:2px;background:#EFECE6"></div>
+    </div>
+    <div class="l" id="hl" style="left:-385px;top:0;width:770px;height:86px;border-radius:22px;background:#F1EFEA"></div>
+    <div id="rows"></div>
+  </div>
+  <!-- toast -->
+  <div class="g" id="g_toast">
+    <div class="c" style="left:-318px;top:0;width:84px;height:84px;border-radius:42px;background:#2D5BE3">
+      <svg style="position:absolute;left:0;top:0" width="84" height="84" viewBox="0 0 24 24"><path id="tCheck" class="ico" d="M6.5 12.5l3.5 3.5 7.5-8" style="stroke:#fff;stroke-width:2.6" pathLength="1" stroke-dasharray="1 1"/></svg>
+    </div>
+    <div class="l" style="left:-252px;top:-19px;color:#fff;font-size:40px">Orçamento enviado</div>
+    <div class="l" style="left:-252px;top:27px;color:#A19E97;font-size:30px">Resposta no WhatsApp</div>
+  </div>
+  <!-- tela final -->
+  <div class="g" id="g_end">
+    <img class="c" id="eLogo" src="img/ngraph.svg" style="left:0;top:-250px;width:500px">
+    <div class="c" id="eSub" style="left:0;top:-110px;color:#8E8B85;font-size:32px">Fachadas · Letreiros · Placas NFC · Sites</div>
+    <div class="c" id="eAt" style="left:0;top:-20px;font-size:48px;font-weight:600;letter-spacing:-.02em">@ngraph.pe</div>
+    <div class="c" id="eCta" style="left:0;top:180px;width:690px;height:140px">
+      <div id="ctaRing" style="position:absolute;left:0;top:0;width:690px;height:140px;border-radius:70px;box-shadow:0 0 0 3px #2D5BE3;opacity:0"></div>
+      <div style="position:absolute;left:0;top:0;width:690px;height:140px;border-radius:70px;background:#0B0B0C;display:flex;align-items:center;justify-content:center;gap:22px;color:#fff;font-size:44px">
+        <svg class="ico" width="50" height="50" viewBox="0 0 24 24" style="stroke:#fff;stroke-width:1.8"><path d="M4.5 19.5l1.1-3.6A8 8 0 1 1 8.4 18.5z"/><path d="M9.2 8.6c.3-.5.7-.5 1-.1l.7 1.4c.1.3 0 .6-.2.8l-.4.4c.5 1.1 1.4 2 2.5 2.5l.4-.4c.2-.2.5-.3.8-.2l1.4.7c.4.3.4.7-.1 1-.9.7-2.2.7-3.6-.2a8.4 8.4 0 0 1-2.7-2.7c-.9-1.4-.9-2.6-.2-3.6z" style="fill:#fff;stroke:none"/></svg>
+        Peça seu orçamento</div>
+    </div>
+  </div>
+ </div>
+ <div id="segBlob" style="position:absolute;background:#0B0B0C"></div>
+ <div id="segTop" style="position:absolute;width:810px;height:120px">
+   <div class="c" style="left:140.3px;top:60px;color:#fff;font-size:36px">Fachada</div>
+   <div class="c" style="left:405px;top:60px;color:#fff;font-size:36px">Placa NFC</div>
+   <div class="c" style="left:669.7px;top:60px;color:#fff;font-size:36px">Site</div>
+ </div>
+ <div id="hookTxt" style="position:absolute;left:0;top:0;width:1080px;height:1920px"></div>
+ <div id="caps"></div>
+ <div id="touch"><div id="rips"></div><div id="tDot"></div></div>
+</div>
+<script>
+const CX=540,T=18;
+const $=id=>document.getElementById(id);
+const cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)), lerp=(a,b,x)=>a+(b-a)*x;
+const sm=x=>{x=cl(x);return x*x*(3-2*x)}, eo=x=>{x=cl(x);return 1-Math.pow(1-x,3)}, eio=x=>{x=cl(x);return x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2};
+// molas em forma fechada; um canal = soma de uma mola por mudança de alvo
+function step(t,w,z){ if(t<=0)return 0; const wd=w*Math.sqrt(1-z*z); return 1-Math.exp(-z*w*t)*(Math.cos(wd*t)+z*w/wd*Math.sin(wd*t)); }
+class Ch{ constructor(v0,w=16,z=.85){this.v0=v0;this.w=w;this.z=z;this.ev=[]}
+  to(t,v,w,z){this.ev.push({t,v,w:w||this.w,z:z||this.z});return this}
+  drag(t0,t1,fn){this.ev.push({t:t0,t1,fn});return this}
+  at(t){ let base=this.v0,tgt=this.v0,acc=[];
+    for(const e of this.ev){ if(e.t>t)break;
+      if(e.fn){ if(t<=e.t1)return e.fn(t); base=e.fn(e.t1); tgt=base; acc=[]; continue; }
+      acc.push(e.t,e.v-tgt,e.w,e.z); tgt=e.v; }
+    let v=base; for(let i=0;i<acc.length;i+=4) v+=acc[i+1]*step(t-acc[i],acc[i+2],acc[i+3]); return v; } }
+class Col{ constructor(c,w,z){this.ch=c.map(v=>new Ch(v,w,z))} to(t,c,w,z){c.forEach((v,i)=>this.ch[i].to(t,v,w,z));return this}
+  at(t){return 'rgb('+this.ch.map(c=>Math.round(cl(c.at(t),0,255))).join(',')+')'} }
+const BLACK=[11,11,12],WHITE=[255,255,255];
+// ---------- forma única ----------
+const sW=new Ch(1080,13,.9).to(1.5,810).to(2.3,150,18).to(2.9,810,16).to(14.5,810).to(15.5,810);
+const sH=new Ch(1920,13,.9).to(1.5,150).to(2.3,150).to(2.9,140).to(3.5,1110,15).to(10,120,17).to(11.5,760,15).to(12.5,690,16).to(12.95,490).to(13.15,390).to(14.5,150,17).to(15.5,900,15);
+const sR=new Ch(0,13,.9).to(1.5,75).to(2.9,70).to(3.5,48).to(10,60).to(11.5,48).to(12.5,40).to(14.5,75).to(15.5,56);
+const sY=new Ch(960,13,.9).to(1.5,930).to(3.5,965,15).to(10,930,17).to(15.5,900);
+const sC=new Col(BLACK,14,.9).to(3.5,WHITE).to(14.5,BLACK).to(15.5,WHITE);
+const sS=new Ch(1,32,.8).to(2.0,.955).to(2.12,1,18);
+// ---------- toque ----------
+const K=[[1.70,700,1080],[1.95,585,940,1],[2.10,585,940,1],[2.40,640,1010],
+ [7.15,960,1530],[7.45,880,1361,1],[7.6,880,1361,1],[7.9,820,1440],
+ [8.30,300,1580],[8.6,181,1477,1],[9.7,899,1477,1],[10.0,940,1520],
+ [10.15,450,1060],[10.40,548,938,1],[10.52,548,938,1],[10.90,812,938,1],[11.02,812,938,1],[11.3,870,1010],
+ [11.8,760,1010],[12.05,662,822,1],[12.18,662,822,1],[12.45,720,900],
+ [12.5,730,780],[12.70,600,665,1],[12.82,600,665,1],[13.0,660,740],
+ [13.75,760,1130],[14.05,600,960,1],[14.18,600,960,1],[14.45,660,1040]];
+function tPos(t){ const n=K.length; if(t<=K[0][0])return [K[0][1],K[0][2]]; if(t>=K[n-1][0])return [K[n-1][1],K[n-1][2]];
+  let i=0; while(K[i+1][0]<=t)i++; const a=K[i],b=K[i+1],pa=K[Math.max(i-1,0)],pb=K[Math.min(i+2,n-1)];
+  const h=b[0]-a[0],u=(t-a[0])/h; const tan=(p0,p1,p2)=>(p1[3]||p2[0]===p0[0])?[0,0]:[(p2[1]-p0[1])/(p2[0]-p0[0]),(p2[2]-p0[2])/(p2[0]-p0[0])];
+  const ma=tan(pa,a,b),mb=tan(a,b,pb); const h00=2*u*u*u-3*u*u+1,h10=u*u*u-2*u*u+u,h01=-2*u*u*u+3*u*u,h11=u*u*u-u*u;
+  return [h00*a[1]+h10*h*ma[0]+h01*b[1]+h11*h*mb[0],h00*a[2]+h10*h*ma[1]+h01*b[2]+h11*h*mb[1]]; }
+const TWIN=[[1.70,2.40],[7.15,7.9],[8.30,10.0],[10.15,11.3],[11.8,12.45],[12.5,13.0],[13.75,14.45]];
+const TAPS=[2.0,7.5,8.6,10.45,10.95,12.1,12.75,14.1];
+const tPress=new Ch(0,34,.85); [[2,2.1],[7.5,7.6],[8.6,9.7],[10.45,10.55],[10.95,11.05],[12.1,12.2],[12.75,12.85],[14.1,14.2]].forEach(([a,b])=>tPress.to(a,1).to(b,0));
+$('rips').innerHTML=TAPS.map((_,i)=>`<div class="rip" id="rip${i}"></div>`).join('');
+// ---------- legendas ----------
+const CAPS=[['Orçamento em 1 toque',1.6,3.5],['Acompanhe seu projeto',3.5,7.0],['Veja de dia e de noite',7.0,8.4],['Controle o brilho',8.4,10.0],
+ ['Tudo num só lugar',10.0,11.5],['Mais acessos no site',11.5,12.5],['Ache o que precisa',12.5,14.5],['Simples assim',14.5,15.5]];
+$('caps').innerHTML=CAPS.map((c,i)=>`<div class="cap" id="cap${i}">${c[0]}</div>`).join('');
+const HOOK=[['Sua fachada,',1290,-.18],['do pedido à instalação',1388,-.06]];
+$('hookTxt').innerHTML=HOOK.map((h,i)=>`<div class="c" id="hk${i}" style="left:540px;top:${h[1]}px;color:#fff;font-size:${i?76:92}px;font-weight:650;letter-spacing:-.03em;text-shadow:0 2px 18px rgba(0,0,0,.35)">${h[0]}</div>`).join('');
+// ---------- progresso ----------
+const prog=new Ch(0,9,.95).to(3.9,.34).to(4.8,.70).to(5.7,1.0);
+const STG=[['Projeto aprovado',3.5,4.8],['Em produção',4.8,5.7],['Instalação',5.7,6.4],['Concluído',6.4,99]];
+$('stLab').innerHTML=STG.map((s,i)=>`<div class="l" id="st${i}" style="left:-381px;top:392px;font-size:32px;display:flex;align-items:center;gap:14px">
+  ${i==3?'<svg class="ico" width="34" height="34" viewBox="0 0 24 24" style="color:#2D5BE3;stroke-width:2.4"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>':'<span style="width:14px;height:14px;border-radius:7px;background:#2D5BE3;display:inline-block"></span>'}${s[0]}</div>`).join('');
+// ---------- toggle (cada borda numa mola) e brilho ----------
+const kL=new Ch(275).to(7.5,323,12,.9), kR=new Ch(327).to(7.5,375,26,.84);
+const trackC=new Col([214,210,202],18,.9).to(7.5,[45,91,227]);
+const bri=new Ch(0).drag(8.6,9.7,t=>cl((tPos(t)[0]-181)/718));
+// ---------- seletor: indicador com bordas em molas diferentes ----------
+const SEGX=[-397,-132.3,132.3,397];
+const gL=new Ch(SEGX[0]).to(10.45,SEGX[1],12,.9).to(10.95,SEGX[2],12,.9), gR=new Ch(SEGX[1]).to(10.45,SEGX[2],24,.84).to(10.95,SEGX[3],24,.84);
+// ---------- gráfico ----------
+const DATA=[.30,.42,.37,.56,.86,.62,.70], DAYS=['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+const PX=i=>-345+i*115, PY=v=>260-v*450;
+(function(){ const pts=DATA.map((v,i)=>[PX(i),PY(v)]); let d=`M${pts[0]}`;
+  for(let i=0;i<pts.length-1;i++){const p0=pts[i-1]||pts[i],p1=pts[i],p2=pts[i+1],p3=pts[i+2]||p2;
+    d+=` C${p1[0]+(p2[0]-p0[0])/6},${p1[1]+(p2[1]-p0[1])/6} ${p2[0]-(p3[0]-p1[0])/6},${p2[1]-(p3[1]-p1[1])/6} ${p2[0]},${p2[1]}`;}
+  $('line').setAttribute('d',d); $('area').setAttribute('d',d+` L345,260 L-345,260 Z`);
+  $('dots').innerHTML=pts.map((p,i)=>`<circle id="dot${i}" cx="${p[0]}" cy="${p[1]}" r="8" fill="#fff" stroke="#2D5BE3" stroke-width="5"/>`).join('');
+  $('days').innerHTML=DAYS.map((s,i)=>`<text x="${PX(i)}" y="318">${s}</text>`).join('');
+  const g=$('guide'); g.setAttribute('x1',PX(4));g.setAttribute('x2',PX(4));g.setAttribute('y1',PY(DATA[4])+14);g.setAttribute('y2',260);
+  $('tip').style.left=PX(4)+'px'; $('tip').style.top=(PY(DATA[4])-84)+'px';})();
+// ---------- busca: a lista filtra de verdade a cada tecla ----------
+const ICON={fach:'<path d="M4 21V5.5L12 3v18M12 8h8v13M7.5 9h1.5M7.5 13h1.5M7.5 17h1.5M15.5 12h1.5M15.5 16h1.5M2.5 21h19"/>',
+ letr:'<path d="M5 7V5h14v2M12 5v14M9 19h6"/>', nfc:'<path d="M7 9a4.5 4.5 0 0 1 0 6M10.5 6.5a8.5 8.5 0 0 1 0 11M14 4a12.5 12.5 0 0 1 0 16"/>',
+ sin:'<path d="M12 3v18M5 6.5h11.5L19 9l-2.5 2.5H5zM8.5 21h7"/>', site:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>'};
+const ROWS=[['fach','Fachada em ACM'],['letr','Letreiro neon'],['nfc','Placa NFC'],['sin','Placa de sinalização'],['site','Site profissional']];
+$('rows').innerHTML=ROWS.map((r,i)=>`<div class="g" id="row${i}"><div class="c" style="left:-335px;top:0;width:64px;height:64px;border-radius:18px;background:#fff;box-shadow:inset 0 0 0 2px #ECE9E3">
+  <svg class="c ico" style="left:32px;top:32px" width="38" height="38" viewBox="0 0 24 24">${ICON[r[0]]}</svg></div>
+  <div class="l" style="left:-281px;top:0;font-size:38px">${r[1]}</div></div>`).join('');
+const QUERY='plac', KEYS=[12.95,13.15,13.35,13.55];
+const visibleAt=t=>{const q=QUERY.slice(0,KEYS.filter(k=>t>=k).length); return ROWS.map((r,i)=>i).filter(i=>ROWS[i][1].toLowerCase().includes(q));};
+const rowPos=ROWS.map((r,i)=>{const c=new Ch(i,16,.86); KEYS.forEach(k=>{const v=visibleAt(k); if(v.includes(i))c.to(k,v.indexOf(i));}); return c;});
+const rowVis=ROWS.map((r,i)=>{let lastOut=99; for(const k of KEYS){ if(!visibleAt(k).includes(i)){lastOut=k;break;} } return lastOut;});
+const hlS=new Ch(1,32,.8).to(14.1,.97).to(14.22,1,18);
+// ---------- conteúdo: entrada e saída próprias ----------
+const GR={hook:[[-9,1.5]],btn:[[1.5,2.3]],spin:[[2.3,2.9]],isl:[[2.9,3.5]],card:[[3.5,10]],prog:[[3.5,7.0]],ctrl:[[7.0,10]],
+  seg:[[10,11.5]],chart:[[11.5,12.5]],cmd:[[12.5,14.5]],toast:[[14.5,15.5]],end:[[15.5,99]]};
+function vis(t,a,b,din=.26,dout=.12,dl=.12){ const i=a<-5?1:eo((t-a-dl)/din), o=b>50?1:1-sm((t-b)/dout); return Math.min(i,o); }
+const visW=(t,ws)=>Math.max(...ws.map(w=>vis(t,w[0],w[1])));
+function fx(el,o,pre=''){ el.style.opacity=o.toFixed(3); el.style.visibility=o<=.001?'hidden':'visible';
+  el.style.filter=o<.999?`blur(${((1-o)*12).toFixed(2)}px)`:'none'; el.style.transform=`${pre} scale(${(.96+.04*o).toFixed(4)})`; }
+// ---------- fotos: acendimento por pixel (atraso por ponto + brilho de bloom só durante a transição) ----------
+const LAY={};
+async function loadLayer(key,pre,W,H){ const get=src=>new Promise(r=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');x.drawImage(im,0,0,W,H);r(x.getImageData(0,0,W,H).data)};im.src=src;});
+  const [off,on,mp,bl]=await Promise.all(['off','on','map','bloom'].map(s=>get(`img/${pre}_${s}.png`)));
+  const n=W*H, O=new Float32Array(n*3),D=new Float32Array(n*3),B=new Float32Array(n*3),DL=new Float32Array(n),IW=new Float32Array(n);
+  for(let i=0;i<n;i++){ for(let k=0;k<3;k++){O[i*3+k]=off[i*4+k];D[i*3+k]=on[i*4+k]-off[i*4+k];B[i*3+k]=bl[i*4+k];} DL[i]=mp[i*4+2]/255; IW[i]=255/Math.max(mp[i*4+1],20); }
+  const cv=$(key=='card'?'cvCard':'cvHook'),ctx=cv.getContext('2d'); LAY[key]={n,O,D,B,DL,IW,ctx,img:ctx.createImageData(W,H),last:-1}; }
+function paint(key,b){ const L=LAY[key]; if(!L||Math.abs(L.last-b)<1e-5)return; L.last=b; const o=L.img.data,{n,O,D,B,DL,IW}=L;
+  for(let i=0;i<n;i++){ let x=(b-DL[i])*IW[i]; x=x<0?0:x>1?1:x; const w=x*x*(3-2*x), bu=2.3*w*(1-w);
+    const j=i*3,q=i*4; o[q]=O[j]+w*D[j]+bu*B[j]; o[q+1]=O[j+1]+w*D[j+1]+bu*B[j+1]; o[q+2]=O[j+2]+w*D[j+2]+bu*B[j+2]; o[q+3]=255; }
+  L.ctx.putImageData(L.img,0,0); }
+// ---------- seek(t) ----------
+function seek(t){
+  const w=sW.at(t),h=sH.at(t),r=Math.min(sR.at(t),h/2),cy=sY.at(t);
+  const S=$('shape'); Object.assign(S.style,{left:(CX-w/2)+'px',top:(cy-h/2)+'px',width:w+'px',height:h+'px',borderRadius:r+'px',background:sC.at(t),transform:`scale(${sS.at(t).toFixed(4)})`});
+  for(const k in GR){ const g=$('g_'+k); if(k!='prog'&&k!='ctrl'){g.style.left=(w/2)+'px'; g.style.top=(h/2)+'px';} fx(g,visW(t,GR[k])); }
+  $('g_hook').style.filter='none'; $('g_hook').style.transform='none'; $('g_hook').style.opacity=1-sm((t-1.5)/.2); $('g_hook').style.visibility=t<1.9?'visible':'hidden';
+  // gancho
+  if(t<1.9){ paint('hook',.1+.9*eo((t+.03)/1.12)); $('cvHook').style.transform=`scale(${(1.34-.22*eo((t+.2)/1.9)).toFixed(4)})`; }
+  HOOK.forEach((hk,i)=>{const e=$('hk'+i); const o=Math.min(eo((t-hk[2])/.42),1-sm((t-1.38)/.14)); e.style.opacity=o; e.style.visibility=o>0?'visible':'hidden';
+    e.style.filter=o<.999?`blur(${(1-o)*14}px)`:'none'; e.style.transform=`translate(-50%,-50%) translateY(${((1-o)*34).toFixed(2)}px) scale(${.96+.04*o})`;});
+  // loader
+  $('spinArc').setAttribute('transform',`rotate(${(t*430)%360})`);
+  // card: progresso
+  const p=prog.at(t); $('pFill').style.width=(cl(p)*762)+'px'; $('pct').textContent=Math.round(cl(p)*100)+'%';
+  STG.forEach((s,i)=>fx($('st'+i),vis(t,s[1]-.12,s[2],.22,.12,.0),'translate(0,-50%)'));
+  // card: toggle, wipe dia->noite, brilho
+  const L=kL.at(t),R=kR.at(t); Object.assign($('togKnob').style,{left:L+'px',width:(R-L)+'px'}); $('togTrack').style.background=trackC.at(t);
+  const wp=eio((t-7.55)/.62); const cv=$('cvCard'); cv.style.clipPath=`inset(0 ${((1-wp)*100).toFixed(3)}% 0 0)`; cv.style.visibility=wp>0?'visible':'hidden';
+  const wl=$('wipeLine'); wl.style.left=(wp*762-1.5)+'px'; wl.style.opacity=(wp>0&&wp<1)?.9:0;
+  const b=bri.at(t); if(wp>0&&t<10.4) paint('card',b);
+  $('bFill').style.width=(b*740+11)+'px'; $('bKnob').style.left=(-359+b*718)+'px'; $('bTxt').textContent=Math.round(b*100)+'%';
+  let rays=''; const r0=6.6,r1=7.6+2.6*b; for(let i=0;i<8;i++){const a=i*Math.PI/4,c=Math.cos(a),s=Math.sin(a);rays+=`M${12+c*r0} ${12+s*r0}L${12+c*r1} ${12+s*r1}`;} $('rays').setAttribute('d',rays);
+  $('photoZ').style.transform=`scale(${(1+.025*eo((t-3.5)/3.5)+.06*eio((t-8.5)/1.5)).toFixed(4)})`;
+  // seletor
+  const sv=visW(t,GR.seg); const GL=gL.at(t),GR_=gR.at(t);
+  const blob=$('segBlob'); Object.assign(blob.style,{left:(CX+GL+8)+'px',top:(930-52)+'px',width:(GR_-GL-16)+'px',height:'104px',borderRadius:'52px',opacity:sv,visibility:sv>0?'visible':'hidden',transform:`scale(${.96+.04*sv})`});
+  const st=$('segTop'); st.style.left=(CX-405)+'px'; st.style.top=(930-60)+'px'; st.style.opacity=sv; st.style.visibility=sv>0?'visible':'hidden';
+  st.style.clipPath=`inset(8px ${405-GR_+8}px 8px ${GL+405+8}px round 52px)`;
+  // gráfico
+  const dp=eo((t-11.62)/.38); $('line').setAttribute('stroke-dashoffset',(1-dp).toFixed(4)); $('area').setAttribute('opacity',(.08*dp).toFixed(3));
+  DATA.forEach((v,i)=>{const o=cl((dp-i/6)*8+1); const hv=i==4?eo((t-12.1)/.2):0; const d=$('dot'+i); d.setAttribute('opacity',o.toFixed(3)); d.setAttribute('r',(8+5*hv).toFixed(2));});
+  const hov=vis(t,12.1-.12,99,.22); $('guide').setAttribute('opacity',hov.toFixed(3));
+  const tip=$('tip'); tip.style.opacity=hov; tip.style.filter=hov<.999?`blur(${(1-hov)*8}px)`:'none'; tip.style.transform=`translate(-50%,-50%) translateY(${(1-hov)*12}px) scale(${.94+.06*hov})`;
+  // busca
+  const top=-h/2; $('cmdTop').style.top=(top+75)+'px';
+  const nk=KEYS.filter(k=>t>=k).length; $('typed').textContent=QUERY.slice(0,nk); $('ph').style.opacity=nk?0:1;
+  $('caret').style.left=(-302+($('typed').offsetWidth||0)+(nk?4:0))+'px';
+  $('caret').style.opacity=(t>=12.75&&t<13.8)||Math.floor((t-12.5)*3.6)%2==0?1:0;
+  ROWS.forEach((r0,i)=>{const e=$('row'+i); e.style.top=(top+220+rowPos[i].at(t)*100)+'px'; const o=1-sm((t-rowVis[i])/.14);
+    e.style.opacity=o; e.style.filter=o<.999?`blur(${(1-o)*10}px)`:'none'; e.style.visibility=o>0?'visible':'hidden';});
+  const hl=$('hl'); hl.style.top=(top+220)+'px'; hl.style.transform=`translate(0,-50%) scale(${hlS.at(t)})`; hl.style.background=t>=14.1?'#E3E9FB':'#F1EFEA';
+  // toast
+  $('tCheck').setAttribute('stroke-dashoffset',(1-eo((t-14.62)/.28)).toFixed(4));
+  // tela final: entradas escalonadas + pulso do CTA
+  [['eLogo',15.62],['eSub',15.74],['eAt',15.82],['eCta',15.92]].forEach(([id,a])=>{const o=eo((t-a)/.34);const e=$(id);
+    e.style.opacity=o; e.style.filter=o<.999?`blur(${(1-o)*10}px)`:'none';
+    const pu=id=='eCta'&&t>16.4?(1-Math.cos(2*Math.PI*(t-16.4)/1.1))/2:0;
+    e.style.transform=`translate(-50%,-50%) translateY(${(1-o)*18}px) scale(${(.96+.04*o)*(1+.035*pu)})`;});
+  const rp=t>16.4?((t-16.4)/1.1)%1:0; const ring=$('ctaRing'); ring.style.opacity=t>16.4?(.55*(1-rp)).toFixed(3):0; ring.style.transform=`scale(${1+.1*eo(rp)},${1+.45*eo(rp)})`;
+  // legendas
+  CAPS.forEach((c,i)=>fx($('cap'+i),vis(t,c[1],c[2],.26,.12,.06),'translate(-50%,-50%)'));
+  // indicador de toque
+  const [tx,ty]=tPos(t); const tv=Math.max(...TWIN.map(([a,b])=>Math.min(eo((t-a)/.2),1-sm((t-b+.22)/.22))));
+  const pr=tPress.at(t); $('touch').style.transform=`translate(${tx.toFixed(2)}px,${ty.toFixed(2)}px)`;
+  const dot=$('tDot'); dot.style.opacity=tv.toFixed(3); dot.style.transform=`scale(${((.7+.3*tv)*(1-.14*pr)).toFixed(4)})`; dot.style.background=`rgba(15,15,18,${(.22+.12*pr).toFixed(3)})`;
+  TAPS.forEach((a,i)=>{const e=$('rip'+i); const u=(t-a)/.5; if(u<0||u>1){e.style.visibility='hidden';return;}
+    const [rx,ry]=tPos(a); const d=84+150*eo(u); Object.assign(e.style,{visibility:'visible',width:d+'px',height:d+'px',left:(rx-tx-d/2)+'px',top:(ry-ty-d/2)+'px',opacity:(.7*(1-u)).toFixed(3)});});
+}
+window.seek=seek; window.T=T;
+window.ready=Promise.all([document.fonts.ready,loadLayer('card','card',762,762),loadLayer('hook','hook',1080,1920),
+  ...[...document.images].map(i=>i.decode().catch(()=>0))]).then(()=>{seek(0);return true});
+</script></body></html>
