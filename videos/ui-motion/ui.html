@@ -1,0 +1,275 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+html,body{margin:0;background:#EAE7E2}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#EAE7E2;font-family:Geist,sans-serif;font-weight:500;
+  -webkit-font-smoothing:antialiased;font-feature-settings:"tnum" 1,"ss01" 1;letter-spacing:-.01em}
+#world{position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:540px 960px}
+#shape{position:absolute;overflow:hidden;box-shadow:0 1px 2px rgba(20,18,15,.06),0 22px 50px -20px rgba(20,18,15,.30)}
+.g{position:absolute;left:0;top:0;width:0;height:0}
+.c{position:absolute;transform:translate(-50%,-50%);white-space:nowrap}
+.l{position:absolute;transform:translate(0,-50%);white-space:nowrap}
+.r{position:absolute;transform:translate(-100%,-50%);white-space:nowrap}
+.ico{fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+#blob{position:absolute;background:#fff}
+#cursor{position:absolute;left:0;top:0;width:46px;height:46px;transform-origin:4px 3px}
+img{display:block}
+</style></head><body>
+<div id="stage">
+ <div id="world">
+  <div id="shape">
+   <!-- 1 botão -->
+   <div class="g" id="g_btn"><div class="c" style="left:0;top:0;color:#fff;font-size:46px">Solicitar orçamento</div></div>
+   <!-- 2 loader -->
+   <div class="g" id="g_spin"><svg class="c" style="left:0;top:0" width="110" height="110" viewBox="-55 -55 110 110">
+     <circle r="38" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="9"/>
+     <circle id="spinArc" r="38" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" pathLength="100" stroke-dasharray="26 74"/></svg></div>
+   <!-- 3 check -->
+   <div class="g" id="g_check"><svg class="c" style="left:0;top:0" width="110" height="110" viewBox="-55 -55 110 110">
+     <path id="checkP" d="M-27 2 L-8 21 L28 -19" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1 1"/></svg></div>
+   <!-- 4 ilha -->
+   <div class="g" id="g_isl">
+     <img class="c" src="img/n_white.svg" style="left:-196px;top:0;height:54px">
+     <div class="l" style="left:-150px;top:0;color:#fff;font-size:36px">Novo pedido</div>
+     <div class="c" style="left:208px;top:0;width:18px;height:18px;border-radius:9px;background:#2F6FE0"></div>
+   </div>
+   <!-- 5 ilha expandida -->
+   <div class="g" id="g_isl2">
+     <div class="c" style="left:-306px;top:0;width:212px;height:212px;border-radius:40px;overflow:hidden"><img src="img/day.jpg" style="width:296px;height:212px;margin-left:-42px;object-fit:cover"></div>
+     <div class="l" style="left:-170px;top:-66px;color:#8E8B85;font-size:28px">Pedido #2417</div>
+     <div class="l" style="left:-170px;top:-12px;color:#fff;font-size:52px;font-weight:600;letter-spacing:-.02em">Fachada em ACM</div>
+     <div class="l" style="left:-170px;top:58px;color:#C9C6BF;font-size:30px;display:flex;align-items:center;gap:14px"><span style="width:14px;height:14px;border-radius:7px;background:#2F6FE0;display:inline-block"></span>Em produção</div>
+   </div>
+   <!-- 6 player -->
+   <div class="g" id="g_player">
+     <div class="c" style="left:0;top:-200px;width:800px;height:800px;border-radius:40px;overflow:hidden;background:#111">
+       <img src="img/day.jpg" style="position:absolute;width:100%;height:100%;object-fit:cover">
+       <img id="imgNight" src="img/night.jpg" style="position:absolute;width:100%;height:100%;object-fit:cover;opacity:0">
+     </div>
+     <div class="l" style="left:-400px;top:268px;color:#0B0B0C;font-size:48px;font-weight:600;letter-spacing:-.02em">Fachada em ACM</div>
+     <div class="l" style="left:-400px;top:322px;color:#8E8B85;font-size:32px">Instalação · de dia e de noite</div>
+     <div class="l" style="left:-400px;top:400px;width:800px;height:10px;border-radius:5px;background:#E6E3DE"></div>
+     <div class="l" id="progFill" style="left:-400px;top:400px;width:0;height:10px;border-radius:5px;background:#0B0B0C"></div>
+     <div class="c" id="progKnob" style="left:0;top:400px;width:24px;height:24px;border-radius:50%;background:#0B0B0C"></div>
+     <div class="l" id="tCur" style="left:-400px;top:446px;color:#8E8B85;font-size:28px">0:09</div>
+     <div class="r" id="tRem" style="left:400px;top:446px;color:#8E8B85;font-size:28px">-0:39</div>
+     <svg class="c" style="left:-230px;top:535px;color:#0B0B0C" width="64" height="64" viewBox="0 0 24 24"><g transform="translate(24 0) scale(-1 1)"><path d="M6 5.5v13l9-6.5z" fill="currentColor"/><rect x="16" y="5.5" width="2.4" height="13" rx="1.2" fill="currentColor"/></g></svg>
+     <svg class="c" style="left:230px;top:535px;color:#0B0B0C" width="64" height="64" viewBox="0 0 24 24"><path d="M6 5.5v13l9-6.5z" fill="currentColor"/><rect x="16" y="5.5" width="2.4" height="13" rx="1.2" fill="currentColor"/></svg>
+     <div class="c" id="playBtn" style="left:0;top:535px;width:140px;height:140px;border-radius:70px;background:#0B0B0C">
+       <svg style="position:absolute;left:0;top:0" width="140" height="140" viewBox="-70 -70 140 140"><path id="pp1" fill="#fff" stroke="#fff" stroke-width="5" stroke-linejoin="round"/><path id="pp2" fill="#fff" stroke="#fff" stroke-width="5" stroke-linejoin="round"/></svg>
+     </div>
+   </div>
+   <!-- 7 slider -->
+   <div class="g" id="g_slider">
+     <svg class="c ico" id="sun" style="left:-376px;top:-52px;color:#0B0B0C" width="48" height="48" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path id="rays"/></svg>
+     <div class="l" style="left:-332px;top:-52px;color:#0B0B0C;font-size:38px">Brilho do letreiro</div>
+     <div class="r" id="bvTxt" style="left:400px;top:-52px;color:#8E8B85;font-size:36px">62%</div>
+     <div class="l" id="slTrack" style="left:-400px;top:56px;width:800px;height:16px;border-radius:8px;background:#E6E3DE"></div>
+     <div class="l" id="slFill" style="left:-400px;top:56px;width:0;height:16px;border-radius:8px;background:#0B0B0C"></div>
+     <div class="c" id="slKnob" style="left:0;top:56px;width:48px;height:48px;border-radius:24px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.08),0 3px 8px rgba(0,0,0,.18)"></div>
+   </div>
+   <!-- 9 abas: rótulos brancos -->
+   <div class="g" id="g_tabs">
+     <div class="c" style="left:-293.3px;top:0;color:#fff;font-size:38px">Fachada</div>
+     <div class="c" style="left:0;top:0;color:#fff;font-size:38px">Placa NFC</div>
+     <div class="c" style="left:293.3px;top:0;color:#fff;font-size:38px">Site</div>
+   </div>
+   <!-- 10 gráfico -->
+   <div class="g" id="g_chart">
+     <div class="l" style="left:-400px;top:-418px;color:#0B0B0C;font-size:46px;font-weight:600;letter-spacing:-.02em">Acessos ao site</div>
+     <div class="l" style="left:-400px;top:-366px;color:#8E8B85;font-size:30px">Últimos 7 dias</div>
+     <svg style="position:absolute;left:-450px;top:-500px;overflow:visible" width="900" height="1000" viewBox="-450 -500 900 1000">
+       <g stroke="#EFECE7" stroke-width="2"><path d="M-390 -240H390M-390 -60H390M-390 120H390M-390 300H390"/></g>
+       <path id="area" fill="#004299" opacity="0"/>
+       <line id="guide" x1="0" x2="0" y1="0" y2="300" stroke="#C9C5BE" stroke-width="2.5" stroke-dasharray="6 8" opacity="0"/>
+       <path id="line" fill="none" stroke="#004299" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1 1"/>
+       <g id="dots"></g>
+       <g id="days" fill="#8E8B85" font-size="26" text-anchor="middle" font-family="Geist"></g>
+     </svg>
+     <div class="c" id="tip" style="left:0;top:0;background:#0B0B0C;color:#fff;font-size:30px;padding:16px 26px;border-radius:22px;opacity:0"><span style="color:#9F9C95">Sex</span>&nbsp; 312 acessos</div>
+   </div>
+   <!-- 11 ⌘K -->
+   <div class="g" id="g_cmd">
+     <div class="g" id="cmdTop">
+       <svg class="c ico" style="left:-386px;top:0;color:#0B0B0C" width="44" height="44" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+       <div class="l" id="ph" style="left:-336px;top:0;color:#A19E97;font-size:40px">Buscar serviço…</div>
+       <div class="l" id="typed" style="left:-336px;top:0;color:#0B0B0C;font-size:40px"></div>
+       <div class="l" id="caret" style="left:-336px;top:0;width:3px;height:48px;background:#004299;border-radius:2px"></div>
+       <div class="r" style="left:404px;top:0;color:#6E6B65;font-size:28px;background:#F1EFEB;border-radius:12px;padding:8px 14px">⌘K</div>
+       <div class="l" style="left:-450px;top:75px;width:900px;height:2px;background:#EFECE7"></div>
+     </div>
+     <div class="l" id="hl" style="left:-430px;top:0;width:860px;height:86px;border-radius:22px;background:#F2F0EC"></div>
+     <div id="rows"></div>
+   </div>
+   <!-- 12 toast -->
+   <div class="g" id="g_toast">
+     <div class="c" style="left:-284px;top:0;width:80px;height:80px;border-radius:40px;background:#004299">
+       <svg style="position:absolute;left:0;top:0" width="80" height="80" viewBox="0 0 24 24"><path id="tCheck" class="ico" d="M6.5 12.5l3.5 3.5 7.5-8" style="color:#fff;stroke-width:2.6" pathLength="1" stroke-dasharray="1 1"/></svg>
+     </div>
+     <div class="l" style="left:-222px;top:-17px;color:#fff;font-size:40px">Orçamento enviado</div>
+     <div class="l" style="left:-222px;top:27px;color:#9F9C95;font-size:28px">Placa NFC · resposta no WhatsApp</div>
+   </div>
+  </div>
+  <div id="blob"></div>
+  <div id="tabsTop" style="position:absolute;width:900px;height:160px">
+     <div class="c" style="left:156.7px;top:80px;color:#0B0B0C;font-size:38px">Fachada</div>
+     <div class="c" style="left:450px;top:80px;color:#0B0B0C;font-size:38px">Placa NFC</div>
+     <div class="c" style="left:743.3px;top:80px;color:#0B0B0C;font-size:38px">Site</div>
+  </div>
+  <div class="c" id="togLabel" style="left:540px;top:1100px;color:#0B0B0C;font-size:28px">Modo noite</div>
+ </div>
+ <svg id="cursor" viewBox="0 0 24 24"><path d="M5.5 3.2 L5.5 19.6 L9.6 15.7 L12.3 21.6 L15.1 20.4 L12.5 14.6 L18.4 14.6 Z" fill="#0B0B0C" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg>
+</div>
+<script>
+const CX=540,CY=960,T=14;
+const $=id=>document.getElementById(id);
+const cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)), lerp=(a,b,x)=>a+(b-a)*x;
+const sm=x=>{x=cl(x);return x*x*(3-2*x)}, eo=x=>{x=cl(x);return 1-Math.pow(1-x,3)};
+// ---------- molas: resposta ao degrau em forma fechada ----------
+function step(t,w,z){ if(t<=0)return 0; const wd=w*Math.sqrt(1-z*z);
+  return 1-Math.exp(-z*w*t)*(Math.cos(wd*t)+z*w/wd*Math.sin(wd*t)); }
+// Um canal é a soma de uma mola por mudança de alvo; um arraste substitui o valor enquanto dura e, ao soltar, as molas partem dali.
+class Ch{ constructor(v0,w=16,z=.84){this.v0=v0;this.w=w;this.z=z;this.ev=[]}
+  to(t,v,w,z){this.ev.push({t,v,w:w||this.w,z:z||this.z});return this}
+  drag(t0,t1,fn){this.ev.push({t:t0,t1,fn});return this}
+  at(t){ let base=this.v0,tgt=this.v0,acc=[];
+    for(const e of this.ev){ if(e.t>t)break;
+      if(e.fn){ if(t<=e.t1)return e.fn(t); base=e.fn(e.t1); tgt=base; acc=[]; continue; }
+      acc.push(e.t,e.v-tgt,e.w,e.z); tgt=e.v; }
+    let v=base; for(let i=0;i<acc.length;i+=4) v+=acc[i+1]*step(t-acc[i],acc[i+2],acc[i+3]); return v; } }
+class Col{ constructor(c,w,z){this.ch=c.map(v=>new Ch(v,w,z))} to(t,c,w,z){c.forEach((v,i)=>this.ch[i].to(t,v,w,z));return this}
+  at(t){return 'rgb('+this.ch.map(c=>Math.round(cl(c.at(t),0,255))).join(',')+')'} }
+const BLACK=[11,11,12],WHITE=[255,255,255],BLUE=[0,66,153],OFF=[208,204,197],HOV=[38,38,42];
+// ---------- forma única ----------
+const sW=new Ch(620).to(1,150).to(2,520).to(2.5,880).to(5.5,880).to(7.5,300).to(8.5,900).to(10,900).to(13,720).to(13.5,620);
+const sH=new Ch(150).to(1,150).to(2,120).to(2.5,300).to(3,1280).to(5.5,260).to(7.5,170).to(8.5,160).to(10,1000).to(11.5,690).to(12.5,390).to(13,140).to(13.5,150);
+const sR=new Ch(75).to(1,75).to(2,60).to(2.5,72).to(3,56).to(7.5,85).to(8.5,80).to(10,56).to(11.5,44).to(13,70).to(13.5,75);
+const sC=new Col(BLACK).to(0,HOV).to(1,BLACK).to(1.5,BLUE).to(2,BLACK).to(3,WHITE).to(7.5,OFF).to(8,BLUE).to(8.5,BLACK).to(10,WHITE).to(13,BLACK);
+const sS=new Ch(1,30,.8).to(.5,.95).to(.62,1,18).to(8,.96).to(8.12,1,18).to(13,.97).to(13.12,1,18);
+const cam=new Ch(1.42,10,.9).to(1,2.4).to(2,1.69).to(2.5,1).to(7.5,2.4).to(8.5,1).to(13,1.22).to(13.5,1.42,15,.9);
+// ---------- cursor: Hermite periódico, tangente zero nos pontos de pausa ----------
+const K=[[0,742,1150],[.40,612,992,1],[.64,612,992,1],[1.3,700,1120],[2.4,760,1240],[3.38,548,1500,1],[3.64,548,1500,1],
+ [4,296,1360,1],[4.5,560,1363],[5,780,1360,1],[5.45,760,1180],[6,636,1015,1],[6.5,940,1013],[7,1020,1012,1],
+ [7.55,700,1110],[7.95,548,968,1],[9.1,548,968,1],[9.45,836,968,1],[9.64,836,968,1],[10.4,760,1000],[10.95,670,842,1],
+ [11.35,672,843,1],[11.9,850,1420],[12.9,870,1450],[13.5,830,1330]];
+function curPos(t){ t=((t%T)+T)%T; const n=K.length; const P=i=>{const k=K[((i%n)+n)%n];return [k[0]+Math.floor(i/n)*T,k[1],k[2],k[3]]};
+  let i=0; while(i<n-1&&K[i+1][0]<=t)i++;
+  const a=P(i),b=P(i+1),pa=P(i-1),pb=P(i+2); const h=b[0]-a[0], u=(t-a[0])/h;
+  const tan=(p0,p1,p2)=>p1[3]?[0,0]:[(p2[1]-p0[1])/(p2[0]-p0[0]),(p2[2]-p0[2])/(p2[0]-p0[0])];
+  const ma=tan(pa,a,b),mb=tan(a,b,pb);
+  const h00=2*u*u*u-3*u*u+1,h10=u*u*u-2*u*u+u,h01=-2*u*u*u+3*u*u,h11=u*u*u-u*u;
+  return [h00*a[1]+h10*h*ma[0]+h01*b[1]+h11*h*mb[0], h00*a[2]+h10*h*ma[1]+h01*b[2]+h11*h*mb[1]]; }
+const HELD=[[.5,.6],[3.5,3.6],[4,5],[6,7],[8,8.1],[9,9.1],[9.5,9.6]];
+const press=new Ch(0,34,.85); HELD.forEach(([a,b])=>press.to(a,1).to(b,0));
+// ---------- player ----------
+const progAt=t=>{ if(t<3.5)return .18; if(t<4)return .18+.03*(t-3.5); if(t<=5)return cl((curPos(t)[0]-140)/800); return cl((curPos(5)[0]-140)/800)+.03*(t-5); };
+const knob=new Ch(24,22,.8).to(4,40).to(5,24);
+const pp=new Ch(0,20,.86).to(3.5,1);
+const pbS=new Ch(1,34,.8).to(3.5,.92).to(3.62,1,18);
+const PLAY=[[[-18,-26],[5,-13],[5,13],[-18,26]],[[5,-13],[28,0],[28,0],[5,13]]];
+const PAUSE=[[[-22,-26],[-6,-26],[-6,26],[-22,26]],[[6,-26],[22,-26],[22,26],[6,26]]];
+// ---------- slider com elástico ----------
+const rawBV=t=>(curPos(t)[0]-140)/800;
+const bv=new Ch(.62).drag(6,7,t=>cl(rawBV(t)));
+const rub=o=>92*(1-Math.exp(-o/110));
+const stretch=new Ch(0,15,.8).drag(6,7,t=>rub(Math.max(0,curPos(t)[0]-940))).to(7,0);
+// ---------- bolinha do toggle / indicador das abas: cada borda numa mola ----------
+const bL=new Ch(376).to(7.5,-132,20,.84).to(8,-2,12,.9).to(8.5,-440,24,.84).to(9,-146.7,12,.9).to(9.5,146.7,12,.9).to(10,-450,15,.9);
+const bR=new Ch(424).to(7.5,2,13,.9).to(8,132,26,.84).to(8.5,-146.7,13,.9).to(9,146.7,24,.84).to(9.5,440,24,.84).to(10,450,15,.9);
+const bT=new Ch(31).to(7.5,-67).to(8.5,-70).to(10,-500,15,.9);
+const bB=new Ch(79).to(7.5,67).to(8.5,70).to(10,500,15,.9);
+// ---------- gráfico ----------
+const DATA=[.30,.44,.36,.58,.84,.64,.74], DAYS=['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+const PX=i=>-380+i*760/6, PY=v=>300-v*520;
+(function(){ const pts=DATA.map((v,i)=>[PX(i),PY(v)]); let d=`M${pts[0]}`;
+  for(let i=0;i<pts.length-1;i++){const p0=pts[i-1]||pts[i],p1=pts[i],p2=pts[i+1],p3=pts[i+2]||p2;
+    d+=` C${p1[0]+(p2[0]-p0[0])/6},${p1[1]+(p2[1]-p0[1])/6} ${p2[0]-(p3[0]-p1[0])/6},${p2[1]-(p3[1]-p1[1])/6} ${p2[0]},${p2[1]}`;}
+  $('line').setAttribute('d',d); $('area').setAttribute('d',d+` L380,300 L-380,300 Z`);
+  $('dots').innerHTML=pts.map((p,i)=>`<circle id="dot${i}" cx="${p[0]}" cy="${p[1]}" r="8" fill="#fff" stroke="#004299" stroke-width="5"/>`).join('');
+  $('days').innerHTML=DAYS.map((s,i)=>`<text x="${PX(i)}" y="362">${s}</text>`).join('');
+  $('guide').setAttribute('x1',PX(4));$('guide').setAttribute('x2',PX(4));$('guide').setAttribute('y1',PY(DATA[4])+14);
+  $('tip').style.left=PX(4)+'px'; $('tip').style.top=(PY(DATA[4])-86)+'px';})();
+// ---------- ⌘K ----------
+const ICON={
+ fach:'<path d="M4 21V5.5L12 3v18M12 8h8v13M7.5 9h1.5M7.5 13h1.5M7.5 17h1.5M15.5 12h1.5M15.5 16h1.5M2.5 21h19"/>',
+ letr:'<path d="M5 7V5h14v2M12 5v14M9 19h6"/>',
+ nfc:'<path d="M7 9a4.5 4.5 0 0 1 0 6M10.5 6.5a8.5 8.5 0 0 1 0 11M14 4a12.5 12.5 0 0 1 0 16"/>',
+ sin:'<path d="M12 3v18M5 6.5h11.5L19 9l-2.5 2.5H5zM8.5 21h7"/>',
+ site:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>'};
+const ROWS=[['fach','Fachada em ACM'],['letr','Letreiro em neon'],['nfc','Placa NFC'],['sin','Placa de sinalização'],['site','Site profissional']];
+$('rows').innerHTML=ROWS.map((r,i)=>`<div class="g" id="row${i}"><div class="c" style="left:-376px;top:0;width:64px;height:64px;border-radius:18px;background:#fff;box-shadow:inset 0 0 0 2px #ECE9E4">
+  <svg class="c ico" style="left:32px;top:32px;color:#0B0B0C" width="38" height="38" viewBox="0 0 24 24">${ICON[r[0]]}</svg></div>
+  <div class="l" style="left:-322px;top:0;color:#0B0B0C;font-size:38px">${r[1]}</div></div>`).join('')+
+  `<svg class="g ico" id="enterK" style="left:0;top:0;color:#6E6B65;overflow:visible" width="0" height="0"><g transform="translate(372 -19) scale(1.6)"><path d="M20 5v7a3 3 0 0 1-3 3H6M10 11l-4 4 4 4"/></g></svg>`;
+const KEEP=[2,3];
+const rowPos=ROWS.map((r,i)=>{const c=new Ch(i,15,.86); if(KEEP.includes(i))c.to(12.5,KEEP.indexOf(i)); return c;});
+const TYPE='placa', TYPE_T=[12,12.125,12.25,12.375,12.5];
+const hlS=new Ch(1,34,.8).to(13,.97).to(13.12,1,18);
+// ---------- conteúdo: cada bloco com entrada e saída próprias ----------
+const GR={btn:[[-1,1],[13.5,99]],spin:[[1,1.5]],check:[[1.5,2]],isl:[[2,2.5]],isl2:[[2.5,3]],player:[[3,5.5]],slider:[[5.5,7.5]],
+  tabs:[[8.5,10]],chart:[[10,11.5]],cmd:[[11.5,13]],toast:[[13,13.5]]};
+function vis(t,a,b,din=.24,dout=.12,dl=.12){ const i=a<0?1:eo((t-a-dl)/din), o=b>T?1:1-sm((t-b)/dout); return Math.min(i,o); }
+const visW=(t,ws)=>Math.max(...ws.map(w=>vis(t,w[0],w[1])));
+function fx(el,o,extra=''){ el.style.opacity=o.toFixed(3); el.style.visibility=o<=0.001?'hidden':'visible';
+  el.style.filter=o<.999?`blur(${((1-o)*12).toFixed(2)}px)`:'none'; el.style.transform=`scale(${(.965+.035*o).toFixed(4)})${extra}`; }
+// ---------- seek(t): todo estilo calculado a partir do tempo ----------
+function seek(t){
+  t=((t%T)+T)%T;
+  const s=cam.at(t); $('world').style.transform=`scale(${s.toFixed(5)})`;
+  const st=stretch.at(t);
+  const w=sW.at(t)+st, h=sH.at(t)-st*.14, r=Math.min(sR.at(t),h/2), dx=st/2;
+  const S=$('shape'); S.style.left=(CX+dx-w/2)+'px'; S.style.top=(CY-h/2)+'px'; S.style.width=w+'px'; S.style.height=h+'px';
+  S.style.borderRadius=r+'px'; S.style.background=sC.at(t); S.style.transform=`scale(${sS.at(t).toFixed(4)})`;
+  for(const k in GR){ const g=$('g_'+k); g.style.left=(w/2)+'px'; g.style.top=(h/2)+'px'; fx(g,visW(t,GR[k])); }
+  // loader e check
+  $('spinArc').setAttribute('transform',`rotate(${(t*430)%360})`);
+  $('checkP').setAttribute('stroke-dashoffset',(1-eo((t-1.56)/.3)).toFixed(4));
+  // player
+  const p=progAt(t); $('progFill').style.width=(p*800)+'px'; const kn=knob.at(t);
+  Object.assign($('progKnob').style,{left:(-400+p*800)+'px',width:kn+'px',height:kn+'px'});
+  $('imgNight').style.opacity=sm((p-.42)/.2).toFixed(3);
+  const sec=Math.round(p*48); $('tCur').textContent=`0:${String(sec).padStart(2,'0')}`; $('tRem').textContent=`-0:${String(48-sec).padStart(2,'0')}`;
+  const m=pp.at(t); ['pp1','pp2'].forEach((id,j)=>$(id).setAttribute('d','M'+PLAY[j].map((q,i)=>[lerp(q[0],PAUSE[j][i][0],m),lerp(q[1],PAUSE[j][i][1],m)].map(v=>v.toFixed(2)).join(',')).join(' L')+'Z'));
+  $('playBtn').style.transform=`translate(-50%,-50%) scale(${pbS.at(t).toFixed(4)})`;
+  // slider
+  const b=bv.at(t); const sg=$('g_slider'); sg.style.left=(w/2-dx)+'px';
+  $('slTrack').style.width=(800+st)+'px'; $('slFill').style.width=(b<1?b*800:800+st)+'px';
+  $('slKnob').style.left=(-400+b*800+(b>=1?st:0))+'px'; $('slKnob').style.visibility=(t>=7.5||t<5.5)?'hidden':'visible';
+  $('bvTxt').style.left=(400+st)+'px'; $('bvTxt').textContent=Math.round(b*100)+'%';
+  let rays=''; const r0=6.6,r1=6.6+1.2+2.4*b; for(let i=0;i<8;i++){const a=i*Math.PI/4,c=Math.cos(a),sn=Math.sin(a);rays+=`M${12+c*r0} ${12+sn*r0}L${12+c*r1} ${12+sn*r1}`;} $('rays').setAttribute('d',rays);
+  // bolinha / indicador
+  const L=bL.at(t),R=bR.at(t),Tt=bT.at(t),B=bB.at(t); const bw=R-L,bh=B-Tt;
+  const q=sm((t-10)/.3); const br=lerp(Math.min(bw,bh)/2,56,q);
+  const bo=(t>=7.5&&t<10.4)?1-sm((t-10.12)/.25):0;
+  Object.assign($('blob').style,{left:(CX+L)+'px',top:(CY+Tt)+'px',width:bw+'px',height:bh+'px',borderRadius:br+'px',opacity:bo,visibility:bo>0?'visible':'hidden',
+    boxShadow:`0 2px 8px rgba(0,0,0,${(.22*(1-sm((t-8.5)/.3))).toFixed(3)})`});
+  const tt=$('tabsTop'); tt.style.left=(CX-450)+'px'; tt.style.top=(CY-80)+'px';
+  tt.style.clipPath=`inset(${Tt+80}px ${450-R}px ${80-B}px ${L+450}px round ${br}px)`;
+  const tv=visW(t,GR.tabs); tt.style.opacity=tv; tt.style.visibility=tv>0?'visible':'hidden'; tt.style.filter=tv<.999?`blur(${(1-tv)*12}px)`:'none';
+  fx($('togLabel'),vis(t,7.5,8.5),' translate(-50%,-50%)');
+  // gráfico
+  const dp=eo((t-10.5)/.5); $('line').setAttribute('stroke-dashoffset',(1-dp).toFixed(4)); $('area').setAttribute('opacity',(.07*dp).toFixed(3));
+  DATA.forEach((v,i)=>{const o=cl((dp-i/6)*8+1); const hv=i==4?eo((t-11)/.2):0; const d=$('dot'+i); d.setAttribute('opacity',o.toFixed(3)); d.setAttribute('r',(8+5*hv).toFixed(2));});
+  const hov=vis(t,11-.12,99,.22); $('guide').setAttribute('opacity',hov.toFixed(3));
+  const tip=$('tip'); tip.style.opacity=hov.toFixed(3); tip.style.filter=hov<.999?`blur(${(1-hov)*8}px)`:'none';
+  tip.style.transform=`translate(-50%,-50%) translateY(${(1-hov)*12}px) scale(${.94+.06*hov})`;
+  // ⌘K
+  const top=-h/2; $('cmdTop').style.top=(top+75)+'px';
+  const n=TYPE_T.filter(x=>t>=x).length; $('typed').textContent=TYPE.slice(0,n); $('ph').style.opacity=n?0:1;
+  $('caret').style.left=(-336+($('typed').offsetWidth||0)+(n?4:0))+'px';
+  $('caret').style.opacity=(t>=11.95&&t<12.7)||Math.floor((t-11.5)*3.6)%2==0?1:0;
+  ROWS.forEach((r0,i)=>{const e=$('row'+i); const y=top+220+rowPos[i].at(t)*100; e.style.top=y+'px';
+    const o=KEEP.includes(i)?1:1-sm((t-12.5)/.14); e.style.opacity=o; e.style.filter=o<.999?`blur(${(1-o)*10}px)`:'none';});
+  const hl=$('hl'); hl.style.top=(top+220)+'px'; hl.style.transform=`translate(0,-50%) scale(${hlS.at(t)})`;
+  $('enterK').style.top=(top+220)+'px'; $('enterK').style.color=t>=13?'#004299':'#6E6B65';
+  // toast
+  $('tCheck').setAttribute('stroke-dashoffset',(1-eo((t-13.12)/.26)).toFixed(4));
+  // cursor (mundo -> tela)
+  const [cx,cy]=curPos(t), sx=CX+(cx-CX)*s, sy=CY+(cy-CY)*s, pr=press.at(t);
+  $('cursor').style.transform=`translate(${(sx-4).toFixed(2)}px,${(sy-3).toFixed(2)}px) scale(${(1-.14*pr).toFixed(4)})`;
+}
+window.seek=seek; window.T=T;
+window.renderFrame=(f,fps=60)=>seek(f/fps);
+seek(0);
+</script></body></html>
