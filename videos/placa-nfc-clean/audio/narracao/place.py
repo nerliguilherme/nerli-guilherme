@@ -15,7 +15,7 @@ def seg(src,a,b,tempo=1.0,cut=None):
     f=int(.012*SR); y[:f]*=np.linspace(0,1,f); y[-f:]*=np.linspace(1,0,f); return y
 P=json.loads(sys.argv[2]); out=np.zeros(22*SR); log=[]
 for p in P:
-    y=seg(sys.argv[1],p['a'],p['b'],p.get('tempo',1.0),p.get('cut')); i=int(p['at']*SR)
+    y=seg(p.get('src',sys.argv[1]),p['a'],p['b'],p.get('tempo',1.0),p.get('cut')); i=int(p['at']*SR)
     assert i+len(y)<=len(out), ('passa de 22s',p); 
     if np.abs(out[i:i+len(y)]).max()>0: raise SystemExit(f'sobreposição em {p}')
     out[i:i+len(y)]+=y; log.append((p['at'],round(p['at']+len(y)/SR,2)))
