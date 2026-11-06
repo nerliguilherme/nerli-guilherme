@@ -1,0 +1,210 @@
+<!doctype html><html><head><meta charset="utf-8">
+<script src="assets/logo_paths.js"></script>
+<script src="engine.js"></script>
+<script src="v3_sync.js"></script>
+<style>
+/* NGraph · Reels NFC v4 — 3D, câmera, morph e tipografia cinética.
+   Regra: tudo é função do número do quadro (renderFrame(f), t = f/30). Sem relógio, sem aleatório. */
+:root{--mag:#ff2d8a;--blu:#2f7bff;--ora:#ff9a1f;--cya:#19e3c4}
+#bg{position:absolute;inset:0;background:radial-gradient(ellipse 75% 45% at 50% 48%,#0f1838 0%,#070a17 55%,#020308 100%)}
+#view{position:absolute;inset:0;perspective:1500px;perspective-origin:50% 48%;overflow:hidden}
+#cam{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:540px 950px}
+.o3{position:absolute;transform-style:preserve-3d}
+.face{position:absolute;backface-visibility:hidden}
+#floor{position:absolute;left:-1460px;top:1150px;width:4000px;height:3000px;transform-origin:50% 0;
+  background-image:linear-gradient(rgba(90,130,255,.55) 2px,transparent 2px),linear-gradient(90deg,rgba(90,130,255,.55) 2px,transparent 2px);background-size:120px 120px;
+  -webkit-mask-image:radial-gradient(ellipse 45% 40% at 50% 8%,#000 10%,transparent 75%)}
+.pt{position:absolute;left:0;top:0;border-radius:50%;background:#a9bdff}
+/* placa */
+.pfront{border-radius:34px;background:linear-gradient(160deg,#173690,#0b1a4f 60%,#081232);box-shadow:inset 0 0 0 4px rgba(150,190,255,.9),inset 0 0 50px rgba(47,123,255,.45)}
+.pedge{background:linear-gradient(90deg,#4f86ff,#1d3fa0)}
+/* celular */
+.phfront{border-radius:46px;background:#05070f;box-shadow:inset 0 0 0 6px #e6ebff}
+.scr{position:absolute;left:14px;top:14px;right:14px;bottom:14px;border-radius:36px;overflow:hidden;background:#0b1020}
+.notch{position:absolute;left:50%;top:22px;width:96px;height:26px;margin-left:-48px;border-radius:14px;background:#000;z-index:5}
+.phedge{background:linear-gradient(90deg,#e6ebff,#8f9bbf)}
+/* telas do celular */
+.sc{position:absolute;inset:0;opacity:0}
+.wa .h{height:86px;background:#1f8f5f;color:#fff;font:700 26px/110px IT;padding-left:22px}
+.bub{position:absolute;left:18px;right:40px;top:120px;background:#005c4b;color:#fff;font:500 26px/1.3 IT;padding:16px 18px;border-radius:18px 18px 18px 4px;transform-origin:0 100%}
+/* carrossel e cartões */
+.tile{position:absolute;width:300px;height:110px;margin:-55px 0 0 -150px;border-radius:26px;background:#fff;color:#0e2563;font:800 30px/110px IT;text-align:center;
+  box-shadow:0 0 0 4px var(--blu),0 0 40px rgba(47,123,255,.8);backface-visibility:hidden}
+.tile .e{font:34px 'Noto Color Emoji';margin-right:10px}
+.flip{border-radius:34px;display:flex;align-items:center;justify-content:center;text-align:center;font:900 64px/1.05 Mont;color:#fff}
+/* morph */
+#morph{position:absolute;left:0;top:0;overflow:visible}
+/* tipografia cinética */
+.kt{position:absolute;left:40px;right:40px;text-align:center;font:110px/1.02 Anton;text-transform:uppercase;color:#fff;letter-spacing:1px;perspective:900px;
+  -webkit-text-stroke:10px #000;paint-order:stroke fill}
+.kt .w{display:inline-block;white-space:nowrap;margin:0 .14em;transform-style:preserve-3d}
+.kt .l{display:inline-block;transform-origin:50% 100%}
+.kt .hl{color:var(--acc,#2f7bff)}
+.num{position:absolute;font:900 280px/1 Mont;color:transparent;-webkit-text-stroke:5px rgba(255,255,255,.85);letter-spacing:-10px}
+.ttl{position:absolute;left:0;right:0;text-align:center;font:800 64px/1.1 Mont;color:#fff}
+.ttl .l{display:inline-block}
+.pill{position:absolute;display:inline-flex;align-items:center;gap:16px;background:#fff;color:#0a0a0a;font:800 50px IT;padding:20px 38px;border-radius:999px;white-space:nowrap}
+</style></head><body><div id="stage">
+<div id="bg"></div>
+<div id="view"><div id="cam">
+  <div id="floor"></div>
+  <div id="pts"></div>
+  <svg id="morph" width="1080" height="1920"><defs>
+    <linearGradient id="mg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff2d8a"/><stop offset=".5" stop-color="#2f7bff"/><stop offset="1" stop-color="#ff9a1f"/></linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="9" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    <path id="mp" fill="none" stroke="url(#mg)" stroke-width="7" filter="url(#glow)"/></svg>
+  <div id="nums"></div>
+  <div class="o3" id="rings"></div>
+  <div class="o3" id="plate"></div>
+  <div class="o3" id="ph1"></div>
+  <div class="o3" id="ph2"></div>
+  <div class="o3" id="caro"></div>
+  <div class="o3" id="flip"></div>
+  <div class="o3" id="spin"></div>
+</div></div>
+<div id="titles"></div>
+<div id="kts"></div>
+<div id="cta"></div>
+</div>
+<script>
+const {cl,eo,eio,eb,lerp,$}=E;
+const p=E.p, FPS=30, A=window.ANCH; A.dur=40; window.DUR=40;
+// ---------- utilidades determinísticas ----------
+const hash=i=>{const x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x);};
+const ss=(a,b,x)=>{const k=cl((x-a)/(b-a));return k*k*(3-2*k);};
+function keys(K,t){ // interpolação suave entre quadros-chave [t,{...}]
+  if(t<=K[0][0])return K[0][1]; for(let i=1;i<K.length;i++){if(t<=K[i][0]){const [t0,a]=K[i-1],[t1,b]=K[i];const k=eio((t-t0)/(t1-t0));const o={};for(const n in a)o[n]=lerp(a[n],b[n],k);return o;}}return K[K.length-1][1];}
+// ---------- construtores 3D ----------
+function slab(root,w,h,d,front,cls){ // caixa com espessura
+  root.style.width=w+'px';root.style.height=h+'px';
+  const f=[['front',w,h,`translateZ(${d/2}px)`,front],['back',w,h,`rotateY(180deg) translateZ(${d/2}px)`,''],
+   ['l',d,h,`translateX(${-d/2}px) rotateY(-90deg)`,''],['r',d,h,`translateX(${w-d/2}px) rotateY(90deg)`,''],
+   ['t',w,d,`translateY(${-d/2}px) rotateX(90deg)`,''],['b',w,d,`translateY(${h-d/2}px) rotateX(-90deg)`,'']];
+  f.forEach(([n,fw,fh,tr,html])=>{const e=document.createElement('div');e.className='face '+(n=='front'?cls+'front':(n=='back'?cls+'front':cls+'edge'));
+    e.style.cssText+=`width:${fw}px;height:${fh}px;transform:${tr};`+(n=='l'||n=='r'?`left:0;top:0;`:``)+(n=='back'?'filter:brightness(.55)':'');e.innerHTML=html;root.appendChild(e);});
+}
+const NFCICON=(c,s)=>`<svg width="${s}" height="${s*.82}" viewBox="0 0 110 90" fill="none" stroke="${c}" stroke-width="8" stroke-linecap="round"><path d="M30 20 Q45 45 30 70"/><path d="M50 10 Q72 45 50 80"/><path d="M70 2 Q99 45 70 88"/><circle cx="14" cy="45" r="6" fill="${c}"/></svg>`;
+slab($('plate'),520,700,26,`<img src="assets/ngraph_white.svg" style="position:absolute;left:50px;width:420px;top:70px">
+  <div style="position:absolute;left:0;right:0;top:270px;text-align:center">${NFCICON('#fff',120)}<div style="font:700 32px IT;color:#dfe7ff;margin-top:10px">Aproxime seu celular</div></div>
+  <div style="position:absolute;left:170px;top:470px;width:180px;height:180px;background:#fff;border-radius:18px;padding:10px"><img src="assets/qr.png" style="width:100%;height:100%"></div>`,'p');
+const SCR1=`<div class="scr"><div class="notch"></div>
+  <div class="sc" id="s1home" style="background:linear-gradient(160deg,#3b4c86,#151a33)"></div>
+  <div class="sc wa" id="s1wa" style="background:#0b141a"><div class="h">💬 WhatsApp</div><div class="bub" id="s1b">Olá! Vim pela placa 👋</div></div>
+  <div class="sc" id="s1menu" style="background:linear-gradient(180deg,#0e2563,#2a5bd6);display:flex;align-items:center;justify-content:center">
+    <img src="assets/ngraph_sym.svg" style="width:120px;filter:drop-shadow(0 0 16px #fff)"></div>
+  <div class="sc" id="s1nfc" style="background:#08101f;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;color:#fff;font:800 44px Mont">${NFCICON('#19e3c4',130)}NFC</div></div>`;
+slab($('ph1'),300,620,30,SCR1,'ph');
+slab($('ph2'),300,620,30,`<div class="scr"><div class="notch"></div><div style="position:absolute;inset:0;background:#05080f"></div>
+  <img src="assets/qr.png" style="position:absolute;left:46px;top:170px;width:180px;border-radius:12px">
+  <div id="laser" style="position:absolute;left:30px;right:30px;height:6px;background:#19e3c4;box-shadow:0 0 18px 5px #19e3c4"></div>
+  <div style="position:absolute;left:30px;right:30px;top:150px;height:220px;border:5px solid rgba(255,255,255,.85);border-radius:18px"></div></div>`,'ph');
+// carrossel de botões (Vantagem 2)
+const TL=[['📸','Instagram'],['📒','Catálogo'],['⭐','Avaliação'],['💠','Pix']];
+$('caro').innerHTML=TL.map(([e,n],i)=>`<div class="tile" id="tl${i}"><span class="e">${e}</span>${n}</div>`).join('');
+// cartão que gira (Vantagem 3)
+$('flip').style.cssText+='width:700px;height:400px';
+$('flip').innerHTML=`<div class="face flip" style="width:700px;height:400px;background:#120b05;box-shadow:inset 0 0 0 5px #ff9a1f,0 0 60px rgba(255,154,31,.6)"><div>Promo de<br>outubro</div></div>
+ <div class="face flip" style="width:700px;height:400px;transform:rotateY(180deg);background:#03140f;box-shadow:inset 0 0 0 5px #19e3c4,0 0 60px rgba(25,227,196,.6)"><div>Promo de<br>novembro 🔥</div></div>`;
+// anel giratório (seta de atualizar)
+$('spin').innerHTML=`<svg width="560" height="560" viewBox="0 0 24 24" fill="none" stroke="#ff9a1f" stroke-width=".6" stroke-linecap="round" style="filter:drop-shadow(0 0 8px #ff9a1f)"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>`;
+// anéis de sinal NFC (3D)
+$('rings').innerHTML=[0,1,2,3].map(i=>`<div id="rg${i}" style="position:absolute;border:7px solid #8fb6ff;border-radius:50%;box-shadow:0 0 22px #2f7bff"></div>`).join('');
+// partículas em profundidade (posições por hash)
+const PT=[];for(let i=0;i<80;i++){const d=document.createElement('div');d.className='pt';const s=3+hash(i+7)*6;d.style.width=d.style.height=s+'px';$('pts').appendChild(d);PT.push([hash(i)*2400-660,hash(i+100)*2600-340,-1400+hash(i+200)*1800,.3+hash(i+300)*.7]);}
+// ---------- tipografia cinética ----------
+const COL={0:'#ff2d8a',1:'#ff2d8a',2:'#2f7bff',3:'#ff9a1f',4:'#19e3c4',5:'#2f7bff'};
+function sceneOf(t){return t<A.v1?0:t<A.v2?1:t<A.v3?2:t<A.v4?3:t<A.end?4:5;}
+const KT=window.CAPS_V.map((c,gi)=>{const el=document.createElement('div');el.className='kt';
+  const big=c[0]<A.olha;el.style.top=(big?720:1430)+'px';if(big)el.style.fontSize='150px';
+  el.style.setProperty('--acc',COL[sceneOf(c[0]+.01)]);
+  let li=0;el.innerHTML=c[2].replace(/\*([^*]+)\*/g,'\u0001$1\u0002').split(/(\u0001[^\u0002]*\u0002)/).map(seg=>{const hl=seg.startsWith('\u0001');const s=hl?seg.slice(1,-1):seg;
+    return s.trim().split(/\s+/).filter(Boolean).map(w=>`<span class="w${hl?' hl':''}">${[...w].map(ch=>`<span class="l" data-i="${li++}">${ch}</span>`).join('')}</span>`).join(' ');}).join(' ');
+  $('kts').appendChild(el);return {el,t0:c[0],t1:c[1],n:li,ls:[...el.querySelectorAll('.l')],ws:[...el.querySelectorAll('.w')]};});
+function renderKT(t){KT.forEach(g=>{const vis=t>=g.t0-.05&&t<g.t1+.1;g.el.style.display=vis?'block':'none';if(!vis)return;
+  const st=Math.min(.03,.32/g.n);
+  g.ls.forEach((l,i)=>{const a=t-(g.t0+i*st);const k=eb(cl(a/.32));const ko=ss(g.t1-.14+i*.004,g.t1+.02+i*.004,t);
+    l.style.transform=`translateY(${(1-k)*70-ko*60}px) rotateX(${(1-eo(cl(a/.32)))*-95+ko*70}deg) scale(${.6+.4*k})`;l.style.opacity=cl(a/.08)*(1-ko);});
+  g.ws.forEach(w=>{if(!w.classList.contains('hl'))return;const a=t-g.t0-.25;const pk=Math.max(0,Math.sin(Math.PI*cl(a/.35)));w.style.transform=`scale(${1+.16*pk})`;});});}
+// títulos de cena: número vazado gigante + título letra a letra
+const TT=[[A.v1,'01','Um toque e pronto','#ff2d8a'],[A.v2,'02','Tudo num lugar só','#2f7bff'],[A.v3,'03','Atualize quando quiser','#ff9a1f'],[A.v4,'04','Qualquer celular','#19e3c4']];
+TT.forEach(([t0,n,s,c],i)=>{$('nums').insertAdjacentHTML('beforeend',`<div class="num" id="nu${i}" style="-webkit-text-stroke-color:${c};text-shadow:0 0 30px ${c}">${n}</div>`);
+  $('titles').insertAdjacentHTML('beforeend',`<div class="ttl" id="tt${i}" style="top:236px">${[...s].map(ch=>`<span class="l">${ch==' '?'&nbsp;':ch}</span>`).join('')}</div>`);});
+// CTA final
+$('titles').insertAdjacentHTML('beforeend',`<div class="ttl" id="ttE" style="top:250px;font-size:72px">${[...'Placa NFC personalizada'].map(ch=>`<span class="l">${ch==' '?'&nbsp;':ch}</span>`).join('')}</div>`);
+$('cta').innerHTML=`<div class="pill" id="pill" style="left:50%;top:1250px"><svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.3" cy="6.7" r="1.1" fill="#0a0a0a" stroke="none"/></svg>@ngraph.pe</div>
+ <div id="chev" style="position:absolute;left:0;right:0;top:1340px;text-align:center">${[0,1,2].map(i=>`<svg id="cv${i}" width="130" height="62" viewBox="0 0 120 60" style="display:block;margin:-12px auto 0"><path d="M10 10 L60 50 L110 10" fill="none" stroke="#2f7bff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 0 12px #2f7bff)"/></svg>`).join('')}</div>`;
+// ---------- forma que se transforma (superelipse) ----------
+function shape(c){const N=120,pts=[];for(let i=0;i<N;i++){const a=i/N*Math.PI*2+c.rot,ca=Math.cos(a),sa=Math.sin(a);
+  const x=Math.sign(ca)*Math.pow(Math.abs(ca),2/c.n)*c.w/2,y=Math.sign(sa)*Math.pow(Math.abs(sa),2/c.n)*c.h/2;pts.push((c.x+x).toFixed(1)+','+(c.y+y).toFixed(1));}return 'M'+pts.join('L')+'Z';}
+const MK=()=>[[0,{x:540,y:1180,w:0,h:0,n:2,rot:0,o:0}],[.4,{x:540,y:1180,w:90,h:90,n:2,rot:0,o:1}],[A.olha-.3,{x:540,y:1180,w:120,h:120,n:2,rot:0,o:1}],
+ [A.olha+.6,{x:540,y:950,w:600,h:780,n:9,rot:0,o:1}],[A.v1+.4,{x:420,y:950,w:560,h:740,n:9,rot:0,o:.7}],[A.v2,{x:540,y:950,w:640,h:640,n:2,rot:0,o:1}],
+ [A.v2+.8,{x:540,y:960,w:1000,h:330,n:2,rot:.4,o:1}],[A.v3,{x:540,y:960,w:1000,h:330,n:2,rot:1.6,o:1}],[A.v3+.8,{x:540,y:950,w:800,h:500,n:10,rot:0,o:1}],
+ [A.v4,{x:540,y:950,w:800,h:500,n:10,rot:0,o:1}],[A.v4+.8,{x:540,y:950,w:900,h:780,n:8,rot:0,o:.8}],[A.end,{x:540,y:950,w:900,h:780,n:8,rot:0,o:.8}],
+ [A.end+.8,{x:540,y:900,w:600,h:780,n:9,rot:0,o:.9}],[A.manda-.4,{x:540,y:900,w:600,h:780,n:9,rot:0,o:.9}],[A.manda+.4,{x:540,y:1250,w:560,h:130,n:7,rot:0,o:1}],[40,{x:540,y:1250,w:580,h:136,n:7,rot:0,o:1}]];
+const MKEYS=MK();
+// ---------- câmera ----------
+const CK=[[0,{rx:0,ry:0,z:-260,x:0,y:0}],[A.olha,{rx:0,ry:0,z:0,x:0,y:0}],[A.olha+.9,{rx:9,ry:-14,z:90,x:0,y:0}],[A.v1+.6,{rx:5,ry:10,z:0,x:0,y:0}],
+ [A.aprox+.9,{rx:0,ry:-6,z:170,x:0,y:0}],[A.whats+.6,{rx:3,ry:4,z:120,x:0,y:0}],[A.v2+.5,{rx:14,ry:0,z:-120,x:0,y:0}],[A.pix+.4,{rx:8,ry:14,z:-20,x:0,y:0}],
+ [A.v3+.5,{rx:0,ry:-10,z:40,x:0,y:0}],[A.link+.5,{rx:2,ry:10,z:140,x:0,y:0}],[A.v4+.6,{rx:6,ry:12,z:20,x:230,y:0}],[A.qr-.3,{rx:4,ry:8,z:60,x:230,y:0}],
+ [A.qr+.5,{rx:4,ry:-10,z:60,x:-230,y:0}],[A.end+.6,{rx:0,ry:0,z:-60,x:0,y:0}],[A.manda,{rx:-3,ry:0,z:30,x:0,y:-60}],[40,{rx:-4,ry:0,z:110,x:0,y:-60}]];
+function place(el,x,y,z,rx,ry,rz,s,o,w,h){el.style.transform=`translate3d(${x-w/2}px,${y-h/2}px,${z}px) rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg) scale(${s})`;el.style.opacity=o;el.style.display=o<=0.001?'none':'block';}
+function scr(id,t0,t1,t){const e=$(id);e.style.opacity=ss(t0,t0+.25,t)*(1-ss(t1,t1+.25,t));}
+// ---------- quadro ----------
+window.renderFrame=function(f){const t=f/FPS;
+ const c=keys(CK,t);const hx=Math.sin(f*.037)*5+Math.sin(f*.091)*2,hy=Math.cos(f*.029)*6;
+ $('cam').style.transform=`translate3d(${c.x+hx}px,${c.y+hy}px,${c.z}px) rotateX(${c.rx}deg) rotateY(${c.ry+Math.sin(f*.021)*1.2}deg)`;
+ $('floor').style.transform=`rotateX(82deg) translateZ(-40px) translateY(${(f*1.6)%120}px)`;
+ PT.forEach((q,i)=>{const e=$('pts').children[i];const y=((q[1]-f*1.2*q[3])%2600+2600)%2600-340;e.style.transform=`translate3d(${q[0]}px,${y}px,${q[2]}px)`;e.style.opacity=.25+.55*(.5+.5*Math.sin(f*.05*q[3]+i));});
+ // morph
+ const m=keys(MKEYS,t);$('mp').setAttribute('d',shape(m));$('mp').style.opacity=m.o*(m.w>2?1:0);
+ // placa
+ const pin=eb(p(t,A.olha-.2,A.olha+.5)), pout=ss(A.v2-.1,A.v2+.4,t), pret=eb(p(t,A.end+.1,A.end+.9));
+ let px=540,pr=-18+Math.sin(f*.026)*8,pz=0,ps=.6+.4*pin;
+ px=lerp(px,400,eio(p(t,A.v1+.3,A.v1+1.1)));
+ const op=(pin*(1-pout))+pret*(t>A.end?1:0);
+ if(t>A.end){px=540;pr=lerp(-70,0,pret)+Math.sin(f*.03)*4;ps=lerp(.5,.86,pret);pz=0;}
+ const py=t>A.end?lerp(900,830,ss(A.manda-.4,A.manda+.3,t)):950;
+ place($('plate'),px,py,pz,4,pr,0,ps*(t>A.end?lerp(1,.78,ss(A.manda-.4,A.manda+.3,t)):1),Math.min(op,1),520,700);
+ // anéis NFC: na abertura e no toque
+ const rT=[A.olha+.4,A.aprox+.8];
+ for(let i=0;i<4;i++){let best=0,d=0;rT.forEach(r0=>{const k=p(t,r0+i*.2,r0+1.1+i*.2);if(k>0&&k<1){best=1-k;d=80+k*620;}});
+  const e=$('rg'+i);e.style.width=e.style.height=d+'px';e.style.left=e.style.top=(-d/2)+'px';e.style.opacity=best;}
+ const rx0=t<A.v1+1?540:lerp(400,560,eio(p(t,A.v1+1.2,A.aprox+.8)));
+ place($('rings'),rx0,950,40,58,0,0,1,1,0,0);
+ // celular 1
+ const ph_in=eo(p(t,A.v1+.9,A.v1+1.7)), ph_touch=eio(p(t,A.v1+1.7,A.aprox+.8));
+ let qx=lerp(1300,780,ph_in),qy=lerp(560,900,ph_in),qz=lerp(300,140,ph_in),qr=lerp(-40,-28,ph_in),qrz=lerp(18,8,ph_in);
+ qx=lerp(qx,560,ph_touch);qz=lerp(qz,60,ph_touch);qr=lerp(qr,-12,ph_touch);qrz=lerp(qrz,-4,ph_touch);
+ const toV2=eio(p(t,A.v2-.1,A.v2+.7));qx=lerp(qx,540,toV2);qy=lerp(qy,950,toV2);qz=lerp(qz,0,toV2);qr=lerp(qr,0,toV2)+toV2*Math.sin(f*.04)*10;qrz=lerp(qrz,0,toV2);
+ const toV4=eio(p(t,A.v4-.1,A.v4+.7));qx=lerp(qx,310,toV4);qr=lerp(qr,22,toV4);
+ const ph1o=ph_in*(1-ss(A.v3-.2,A.v3+.3,t))+ss(A.v4-.1,A.v4+.4,t)*(1-ss(A.end-.2,A.end+.3,t));
+ place($('ph1'),qx,qy,qz,0,qr,qrz,1,Math.min(ph1o,1),300,620);
+ scr('s1home',0,A.whats-.15,t);scr('s1wa',A.whats-.15,A.v2+.2,t);scr('s1menu',A.v2+.2,A.v3,t);scr('s1nfc',A.v4,99,t);
+ const kb=eb(p(t,A.whats+.3,A.whats+.65));$('s1b').style.transform=`scale(${kb})`;
+ // celular 2 (QR)
+ const ph2i=eo(p(t,A.v4+.2,A.v4+1.0));place($('ph2'),770,lerp(1200,950,ph2i),0,0,-22,0,1,ph2i*(1-ss(A.end-.2,A.end+.3,t)),300,620);
+ $('laser').style.top=(170+Math.abs(((f/40)%2)-1)*180)+'px';
+ // carrossel 3D
+ const cv=ss(A.v2+.3,A.v2+.8,t)*(1-ss(A.v3-.2,A.v3+.3,t));
+ const cr=keys([[A.v2,{r:40}],[A.insta-.2,{r:0}],[A.catal-.35,{r:0}],[A.catal-.05,{r:-90}],[A.aval-.35,{r:-90}],[A.aval-.05,{r:-180}],[A.pix-.35,{r:-180}],[A.pix-.05,{r:-270}],[A.v3-.1,{r:-270}],[A.v3+.4,{r:-320}]],t).r;
+ place($('caro'),540,960,0,-8,cr,0,1,cv,0,0);
+ [A.insta,A.catal,A.aval,A.pix].forEach((t0,i)=>{const k=eb(p(t,t0-.12,t0+.3));const a=i*90;const g=Math.max(0,1-Math.abs(t-t0-.15)*2.6);
+  $('tl'+i).style.transform=`rotateY(${a}deg) translateZ(${430*k}px) scale(${k*(1+.12*g)})`;$('tl'+i).style.opacity=cl(k*3);});
+ // cartão que gira + anel
+ const fv=eb(p(t,A.v3+.4,A.v3+1.0))*(1-ss(A.v4-.2,A.v4+.3,t));const fl=eio(p(t,A.link-.45,A.link+.35));
+ place($('flip'),540,950,30,6,fl*180+Math.sin(f*.03)*6,0,.6+.4*fv,cl(fv*2),700,400);
+ place($('spin'),540,950,-160,0,0,eio(p(t,A.mudou-.2,A.link+.6))*720,1,.8*cl(fv*2),560,560);
+ // títulos e números
+ TT.forEach(([t0],i)=>{const t1=i<3?TT[i+1][0]:A.end;const k=eb(p(t,t0,t0+.6)),ko=ss(t1-.3,t1+.1,t);
+  const nu=$('nu'+i);nu.style.transform=`translate3d(${i%2?640:90}px,${340}px,${-420+260*k}px) rotateY(${(1-k)*(i%2?-80:80)}deg)`;nu.style.opacity=(k*(1-ko)*.9);nu.style.display=k*(1-ko)>0?'block':'none';
+  const tt=$('tt'+i);const ls=tt.children;const vis=t>=t0&&t<t1+.2;tt.style.display=vis?'block':'none';
+  if(vis)[...ls].forEach((l,j)=>{const a=t-(t0+.2+j*.025);const kk=eb(cl(a/.4));l.style.transform=`translateY(${(1-kk)*-60+ko*-40}px) rotateZ(${(1-kk)*-12}deg)`;l.style.opacity=cl(a/.1)*(1-ko);});});
+ {const tt=$('ttE');const vis=t>=A.end+.3;tt.style.display=vis?'block':'none';if(vis)[...tt.children].forEach((l,j)=>{const a=t-(A.end+.5+j*.03);const kk=eb(cl(a/.4));l.style.transform=`translateY(${(1-kk)*-60}px) rotateX(${(1-kk)*90}deg)`;l.style.opacity=cl(a/.1);});}
+ // CTA
+ const kp=eb(p(t,A.manda-.1,A.manda+.35));$('pill').style.transform=`translate(-50%,-50%) scale(${kp})`;$('pill').style.opacity=cl(kp*3);
+ for(let i=0;i<3;i++){const ph=((f/14)-i*.35)%1;$('cv'+i).style.opacity=t>A.manda+.2?(.2+.8*Math.max(0,Math.sin(ph*Math.PI))):0;}
+ renderKT(t);
+};
+window.render=t=>renderFrame(Math.round(t*FPS));
+renderFrame(0);
+</script></body></html>

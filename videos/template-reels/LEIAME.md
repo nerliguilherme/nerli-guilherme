@@ -25,3 +25,11 @@ ffmpeg -framerate 30 -i frames1/%05d.png -i a1.wav -vf "vignette=PI/6,format=yuv
 - `sync3.py` lê `w3.json` (tempos por palavra) e gera `v3_sync.js` (âncoras das cenas, legendas e gancho).
 - Trilha: ElevenLabs Music (videos/trilhas/trilha-neon-A.mp3), voz ~19 dB acima da trilha.
 - `render_range.js` re-renderiza só um trecho de quadros (útil para ajustes rápidos).
+
+## v4.html — versão 3D (40s, vertical)
+- Cada quadro é função pura do número dele: `renderFrame(f)`, com `t = f/30`. Nada de relógio nem de `Math.random`; partículas usam `hash(i)`. O mesmo quadro sempre sai idêntico (testado por md5).
+- 3D em CSS: placa e celulares com espessura (6 faces), carrossel 3D de botões, cartão que gira, piso em perspectiva, partículas em profundidade.
+- Câmera virtual: quadros-chave (`CK`) suavizados, com leve tremida calculada por seno do número do quadro.
+- Contorno que se transforma: superelipse (`shape`) com parâmetros em quadros-chave (`MKEYS`): círculo → placa → anel → cartão → moldura → selo do @.
+- Tipografia cinética: letras em cascata com giro em X; palavras-chave com "soco" de escala; números vazados gigantes por cena.
+- Logo para fundo escuro (`assets/ngraph_white.svg`): letras brancas e azul do "N" clareado para não sumir no fundo.

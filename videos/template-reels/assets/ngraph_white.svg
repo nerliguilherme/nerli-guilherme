@@ -8,8 +8,8 @@
 <stop offset="0.116862" stop-color="#450932"/>
 <stop offset="0.191172" stop-color="#A20056"/>
 <stop offset="0.389323" stop-color="#DB0074"/>
-<stop offset="0.389423" stop-color="#142C6C"/>
-<stop offset="0.701823" stop-color="#004299"/>
+<stop offset="0.389423" stop-color="#3D7BFF"/>
+<stop offset="0.701823" stop-color="#6FA6FF"/>
 <stop offset="0.701923" stop-color="#F28E25"/>
 <stop offset="0.758333" stop-color="#E98F00"/>
 <stop offset="0.820112" stop-color="#CC8900"/>
@@ -18,8 +18,8 @@
 <stop offset="0.116862" stop-color="#450932"/>
 <stop offset="0.191172" stop-color="#A20056"/>
 <stop offset="0.389323" stop-color="#DB0074"/>
-<stop offset="0.389423" stop-color="#142C6C"/>
-<stop offset="0.703619" stop-color="#004299"/>
+<stop offset="0.389423" stop-color="#3D7BFF"/>
+<stop offset="0.703619" stop-color="#6FA6FF"/>
 <stop offset="0.703743" stop-color="#FF8200"/>
 </linearGradient>
 </defs>
