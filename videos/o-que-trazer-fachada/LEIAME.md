@@ -3,7 +3,7 @@
 Saída final: `videos/reels-o-que-trazer-fachada.mp4`
 
 ## Narração
-- Voz clonada do Guilherme (ElevenLabs eleven_v4), em `audio/narr.mp3`.
+- Voz clonada do Guilherme (ElevenLabs eleven_v4), em `audio/narr.mp3`. A frase final foi regravada com a pronúncia "Enigráfi" (`audio/fix_fach.mp3`).
 - No vídeo, a narração está acelerada 6% e começa em 0,15 s.
 
 ## Sincronia
