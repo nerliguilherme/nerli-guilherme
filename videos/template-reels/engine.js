@@ -58,30 +58,43 @@
     el.style.opacity = E.p(t, c[0], c[0] + .06);
   };
 
-  // Vinheta final com a logo (monta camadas em #end)
-  E.buildEnd = function (sub) {
-    const LX = [236, 377, 507, 650, 788], LW = [121, 112, 123, 117, 113];
+  // Vinheta final com a logo vetorial (assets/logo_paths.js -> window.NG)
+  const LET = [[203, 334], [353, 473], [491, 623], [643, 768], [788, 910]];
+  E.buildEnd = function (sub, contato) {
+    const N = window.NG;
+    const ns = 'http://www.w3.org/2000/svg';
     E.$('end').innerHTML = `
-     <div class="abs" id="endbg" style="inset:0;background:radial-gradient(ellipse at 50% 45%,#fff 0%,#eef0fa 60%,#dfe3f5 100%)"></div>
-     <div class="abs" id="elogo" style="left:80px;top:820px;width:920px;height:240px;transform-origin:460px 120px">
-       <img class="abs" id="enm" src="assets/n_mag.png"><img class="abs" id="enb" src="assets/n_blu.png"><img class="abs" id="eno" src="assets/n_ora.png">
-       ${LX.map((x, i) => `<div class="abs" style="left:${x}px;top:0;width:${LW[i]}px;height:172px;overflow:hidden"><img class="abs" id="el${i}" src="assets/L${i}.png"></div>`).join('')}
-       <div class="abs" id="etag" style="left:0;top:172px;height:68px;width:0;overflow:hidden"><img class="abs" src="assets/tag.png"></div>
-     </div>
-     <div class="abs" id="esub" style="left:0;right:0;top:1110px;text-align:center;font:700 44px IT;color:#1e3f99;opacity:0">${sub}</div>`;
+     <div class="abs" style="inset:0;background:radial-gradient(ellipse at 50% 45%,#fff 0%,#eef0fa 60%,#dfe3f5 100%)"></div>
+     <svg class="abs" id="elogo" style="left:80px;top:800px;transform-origin:460px 130px" width="920" height="260" viewBox="0 0 972 275" xmlns="${ns}">
+       ${N.defs.replace('<defs>', '<defs>' +
+         '<clipPath id="cpM"><rect id="rM" x="-10" y="275" width="64.3" height="300"/></clipPath>' +
+         '<clipPath id="cpB"><polygon id="pB" points="54.3,0 54.3,0 54.3,0"/></clipPath>' +
+         '<clipPath id="cpO"><rect id="rO" x="131.2" y="-20" width="80" height="0"/></clipPath>' +
+         LET.map((l, i) => `<clipPath id="cL${i}"><rect x="${l[0]}" y="55" width="${l[1] - l[0]}" height="160"/></clipPath>`).join('') +
+         '<clipPath id="cT"><rect id="rT" x="200" y="220" width="0" height="60"/></clipPath>')}
+       ${['cpM', 'cpB', 'cpO'].map(c => `<g clip-path="url(#${c})"><path d="${N.sym1}" fill="url(#paint0_linear_259_122)"/><path d="${N.sym2}" fill="url(#paint1_linear_259_122)"/></g>`).join('')}
+       ${LET.map((l, i) => `<g clip-path="url(#cL${i})"><g id="eL${i}"><path d="${N.text}" fill="#0a0a0a"/></g></g>`).join('')}
+       <g clip-path="url(#cT)"><path d="${N.tag}" fill="#0a0a0a"/></g>
+     </svg>
+     <div class="abs" id="esub" style="left:0;right:0;top:1100px;text-align:center;font:700 42px IT;color:#1e3f99;opacity:0">${sub}</div>
+     <div class="abs" id="econ" style="left:0;right:0;top:1170px;text-align:center;opacity:0">
+       <span style="display:inline-flex;align-items:center;gap:14px;background:#0a0a0a;color:#fff;font:800 44px IT;padding:16px 30px;border-radius:999px">
+       <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.3" cy="6.7" r="1.1" fill="#fff" stroke="none"/></svg>${contato || '@ngraph.pe'}</span></div>`;
   };
   E.renderEnd = function (t, t0) {
     const x = t - t0, p = E.p, eo = E.eo, eb = E.eb;
     E.$('end').style.opacity = p(x, 0, .25);
     E.$('end').style.clipPath = `circle(${eo(p(x, 0, .5)) * 120}% at 50% 50%)`;
     const km = eo(p(x, .2, .6)), kb = eo(p(x, .35, .75)), ko = eo(p(x, .5, .9));
-    E.$('enm').style.clipPath = `inset(${(1 - km) * 100}% 0 0 0)`;
-    E.$('enb').style.clipPath = `polygon(0 0, ${kb * 520}px 0, 0 ${kb * 520}px)`;
-    E.$('eno').style.clipPath = `inset(0 0 ${(1 - ko) * 100}% 0)`;
-    for (let i = 0; i < 5; i++) E.$('el' + i).style.transform = `translateY(${(1 - eb(p(x, .7 + i * .07, 1.15 + i * .07))) * 175}px)`;
-    E.$('etag').style.width = eo(p(x, 1.2, 1.7)) * 920 + 'px';
+    E.$('rM').setAttribute('y', 280 - km * 290);
+    const d = kb * 520; E.$('pB').setAttribute('points', `54.3,-20 ${54.3 + d},-20 54.3,${-20 + d}`);
+    E.$('rO').setAttribute('height', ko * 300);
+    for (let i = 0; i < 5; i++) E.$('eL' + i).setAttribute('transform', `translate(0 ${(1 - eb(p(x, .7 + i * .07, 1.15 + i * .07))) * 165})`);
+    E.$('rT').setAttribute('width', eo(p(x, 1.2, 1.7)) * 760);
     E.$('esub').style.opacity = p(x, 1.5, 1.8);
     E.$('esub').style.transform = `translateY(${(1 - eo(p(x, 1.5, 1.9))) * 30}px)`;
+    const kc = eb(p(x, 1.8, 2.25)); E.$('econ').style.opacity = p(x, 1.8, 1.95);
+    E.$('econ').style.transform = `scale(${.7 + .3 * kc})`;
     E.$('elogo').style.transform = `scale(${.9 + .1 * eo(p(x, .2, 1.4)) + .02 * p(x, 1.4, 4)})`;
   };
 })();

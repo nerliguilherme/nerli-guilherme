@@ -1,4 +1,5 @@
 <!doctype html><html><head><meta charset="utf-8">
+<script src="assets/logo_paths.js"></script>
 <script src="engine.js"></script>
 <style>
 #bg{position:absolute;inset:0;background:
@@ -10,7 +11,7 @@
   background:linear-gradient(150deg,#2f6bff 0%,#1e3f99 55%,#132a6e 100%);
   box-shadow:0 60px 90px rgba(0,0,0,.6),inset 0 2px 0 rgba(255,255,255,.35),inset 0 -6px 18px rgba(0,0,0,.35)}
 #plate .gloss{position:absolute;inset:0;border-radius:40px;background:linear-gradient(120deg,rgba(255,255,255,.28) 0%,rgba(255,255,255,0) 35%,rgba(255,255,255,0) 70%,rgba(255,255,255,.08) 100%)}
-#plogo{position:absolute;left:50%;top:70px;width:920px;height:240px;margin-left:-460px;transform:scale(.52);transform-origin:50% 0}
+#plogo{position:absolute;left:60px;right:60px;top:70px}
 #plogo .txt{filter:brightness(0) invert(1)}
 #nfc{position:absolute;left:0;right:0;top:250px;text-align:center;color:#fff;font:800 40px IT}
 #nfc svg{display:block;margin:0 auto 12px}
@@ -51,7 +52,7 @@
 <div id="bg"></div><div id="grain"></div>
 <div id="scene">
  <div id="plate"><div class="gloss"></div>
-   <div id="plogo"><img class="abs" src="assets/n_mag.png"><img class="abs" src="assets/n_blu.png"><img class="abs" src="assets/n_ora.png"><img class="abs txt" src="assets/text.png"></div>
+   <div id="plogo"><img src="assets/ngraph_white.svg" style="width:100%"></div>
    <div id="nfc"><svg width="110" height="90" viewBox="0 0 110 90" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round">
      <path d="M30 20 Q45 45 30 70"/><path d="M50 10 Q72 45 50 80"/><path d="M70 2 Q99 45 70 88"/><circle cx="14" cy="45" r="6" fill="#fff"/></svg>
      Aproxime seu celular</div>
@@ -60,10 +61,10 @@
  </div>
   <div id="phone"><div id="screen"><div id="island"></div>
    <div id="home"><div class="apps"></div></div>
-   <div id="notif"><div class="ic"><img src="assets/n_sym.png" style="position:absolute;left:50%;top:50%;height:40px;transform:translate(-50%,-50%)"></div>
+   <div id="notif"><div class="ic"><img src="assets/ngraph_sym.svg" style="position:absolute;left:50%;top:50%;height:40px;transform:translate(-50%,-50%)"></div>
      <div class="tx">NGraph<small>Toque para abrir o menu</small></div></div>
    <div id="menu">
-     <div class="av"><img src="assets/n_sym.png" style="position:absolute;left:50%;top:50%;height:76px;transform:translate(-50%,-50%)"></div>
+     <div class="av"><img src="assets/ngraph_sym.svg" style="position:absolute;left:50%;top:50%;height:76px;transform:translate(-50%,-50%)"></div>
      <h4>NGraph</h4><h5>Gráfica &amp; Comunicação Visual</h5>
      <div class="btn" id="m0" style="top:340px"><span class="em">💬</span>WhatsApp</div>
      <div class="btn" id="m1" style="top:440px"><span class="em">📸</span>Instagram</div>
