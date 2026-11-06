@@ -19,3 +19,9 @@ ffmpeg -framerate 30 -i frames1/%05d.png -i a1.wav -vf "vignette=PI/6,format=yuv
 - No roteiro enviado à ElevenLabs, escreva **"Ngráfi"** para a voz pronunciar NGraph certo (a legenda continua "NGRAPH").
 - `sync.py` gera legendas e sincronia a partir de `w1.json`/`w2.json` (tempos por palavra da transcrição).
 - Mixagem: voz normalizada em -16 LUFS; trilha em -26 LUFS antes do ducking (fica ~20 dB abaixo da voz); saída final ~-14 LUFS.
+
+## Estilo neon (v3.html) — placa NFC com a voz clonada "Guilherme"
+- Fundo escuro, cards com borda neon empilhados, etiqueta "Vantagem N", vinheta com logo vetorial e @ngraph.pe.
+- `sync3.py` lê `w3.json` (tempos por palavra) e gera `v3_sync.js` (âncoras das cenas, legendas e gancho).
+- Trilha: ElevenLabs Music (videos/trilhas/trilha-neon-A.mp3), voz ~19 dB acima da trilha.
+- `render_range.js` re-renderiza só um trecho de quadros (útil para ajustes rápidos).
