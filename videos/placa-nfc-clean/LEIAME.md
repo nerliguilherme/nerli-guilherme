@@ -20,3 +20,9 @@ python3 -m http.server 8772
 FILM=film_google.html node render.js 0 2639 sub_google
 ffmpeg -framerate 120 -i sub_google/%05d.png -i audio/trilha_google.wav -filter_complex "[0:v]tmix=frames=2,select='eq(mod(n\,2)\,1)',setpts=N/60/TB,format=yuv420p[v]" -map "[v]" -map 1:a -r 60 -c:v libx264 -crf 17 -c:a aac out.mp4
 ```
+
+## Narração (voz clonada do Guilherme, ElevenLabs eleven_v4)
+- `audio/narracao/g2.mp3` e `c2.mp3` são as gravações completas.
+- `place.py` corta cada gravação por frase, usando as pausas medidas, e coloca cada frase no início da sua cena.
+- Saídas: `voz_google.wav` e `voz_catalogo.wav`.
+- Mix: voz a -16 LUFS. A trilha fica a -25 LUFS e baixa automaticamente quando a voz entra (sidechain). Os sons de UI ficam por baixo. Mix final a -14 LUFS.
