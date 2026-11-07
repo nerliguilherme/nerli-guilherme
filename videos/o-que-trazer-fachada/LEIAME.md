@@ -28,3 +28,10 @@ python3 -m http.server 8773
 node render.js 0 4799 sub
 ffmpeg -framerate 120 -i sub/%05d.png -i audio/trilha_fach.wav -filter_complex "[0:v]tmix=frames=2,select='eq(mod(n\,2)\,1)',setpts=N/60/TB,format=yuv420p[v]" -map "[v]" -map 1:a -r 60 -c:v libx264 -crf 17 -c:a aac out.mp4
 ```
+
+## Marca d'água
+- `img/marca-dagua.png` (símbolo N + "@ngraph.pe") fica no canto superior esquerdo, em x=56 e y=262, com 72% de opacidade.
+- Para aplicar em outro vídeo:
+```
+ffmpeg -i video.mp4 -i img/marca-dagua.png -filter_complex "[1:v]format=rgba,colorchannelmixer=aa=0.72[w];[0:v][w]overlay=56:262,format=yuv420p" -c:v libx264 -crf 17 -c:a copy saida.mp4
+```
