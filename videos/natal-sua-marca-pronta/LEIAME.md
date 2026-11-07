@@ -1,31 +1,31 @@
-# Reels "Ainda dá tempo: sua marca pronta antes do Natal" (18 s, 1080x1920, 60 fps)
+# Reels "Ainda dá tempo: sua marca pronta antes do Natal" (26 s, 1080x1920, 60 fps)
 
-Saída final: `videos/reels-natal-sua-marca-pronta.mp4`. O vídeo já sai com a marca d'água @ngraph.pe.
+Saída final: `videos/reels-natal-sua-marca-pronta.mp4`. Já sai com a marca d'água @ngraph.pe.
+
+## Roteiro (versão 2)
+| Tempo | Cena |
+|---|---|
+| 0–2,6 s | Gancho: "Sua loja vai entrar em **dezembro** do mesmo jeito?" |
+| 2,7–4 s | "Olha o que a gente fez:" |
+| 4–10,5 s | Vitrine de 9 fotos, uma por batida e acelerando, com o serviço embaixo de cada uma |
+| 10,5–15,7 s | Personalizados de **Natal**: enfeite de linha dourado + "Letreiros personalizados", "Peças em acrílico", "E muito mais" |
+| 15,8–17,8 s | "Dezembro é o mês que mais **vende**." / "Sua marca precisa ser **vista**." |
+| 17,9–21,7 s | Calendário de novembro com o dia 20 circulado: "Promoção até **20 de novembro**" / "Aproveita antes do **Natal**." |
+| 21,8–26 s | Laço dourado, logo, @ngraph.pe, botão "Chama no WhatsApp" com pulso |
 
 ## Fotos da vitrine
-- Ficam em `img/p1.jpg` … `img/p7.jpg`, em 918x1060, recortadas com foco no letreiro.
-- 1 a 3 são as reais pedidas: D'Paleteiros, Espelho Meu e Fibernett.
-- **4 a 7 são substitutas provisórias**, porque as fotos enviadas não chegaram:
-
-| Vaga | Pedida | Substituta |
-|---|---|---|
-| 4 | Ana Silva | Studio Espelho Meu |
-| 5 | Amor Saúde | Blaser |
-| 6 | Ramyla Melo | Revitafio |
-| 7 | Uninassau | Assembleia de Deus |
-
-- Para trocar: salve a foto nova no lugar de `img/pN.jpg` (918x1060) e re-renderize só os subquadros da vitrine, de 3,4 a 10,1 s (j = 408 a 1212).
+`img/q1.jpg` … `img/q9.jpg` (918x940), em ordem: D'Paleteiros, Espelho Meu, Ana Silva, Fibernett, Amor Saúde, Ramyla Melo, Conecta Service Solar, Uninassau (placa), Uninassau (luminoso).
 
 ## Sincronia
-- As fotos entram nas batidas da trilha (120 BPM, corte em 0,475 s): 4,0 · 5,25 · 6,5 · 7,5 · 8,25 · 9,0 · 9,5 s.
-- A narração (voz do Guilherme) foi cortada por frase e encaixada nas cenas (`audio/seg.json` + `place.py`).
+- As fotos entram nas batidas (120 BPM): 4,0 · 5,25 · 6,25 · 7,0 · 7,75 · 8,5 · 9,0 · 9,5 · 10,0 s.
+- A trilha foi estendida para 26 s repetindo os compassos 5 a 9, com a emenda no tempo forte.
+- A narração (voz do Guilherme) foi cortada por frase e encaixada nas cenas (`audio/seg2.json` + `place.py`).
 - Os tempos de cada palavra vêm do Scribe e ficam em `words.js`.
-- A trilha baixa sozinha quando a voz entra (sidechain). Na vitrine, onde não há voz, ela fica mais alta.
+- A legenda da vitrine fica em y=362, abaixo da marca d'água (y 262–314).
 
 ## Render
-- Sem desfoque de movimento: usa 1 de cada 2 subquadros, porque as trocas rápidas de card geravam imagem dupla.
 ```
 python3 -m http.server 8774
-node render.js 0 2159 sub
-ffmpeg -framerate 120 -i sub/%05d.png -i audio/trilha_natal.wav -filter_complex "[0:v]select='eq(mod(n\,2)\,1)',setpts=N/60/TB,format=yuv420p[v]" -map "[v]" -map 1:a -r 60 -c:v libx264 -crf 17 -c:a aac out.mp4
+node render.js 0 3119 sub
+ffmpeg -framerate 120 -i sub/%05d.png -i audio/trilha_natal2.wav -i ../o-que-trazer-fachada/img/marca-dagua.png -filter_complex "[0:v]select='eq(mod(n\,2)\,1)',setpts=N/60/TB[b];[2:v]format=rgba,colorchannelmixer=aa=0.72[w];[b][w]overlay=56:262,format=yuv420p[v]" -map "[v]" -map 1:a -r 60 -c:v libx264 -crf 17 -c:a aac out.mp4
 ```

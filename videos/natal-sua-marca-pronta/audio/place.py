@@ -13,7 +13,7 @@ def seg(src,a,b,tempo=1.0,cut=None):
         subprocess.run(['ffmpeg','-loglevel','error','-y','-f','s16le','-ar',str(SR),'-ac','1','-i','tmp.raw','-af',f'atempo={tempo}','-f','s16le','tmp2.raw'],check=True)
         y=np.frombuffer(open('tmp2.raw','rb').read(),np.int16).astype(np.float32)/32768
     f=int(.012*SR); y[:f]*=np.linspace(0,1,f); y[-f:]*=np.linspace(1,0,f); return y
-P=json.loads(sys.argv[2]); out=np.zeros(int(18.3*SR)); log=[]
+P=json.loads(sys.argv[2]); out=np.zeros(int(26.2*SR)); log=[]
 for p in P:
     y=seg(p.get('src',sys.argv[1]),p['a'],p['b'],p.get('tempo',1.0),p.get('cut')); i=int(p['at']*SR)
     assert i+len(y)<=len(out), ('passa de 22s',p); 
