@@ -41,7 +41,7 @@ svg.s{position:absolute;left:0;top:0;overflow:visible}
  <div id="caps"></div>
 </div>
 <script>
-const T=26;
+const T=25.5;
 const $=id=>document.getElementById(id);
 const cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)), lerp=(a,b,x)=>a+(b-a)*x;
 function bez(x1,y1,x2,y2){ return x=>{ x=cl(x); if(x<=0||x>=1)return x; let a=0,b=1,u=x; for(let i=0;i<28;i++){u=(a+b)/2; const X=3*(1-u)*(1-u)*u*x1+3*(1-u)*u*u*x2+u*u*u; if(X<x)a=u; else b=u;}
@@ -54,15 +54,15 @@ const EV=[]; function dash(el,p){ el.style.strokeDasharray='1 1'; el.style.strok
 // [linhas], y das linhas, tamanho, saída
 const LINES=[
  {w:[['Sua','loja'],['vai','entrar']],y:[820,920],s:96,out:'em'},
- {w:[['em','<k>dezembro</k>|dezembro'],['do','mesmo','jeito?']],y:[820,920],s:96,outT:2.62},
- {w:[['Olha','o','que'],['a','gente','fez:|fez']],y:[820,920],s:96,outT:3.62},
+ {w:[['em','<k>dezembro</k>|dezembro'],['do','mesmo','jeito?']],y:[820,920],s:96,outT:2.68},
+ {w:[['Olha','o','que'],['a','gente','fez:|fez']],y:[820,920],s:96,outT:3.6},
  {w:[['Fachada,','letreiro,','acrílico...|acrilico']],y:[362],s:64,out:'tudo'},
- {w:[['Tudo|tudo','feito','<k>aqui.</k>|aqui']],y:[362],s:64,outT:10.42},
- {w:[['Personalizados|@10.87'],['de|@10.97','<k>Natal</k>|@11.07']],y:[800,900],s:92,outT:15.55},
- {w:[['Dezembro','é','o','mês'],['que','mais','<k>vende.</k>|vende']],y:[730,830],s:92,outT:17.82},
- {w:[['Sua|@17.0','marca|@17.08','precisa|@17.16'],['ser|@17.24','<k>vista.</k>|@17.32']],y:[1010,1110],s:92,outT:17.82},
+ {w:[['Tudo|tudo','feito','<k>aqui.</k>|aqui']],y:[362],s:64,outT:8.42},
+ {w:[['Personalizados|@8.93'],['de|@9.03','<k>Natal</k>|@9.13']],y:[800,900],s:92,outT:14.1},
+ {w:[['Dezembro','é','o','mês'],['que','mais','<k>vende.</k>|vende']],y:[730,830],s:92,outT:16.68},
+ {w:[['Sua|@16.0','marca|@16.08','precisa|@16.16'],['ser|@16.24','<k>vista.</k>|@16.32']],y:[1010,1110],s:92,outT:16.68},
  {w:[['Promoção|promocao','até','<k>20</k>|vinte','<k>de</k>|de','<k>novembro</k>|novembro']],y:[1180],s:68,out:'aproveita'},
- {w:[['Aproveita','antes','do','<k>Natal.</k>|natal']],y:[1180],s:68,outT:21.72},
+ {w:[['Aproveita','antes','do','<k>Natal.</k>|natal']],y:[1180],s:68,outT:20.52},
  {w:[['Chama|chama','a','Ngraph|enigrafi','no','<k>WhatsApp</k>|whatsapp']],y:[1300],s:64,out:'sua'},
  {w:[['Sua','marca','merece','ser','<k>vista.</k>|vista']],y:[1300],s:64,outT:99}];
 const CW=[]; let h='';
@@ -79,7 +79,8 @@ LINES.forEach((L,li)=>{ const first=Math.min(...CW.filter(c=>c.li==li).map(c=>c.
 // ---------- vitrine: uma foto por batida (120 BPM), as primeiras mais longas ----------
 const PH=[['q1.jpg','Fachada em ACM + LED'],['q2.jpg','Letreiro com backlight'],['q3.jpg','Placa com backlight'],['q4.jpg','Letreiro iluminado'],
  ['q5.jpg','Letras em acrílico'],['q6.jpg','Logo em acrílico'],['q7.jpg','Letreiro personalizado'],['q8.jpg','Placa em ACM'],['q9.jpg','Placa luminosa']];
-const ST=[4.0,5.25,6.25,7.0,7.75,8.5,9.0,9.5,10.0], END=10.5;
+const ST=[4.0,4.75,5.5,6.0,6.5,7.0,7.5,8.0,8.25], END=8.5;
+const DU=ST.map((s,i)=>i?Math.min(.32,(s-ST[i-1])*.6):.32); DU.push(.3);
 const DIR=[[0,1],[1,0],[-1,0],[0,1],[1,0],[-1,0],[0,1],[1,0],[-1,0]];  // de baixo, da direita, da esquerda...
 $('cards').innerHTML=PH.map((p,i)=>`<div class="card" id="cd${i}"><img id="ci${i}" src="img/${p[0]}"></div>`).join('');
 $('labs').innerHTML=PH.map((p,i)=>`<div class="lab" id="lb${i}">${p[1]}</div>`).join('');
@@ -92,7 +93,7 @@ const M={vinte:at('vinte'),chama:0};
 cur=0; M.chama=(()=>{for(const [s,t] of WORDS) if(norm(s)=='chama') return t;})();
 EV.push(['ding',M.vinte+.1]);
 // ---------- personalizados de Natal ----------
-const CH=[['Letreiros personalizados','~letreiros>11'],['Peças em acrílico','~pecas>11'],['E muito mais','~muito>11']];
+const CH=[['Letreiros personalizados','~letreiros>9'],['Peças em acrílico','~pecas>9'],['E muito mais','~muito>9']];
 $('chips').innerHTML=CH.map((c,i)=>`<div id="chp${i}" style="font-size:64px;font-weight:600;padding:18px 44px;border-radius:999px;background:#fff;box-shadow:0 0 0 3px #E4E4E7,0 18px 36px -24px rgba(24,24,27,.4)">${c[0]}</div>`).join('');
 const CHT=CH.map(c=>{const [w,af]=c[1].slice(1).split('>'); return WORDS.find(([q,tt])=>norm(q)==norm(w)&&tt>+af)[1];}); CHT.forEach(x=>EV.push(['pop',x]));
 // ---------- pontinhos dourados ----------
@@ -105,27 +106,27 @@ function seek(t){
     e.style.opacity=(i*(1-o)).toFixed(3); e.style.transform=`translateY(${((1-i)*20-o*14).toFixed(2)}px)`; }
   // cards: entram empurrando o anterior; zoom contínuo dentro do card
   ST.forEach((s,i)=>{ const e=$('cd'+i), im=$('ci'+i); const N=ST.length-1; const nx=i<N?ST[i+1]:END;
-    const ins=i==0?3.45:s-.32, ine=i==0?4.0:s+.02, d=DIR[i], dn=i<N?DIR[i+1]:[0,-1];
-    const ei=seg(t,ins,ine), eo=seg(t,nx-.32,nx+.02);
-    const lb=$('lb'+i), lo=seg(t,s-.05,s+.25)*(1-seg(t,nx-.22,nx-.02)); fe(lb,lo,16);
+    const ins=i==0?3.5:s-DU[i], ine=i==0?4.0:s+.02, d=DIR[i], dn=i<N?DIR[i+1]:[0,-1];
+    const ei=seg(t,ins,ine), eo=seg(t,nx-DU[i+1],nx+.02);
+    const lb=$('lb'+i), lo=seg(t,s-.05,s+Math.min(.25,DU[i]))*(1-seg(t,nx-Math.min(.2,DU[i+1]),nx-.02)); fe(lb,lo,16);
     if(t<ins||t>nx+.02){e.style.visibility='hidden';return;} e.style.visibility='visible';
     const x=(1-ei)*d[0]*1100 - eo*dn[0]*1100, y=(1-ei)*d[1]*1500 - eo*dn[1]*1500;
     e.style.transform=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`; e.style.opacity=i==N?(1-eo).toFixed(3):1;
     im.style.transform=`scale(${(1+.08*cl((t-ins)/(nx-ins+.3))).toFixed(4)})`;
   });
   // personalizados de Natal
-  ['o1','o2','o3','o4'].forEach((id,i)=>{const e=$(id); dash(e,seg(t,10.6+i*.12,11.2+i*.12)); e.style.opacity=t>10.6?(1-seg(t,15.45,15.7)):0;});
-  CHT.forEach((a,i)=>fe($('chp'+i),seg(t,a-.08,a+.32)*(1-seg(t,15.45+i*.04,15.7+i*.04)),24));
+  ['o1','o2','o3','o4'].forEach((id,i)=>{const e=$(id); dash(e,seg(t,8.55+i*.12,9.15+i*.12)); e.style.opacity=t>8.55?(1-seg(t,14.0,14.25)):0;});
+  CHT.forEach((a,i)=>fe($('chp'+i),seg(t,a-.08,a+.32)*(1-seg(t,14.0+i*.04,14.25+i*.04)),24));
   // calendário
-  const cv=seg(t,17.92,18.15)*(1-seg(t,21.62,21.84)); $('cal').style.opacity=cv.toFixed(3);
-  dash($('cR'),seg(t,17.95,18.5)); dash($('cH'),seg(t,18.15,18.55)); dash($('cK'),seg(t,18.2,18.55));
-  $('cT').setAttribute('opacity',seg(t,18.2,18.5).toFixed(3)); $('cN').setAttribute('opacity',seg(t,18.25,18.55).toFixed(3));
+  const cv=seg(t,16.72,16.95)*(1-seg(t,20.45,20.67)); $('cal').style.opacity=cv.toFixed(3);
+  dash($('cR'),seg(t,16.75,17.3)); dash($('cH'),seg(t,16.95,17.35)); dash($('cK'),seg(t,17.0,17.35));
+  $('cT').setAttribute('opacity',seg(t,17.0,17.3).toFixed(3)); $('cN').setAttribute('opacity',seg(t,17.05,17.35).toFixed(3));
   dash($('cC'),seg(t,M.vinte,M.vinte+.4)); const p=seg(t,M.vinte+.2,M.vinte+.45);
   $('cN').querySelectorAll('text')[19].setAttribute('fill',p>.5?'#1E3A8A':'#71717A'); $('cN').querySelectorAll('text')[19].setAttribute('font-weight',p>.5?'800':'600');
   // CTA
-  ['bw1','bw2','bw3','bw4'].forEach((id,i)=>dash($(id),seg(t,22.0+i*.12,22.45+i*.12)));
-  fe($('logo'),seg(t,21.85,22.3),20); fe($('at'),seg(t,22.05,22.45),20); fe($('tag'),seg(t,22.45,22.85),16);
-  const bo=seg(t,22.25,22.65), ph=t>22.9?((t-22.9)/1.0)%1:0, pu=t>22.9?(1-Math.cos(2*Math.PI*ph))/2:0;
+  ['bw1','bw2','bw3','bw4'].forEach((id,i)=>dash($(id),seg(t,20.75+i*.12,21.2+i*.12)));
+  fe($('logo'),seg(t,20.6,21.05),20); fe($('at'),seg(t,20.8,21.2),20); fe($('tag'),seg(t,21.2,21.6),16);
+  const bo=seg(t,21.0,21.4), ph=t>21.65?((t-21.65)/1.0)%1:0, pu=t>21.65?(1-Math.cos(2*Math.PI*ph))/2:0;
   const b=$('btn'); b.style.opacity=bo; b.style.transform=`translateY(${(1-bo)*20}px) scale(${((.96+.04*bo)*(1+.03*pu)).toFixed(4)})`;
   // pontinhos dourados piscando de leve
   SPK.forEach((_,i)=>{ const v=.25+.55*Math.pow((1+Math.sin(t*2.4+i*1.7))/2,2); $('sp'+i).style.opacity=v.toFixed(3); });
