@@ -35,3 +35,8 @@ ffmpeg -framerate 120 -i sub/%05d.png -i audio/trilha_fach.wav -filter_complex "
 ```
 ffmpeg -i video.mp4 -i img/marca-dagua.png -filter_complex "[1:v]format=rgba,colorchannelmixer=aa=0.72[w];[0:v][w]overlay=56:262,format=yuv420p" -c:v libx264 -crf 17 -c:a copy saida.mp4
 ```
+
+## Capa do Reels
+- Arquivo: `videos/capa-o-que-trazer-fachada.jpg` (1080x1920).
+- Todo o conteúdo está dentro da faixa central 1080x1350 (y de 285 a 1635), que é o recorte 4:5 mostrado na grade do perfil.
+- Fonte: `capa/capa.html`. Para regerar, faça um screenshot de 1080x1920, usando as fontes de `../fonts`.
