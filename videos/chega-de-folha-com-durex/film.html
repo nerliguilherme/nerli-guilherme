@@ -72,11 +72,11 @@ SC.forEach((s,i)=>{ const c=$('nz'+i).getContext('2d'), im=c.createImageData(540
   for(let k=0;k<im.data.length;k+=4){ x=(x*1103515245+12345)&0x7fffffff; const v=200+((x>>16)%56); im.data[k]=im.data[k+1]=im.data[k+2]=v; im.data[k+3]=255; } c.putImageData(im,0,0); });
 ST.forEach(s=>EV.push(['swoosh',s.w]));ST.slice(1).forEach(s=>EV.push(['pop',s.a]));
 // ---------- trabalhos reais, um por batida ----------
-const RW=[['r3_flash_vaga.jpg','Sinalização','Flash EV',6.5],['r1_mercatto.jpg','Display de mesa','Novo Mercatto',7.5],['r2_leve.jpg','Placa de estacionamento','Grupo Mateus',8.5],
- ['r5_flash_letreiro.jpg','Letreiro 3D luminoso','Flash EV',9.5],['r4_flash_recarga.jpg','Placa com QR Code','Flash EV',10.5]];
+const RW=[['f3_flash_vaga.jpg','Sinalização','Flash EV',6.5],['f1_mercatto.jpg','Display de mesa','Novo Mercatto',7.5],['f2_leve.jpg','Placa de estacionamento','Grupo Mateus',8.5],
+ ['f5_flash_letreiro.jpg','Letreiro 3D luminoso','Flash EV',9.5],['f4_flash_recarga.jpg','Placa com QR Code','Flash EV',10.5]];
 const RWEND=11.75;
 const CHK='<i><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></i>';
-$('cards').innerHTML=RW.map((r,i)=>`<div class="card" id="cd${i}"><img id="ci${i}" src="img/${r[0]}"></div><div class="seal" id="sl${i}">${CHK}${r[1]} <span>· ${r[2]}</span></div>`).join('');
+$('cards').innerHTML=RW.map((r,i)=>`<div class="card" id="cd${i}"><img src="img/${r[0]}" style="position:absolute;inset:0;filter:blur(28px) brightness(.9);transform:scale(1.15)"><img id="ci${i}" src="img/${r[0]}" style="position:absolute;inset:0;object-fit:contain"></div><div class="seal" id="sl${i}">${CHK}${r[1]} <span>· ${r[2]}</span></div>`).join('');
 RW.forEach(r=>EV.push(['swoosh',r[3]-.1]));
 // ---------- legendas ----------
 const CAPS=[['Colando|colando','folha','com','<k>durex?</k>|durex'],['Sua','empresa','merece','<k>mais</k>|mais'],['Placa','em','<k>PS</k>|ps','·','<k>display</k>|display'],
@@ -104,7 +104,7 @@ function seek(t){
   RW.forEach((r,i)=>{ const a=r[3], nx=i<RW.length-1?RW[i+1][3]:RWEND, e=$('cd'+i);
     const inn=seg(t,a-.3,a), out=seg(t,nx-.3,nx); if(t<a-.3||t>nx){e.style.visibility='hidden'; fe($('sl'+i),0); return;} e.style.visibility='visible';
     const dir=i%2?-1:1; e.style.transform=`translateX(${((1-inn)*1100*dir-out*1100*dir).toFixed(1)}px)`; e.style.opacity=i==RW.length-1?(1-out).toFixed(3):1;
-    $('ci'+i).style.transform=`scale(${(1+.05*cl((t-a+.3)/1.3)).toFixed(4)})`; fe($('sl'+i),seg(t,a-.1,a+.15)*(1-seg(t,nx-.3,nx-.1)),14); });
+    $('ci'+i).style.transform=`scale(${(1+.02*cl((t-a+.3)/1.3)).toFixed(4)})`; fe($('sl'+i),seg(t,a-.1,a+.15)*(1-seg(t,nx-.3,nx-.1)),14); });
   // final
   fe($('logo'),seg(t,CTA-.15,CTA+.25),20); fe($('at'),seg(t,CTA+.05,CTA+.45),20); fe($('tagl'),seg(t,CTA+.45,CTA+.85),16);
   const bo=seg(t,CTA+.25,CTA+.65), ph=t>CTA+1?((t-CTA-1)/1.0)%1:0, pu=t>CTA+1?(1-Math.cos(2*Math.PI*ph))/2:0;
