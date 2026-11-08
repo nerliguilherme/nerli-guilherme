@@ -1,0 +1,163 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="fonts/fonts.css">
+<script src="words.js"></script>
+<style>
+html,body{margin:0;background:#FAFAFA}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#FAFAFA;font-family:Inter,sans-serif;color:#18181B;-webkit-font-smoothing:antialiased;letter-spacing:-.025em}
+.abs{position:absolute;left:0;top:0}
+.w{display:inline-block;white-space:pre}
+.k{color:#1E3A8A}
+.cap{position:absolute;left:0;width:1080px;top:1340px;text-align:center;font-size:72px;font-weight:700;line-height:1}
+#plate{position:absolute;left:110px;top:520px;width:380px;height:674px;transform-origin:50% 50%;filter:drop-shadow(0 26px 30px rgba(24,24,27,.18))}
+#plate img{width:100%;height:100%;display:block}
+#phone{position:absolute;left:610px;top:510px;width:340px;height:700px;border-radius:52px;background:#0B0B0C;padding:12px;box-sizing:border-box;box-shadow:0 34px 60px -26px rgba(24,24,27,.5);transform-origin:50% 50%}
+#scr{position:relative;width:316px;height:676px;border-radius:42px;overflow:hidden;background:#fff}
+.sc{position:absolute;inset:0;opacity:0}
+.sc *{box-sizing:border-box}
+.isl{position:absolute;left:118px;top:12px;width:80px;height:24px;border-radius:12px;background:#0B0B0C;z-index:5}
+.hd{position:absolute;left:22px;top:58px;font-size:28px;font-weight:800;letter-spacing:-.02em}
+.sub{position:absolute;left:22px;top:96px;font-size:15px;color:#71717A;letter-spacing:0}
+.btn{position:absolute;left:22px;width:272px;height:54px;border-radius:27px;font-size:17px;font-weight:600;display:flex;align-items:center;justify-content:center;letter-spacing:-.01em}
+.chip{position:absolute;left:0;width:1080px;top:330px;display:flex;justify-content:center}
+.chip div{display:flex;align-items:center;gap:14px;padding:14px 30px 14px 22px;border-radius:999px;background:#fff;box-shadow:0 0 0 2.5px #E4E4E7;font-size:36px;font-weight:600}
+.wave{position:absolute;border-radius:50%;border:5px solid #1E3A8A;opacity:0}
+.mp{position:absolute;width:300px;height:532px;filter:drop-shadow(0 22px 26px rgba(24,24,27,.18));transform-origin:50% 100%}
+</style></head><body>
+<div id="stage">
+ <div id="chips"></div>
+ <div id="plate"><img src="img/placa_tudo.png"></div>
+ <div id="qrHi" class="abs" style="left:322px;top:883px;width:104px;height:104px;border-radius:18px;box-shadow:0 0 0 6px #1E3A8A;opacity:0"></div>
+ <div id="new" class="abs" style="left:380px;top:488px;padding:12px 26px;border-radius:999px;background:#1E3A8A;color:#fff;font-size:34px;font-weight:800;letter-spacing:.08em;transform-origin:50% 50%">NOVO</div>
+ <div id="waves"></div>
+ <div id="phone"><div id="scr"><div class="isl"></div>
+  <!-- cardápio -->
+  <div class="sc" id="s_menu"><div class="hd">Cardápio</div><div class="sub">Sua Loja · toque para pedir</div><div id="menuItems"></div></div>
+  <!-- pix -->
+  <div class="sc" id="s_pix"><div class="hd">Pague com Pix</div><div class="sub">Sua Loja</div>
+    <div id="pixQr" style="position:absolute;left:58px;top:140px;width:200px;height:200px"></div>
+    <div style="position:absolute;left:22px;top:368px;width:272px;text-align:center;font-size:15px;color:#71717A;letter-spacing:0">Chave Pix</div>
+    <div style="position:absolute;left:22px;top:392px;width:272px;text-align:center;font-size:20px;font-weight:700">pix@sualoja.com.br</div>
+    <div class="btn" id="pixBtn" style="top:450px;background:#18181B;color:#fff">Copiar chave</div>
+    <div style="position:absolute;left:22px;top:522px;width:272px;text-align:center;font-size:14px;color:#A1A1AA;letter-spacing:0">Cole no app do seu banco</div></div>
+  <!-- avaliação -->
+  <div class="sc" id="s_rev"><div class="hd">Avalie a gente</div><div class="sub">Google · Sua Loja</div><div id="stars" style="position:absolute;left:22px;top:170px;width:272px;display:flex;justify-content:space-between"></div>
+    <div style="position:absolute;left:22px;top:250px;width:272px;height:120px;border-radius:14px;border:1.5px solid #D4D4D8;padding:14px;font-size:16px;line-height:1.35;color:#18181B;letter-spacing:0">Atendimento excelente, recomendo!</div>
+    <div class="btn" style="top:396px;background:#18181B;color:#fff">Publicar</div></div>
+  <!-- wi-fi -->
+  <div class="sc" id="s_wifi"><div class="hd">Wi-Fi</div><div class="sub">Rede para clientes</div>
+    <svg style="position:absolute;left:98px;top:150px" width="120" height="100" viewBox="0 0 24 20" fill="none" stroke="#1E3A8A" stroke-width="2" stroke-linecap="round"><path d="M2 7a14 14 0 0 1 20 0M5.5 10.5a9 9 0 0 1 13 0M9 14a4 4 0 0 1 6 0"/><circle cx="12" cy="17.5" r="1.2" fill="#1E3A8A"/></svg>
+    <div style="position:absolute;left:22px;top:290px;font-size:15px;color:#71717A;letter-spacing:0">Rede</div><div style="position:absolute;left:22px;top:312px;font-size:22px;font-weight:700">SuaLoja_Clientes</div>
+    <div style="position:absolute;left:22px;top:358px;font-size:15px;color:#71717A;letter-spacing:0">Senha</div><div style="position:absolute;left:22px;top:380px;font-size:22px;font-weight:700">bemvindo2026</div>
+    <div class="btn" style="top:440px;background:#18181B;color:#fff">Copiar senha</div></div>
+  <!-- whatsapp -->
+  <div class="sc" id="s_wa"><div style="position:absolute;left:0;top:0;width:316px;height:110px;background:#F4F4F5"></div><div class="hd" style="top:52px;font-size:24px">Sua Loja</div><div class="sub" style="top:84px">WhatsApp · online</div>
+    <div style="position:absolute;left:16px;top:140px;max-width:230px;padding:12px 14px;border-radius:16px 16px 16px 4px;background:#F4F4F5;font-size:17px;line-height:1.3;letter-spacing:0">Olá! Como podemos ajudar? 😊</div>
+    <div style="position:absolute;right:16px;top:212px;max-width:230px;padding:12px 14px;border-radius:16px 16px 4px 16px;background:#18181B;color:#fff;font-size:17px;line-height:1.3;letter-spacing:0">Quero fazer um pedido</div></div>
+  <!-- site -->
+  <div class="sc" id="s_site"><div style="position:absolute;left:16px;top:50px;width:284px;height:38px;border-radius:19px;background:#F4F4F5;font-size:15px;color:#52525B;display:flex;align-items:center;justify-content:center;letter-spacing:0">sualoja.com.br</div>
+    <div style="position:absolute;left:16px;top:106px;width:284px;height:220px;border-radius:18px;background:linear-gradient(135deg,#1E3A8A,#3B82F6)"></div>
+    <div style="position:absolute;left:34px;top:250px;color:#fff;font-size:26px;font-weight:800;line-height:1.05">Bem-vindo à<br>Sua Loja</div>
+    <div style="position:absolute;left:16px;top:344px;width:136px;height:110px;border-radius:14px;background:#E4E4E7"></div><div style="position:absolute;left:164px;top:344px;width:136px;height:110px;border-radius:14px;background:#E4E4E7"></div>
+    <div class="btn" style="top:476px;background:#18181B;color:#fff">Ver produtos</div></div>
+  <!-- tudo -->
+  <div class="sc" id="s_all"><div style="position:absolute;left:118px;top:54px;width:80px;height:80px;border-radius:40px;background:#1E3A8A;display:flex;align-items:center;justify-content:center;color:#fff;font-size:30px;font-weight:800">SL</div>
+    <div style="position:absolute;left:0;width:316px;top:144px;text-align:center;font-size:22px;font-weight:800">Sua Loja</div><div id="allBtns"></div></div>
+  <!-- câmera -->
+  <div class="sc" id="s_cam" style="background:#1F2937"><div id="camQr" style="position:absolute;left:68px;top:220px;width:180px;height:180px;background:#fff;padding:12px"></div>
+    <div style="position:absolute;left:54px;top:206px;width:208px;height:208px;border-radius:20px;box-shadow:0 0 0 4px #FCD34D"></div>
+    <div id="camPop" style="position:absolute;left:20px;top:470px;width:276px;padding:14px 16px;border-radius:18px;background:#fff;font-size:16px;font-weight:600;letter-spacing:0">Abrir sualoja.com.br</div></div>
+ </div></div>
+ <div id="fan"></div>
+ <img id="logo" src="img/ngraph.svg" class="abs" style="width:640px;left:220px;top:560px">
+ <div id="at" class="abs" style="width:1080px;top:810px;text-align:center;font-size:64px;font-weight:600">@ngraph.pe</div>
+ <div id="cta" class="abs" style="left:200px;top:930px;width:680px;height:132px;border-radius:66px;background:#18181B;color:#fff;display:flex;align-items:center;justify-content:center;gap:22px;font-size:46px;font-weight:600;transform-origin:50% 50%">
+   <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"><path d="M4.5 19.5l1.1-3.6A8 8 0 1 1 8.4 18.5z"/><path d="M9.2 8.6c.3-.5.7-.5 1-.1l.7 1.4c.1.3 0 .6-.2.8l-.4.4c.5 1.1 1.4 2 2.5 2.5l.4-.4c.2-.2.5-.3.8-.2l1.4.7c.4.3.4.7-.1 1-.9.7-2.2.7-3.6-.2a8.4 8.4 0 0 1-2.7-2.7c-.9-1.4-.9-2.6-.2-3.6z" fill="#fff" stroke="none"/></svg>Chama no WhatsApp</div>
+ <div id="caps"></div>
+</div>
+<script>
+const T=27;
+const $=id=>document.getElementById(id);
+const cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)), lerp=(a,b,x)=>a+(b-a)*x;
+function bez(x1,y1,x2,y2){ return x=>{ x=cl(x); if(x<=0||x>=1)return x; let a=0,b=1,u=x; for(let i=0;i<28;i++){u=(a+b)/2; const X=3*(1-u)*(1-u)*u*x1+3*(1-u)*u*u*x2+u*u*u; if(X<x)a=u; else b=u;}
+  return 3*(1-u)*(1-u)*u*y1+3*(1-u)*u*u*y2+u*u*u; }; }
+const EZ=bez(.65,0,.35,1), seg=(t,a,b)=>EZ((t-a)/(b-a)), D=.3, win=(t,a,b)=>seg(t,a,a+D)*(1-seg(t,b,b+D));
+const norm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'');
+let cur=0; const at=w=>{ for(let i=cur;i<WORDS.length;i++) if(norm(WORDS[i][0])===norm(w)){cur=i+1;return WORDS[i][1];} throw 'palavra: '+w; };
+const EV=[];
+function fe(el,o,dy=20,pre=''){ el.style.opacity=o.toFixed(3); el.style.visibility=o>.001?'visible':'hidden'; el.style.transform=`${pre} translateY(${((1-o)*dy).toFixed(2)}px) scale(${(.96+.04*o).toFixed(4)})`; }
+const hash=i=>{const x=Math.sin(i*91.7+13.3)*43758.5;return x-Math.floor(x);};
+function qr(n,el){ let h=''; const s=100/n; for(let y=0;y<n;y++)for(let x=0;x<n;x++){ const fin=(x<7&&y<7)||(x>n-8&&y<7)||(x<7&&y>n-8);
+  const on=fin?((x%n<7&&y<7&&(x==0||x==6||y==0||y==6||(x>1&&x<5&&y>1&&y<5)))||(x>n-8&&y<7&&(x==n-7||x==n-1||y==0||y==6||(x>n-6&&x<n-2&&y>1&&y<5)))||(x<7&&y>n-8&&(x==0||x==6||y==n-7||y==n-1||(x>1&&x<5&&y>n-6&&y<n-2)))):hash(y*n+x)>.52;
+  if(on) h+=`<div style="position:absolute;left:${x*s}%;top:${y*s}%;width:${s+.3}%;height:${s+.3}%;background:#111"></div>`; } el.innerHTML=h; }
+qr(25,$('pixQr')); qr(25,$('camQr'));
+// agrupa placa + celular + ondas e aumenta 15% em torno do centro
+(()=>{const g=document.createElement('div'); g.id='grp'; g.style.cssText='position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:540px 860px;transform:scale(1.15)';
+ const st=$('stage'); st.insertBefore(g,$('plate')); ['plate','qrHi','new','waves','phone'].forEach(id=>g.appendChild($(id)));})();
+// ---------- marcos ----------
+const M={}; [['novidade','novidade'],['nfc','nfc'],['celular','celular'],['cardapio','cardapio'],['enc2','encostou'],['pix','pix'],['enc3','encostou'],['avaliacao','avaliacao'],
+ ['wifi','wifi'],['whats','whatsapp'],['site','site'],['tudo','tudo'],['sem','sem'],['aponta','aponta'],['code','code'],['personaliza','personaliza'],['marca','marca'],['chama','chama'],['whats2','whatsapp']].forEach(([k,w])=>M[k]=at(w));
+// toques (o celular encosta na placa) e telas
+const TAPS=[M.celular-.25,M.enc2+.05,M.enc3+.05];
+const SCR=[['s_menu',TAPS[0]+.35],['s_pix',TAPS[1]+.35],['s_rev',TAPS[2]+.35],['s_wifi',M.wifi],['s_wa',M.whats],['s_site',M.site],['s_all',M.tudo],['s_cam',M.aponta]];
+TAPS.forEach(t=>EV.push(['beep',t+.3]));[M.wifi,M.whats,M.site,M.tudo].forEach(t=>EV.push(['pop',t])); EV.push(['swoosh',M.personaliza-.1],['chime',M.chama]);
+// cenários
+const CH=[['Restaurante','<path d="M7 3v8M5 3v4a2 2 0 0 0 4 0V3M7 11v10M17 3c-2 2-2 6 0 8v10"/>',SCR[0][1],SCR[1][1]],['Caixa','<rect x="3" y="7" width="18" height="12" rx="2"/><path d="M7 7V4h10v3M7 13h4"/>',SCR[1][1],SCR[2][1]],
+ ['Balcão','<path d="M12 3l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.3l-5.2 2.8 1-5.8L3.5 9.2l5.9-.8z"/>',SCR[2][1],SCR[3][1]],['Recepção','<path d="M2 9a14 14 0 0 1 20 0M5.5 12.5a9 9 0 0 1 13 0M9 16a4 4 0 0 1 6 0"/>',SCR[3][1],SCR[6][1]]];
+$('chips').innerHTML=CH.map((c,i)=>`<div class="chip" id="ch${i}"><div><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1E3A8A" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${c[1]}</svg>${c[0]}</div></div>`).join('');
+// conteúdo das telas
+$('menuItems').innerHTML=[['Pizza margherita','R$ 45,00','#FDE68A'],['Hambúrguer da casa','R$ 32,00','#FECACA'],['Açaí 500 ml','R$ 22,00','#DDD6FE'],['Suco natural','R$ 9,00','#BBF7D0']].map((m,i)=>
+ `<div id="mi${i}" style="position:absolute;left:22px;top:${136+i*112}px;width:272px;height:96px;border-radius:16px;border:1.5px solid #ECECEF;display:flex;align-items:center;gap:14px;padding:12px"><div style="width:70px;height:70px;border-radius:12px;background:${m[2]};flex:none"></div><div><div style="font-size:17px;font-weight:700;letter-spacing:-.01em">${m[0]}</div><div style="font-size:15px;color:#1E3A8A;font-weight:700;margin-top:4px;letter-spacing:0">${m[1]}</div></div></div>`).join('');
+$('stars').innerHTML=[0,1,2,3,4].map(i=>`<svg width="48" height="48" viewBox="0 0 24 24"><path id="st${i}" d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z" fill="none" stroke="#A1A1AA" stroke-width="1.6" stroke-linejoin="round"/></svg>`).join('');
+$('allBtns').innerHTML=['Cardápio','Pix','Avaliar no Google','Wi-Fi','WhatsApp','Site'].map((b,i)=>`<div class="btn" id="ab${i}" style="top:${188+i*68}px;background:#F4F4F5">${b}</div>`).join('');
+// placas personalizadas
+const FAN=[['placa_catalogo.png',-1],['placa_tudo.png',0],['placa_avalie.png',1]];
+$('fan').innerHTML=FAN.map((f,i)=>`<img class="mp" id="fp${i}" src="img/${f[0]}" style="left:${390+f[1]*290}px;top:600px">`).join('');
+$('waves').innerHTML=[0,1,2].map(i=>`<div class="wave" id="wv${i}"></div>`).join('');
+// ---------- legendas ----------
+const CAPS=[['Novidade:|novidade','placa','<k>NFC</k>|nfc'],['Encostou:|encostou','<k>cardápio</k>|cardapio'],['Encostou:|encostou','<k>Pix</k>|pix'],['Encostou:|encostou','<k>avaliação</k>|avaliacao'],
+ ['Wi-Fi|wifi','·','WhatsApp|whatsapp','·','<k>site</k>|site'],['Tudo|tudo','numa','placa','<k>só</k>|so'],['Sem','NFC?|nfc','<k>QR</k>|qr','<k>Code</k>|code'],['Personalize|personaliza','do','seu|jeito','<k>jeito</k>|quiser'],['Chama|chama','no|no','<k>WhatsApp</k>|whatsapp']];
+cur=0; const CW=[]; let h='';
+CAPS.forEach((ln,li)=>{ h+=`<div class="cap" id="cap${li}">`; ln.forEach((w,wi)=>{ const [d,anc]=w.split('|'); const t=d=='·'?null:at(anc||d.replace(/<\/?k>/g,''));
+  const id=`c${li}_${wi}`; h+=`<span class="w" id="${id}">${d.replace('<k>','<span class="k">').replace('</k>','</span>')}${wi<ln.length-1?' ':''}</span>`; CW.push({id,li,a:t}); if(d.includes('<k>'))EV.push(['tick',t]); }); h+='</div>'; });
+CW.forEach((c,i)=>{ if(c.a==null) c.a=CW[i+1].a; });
+$('caps').innerHTML=h;
+const LS=CAPS.map((_,li)=>Math.min(...CW.filter(c=>c.li==li).map(c=>c.a)));
+const LE=LS.map((s,i)=>i<LS.length-1?LS[i+1]-.2:99);
+function seek(t){
+  // placa: entra girando e fica; some na hora das placas personalizadas
+  const pin=seg(t,.1,.9), pout=seg(t,M.personaliza-.15,M.personaliza+.2);
+  const p=$('plate'); p.style.opacity=(pin*(1-pout)).toFixed(3); p.style.visibility=pin*(1-pout)>0?'visible':'hidden';
+  const tapX=TAPS.reduce((m,a)=>Math.max(m,Math.sin(Math.PI*cl((t-a)/.7))),0);
+  p.style.transform=`perspective(1400px) rotateY(${(40*(1-pin)).toFixed(2)}deg) translateY(${((1-pin)*60).toFixed(1)}px) scale(${(1+.02*tapX).toFixed(4)})`;
+  fe($('new'),seg(t,M.nfc-.1,M.nfc+.2)*(1-seg(t,TAPS[0]-.2,TAPS[0]+.1)),14,`rotate(-6deg) scale(${(1+.12*Math.sin(Math.PI*cl((t-M.nfc+.1)/.35))).toFixed(3)})`);
+  // celular: entra, encosta na placa a cada toque, volta
+  const fin=seg(t,M.celular-.9,M.celular-.45), fout=seg(t,M.personaliza-.2,M.personaliza+.15);
+  const ph=$('phone'); ph.style.opacity=(fin*(1-fout)).toFixed(3); ph.style.visibility=fin*(1-fout)>0?'visible':'hidden';
+  let dx=0,rot=0; TAPS.forEach(a=>{const u=cl((t-a)/.7); const k=Math.sin(Math.PI*u)**.8; dx=Math.min(dx,-250*k); rot+=-8*k;});
+  ph.style.transform=`translate(${(dx+(1-fin)*400).toFixed(1)}px,0) rotate(${rot.toFixed(2)}deg)`;
+  // ondas na hora do toque
+  [0,1,2].forEach(i=>{ const e=$('wv'+i); let best=null; TAPS.forEach(a=>{const u=(t-a-.25-i*.12)/.7; if(u>0&&u<1) best=u;});
+    if(best==null){e.style.opacity=0;return;} const r=60+200*EZ(best); Object.assign(e.style,{left:(470-r)+'px',top:(860-r)+'px',width:2*r+'px',height:2*r+'px',opacity:(Math.sin(Math.PI*best)*.8).toFixed(3)}); });
+  // telas: cruzam (a próxima entra enquanto a anterior sai)
+  SCR.forEach(([id,a],i)=>{ const nx=i<SCR.length-1?SCR[i+1][1]:99; const o=seg(t,a,a+.25)*(1-seg(t,nx,nx+.25)); const e=$(id); e.style.opacity=o.toFixed(3); e.style.transform=`translateY(${((1-seg(t,a,a+.3))*14).toFixed(1)}px)`; });
+  [0,1,2,3].forEach(i=>{const e=$('mi'+i),o=seg(t,SCR[0][1]+.1+i*.1,SCR[0][1]+.4+i*.1); e.style.opacity=o; e.style.transform=`translateY(${(1-o)*14}px)`;});
+  [0,1,2,3,4].forEach(i=>{const f=seg(t,SCR[2][1]+.2+i*.12,SCR[2][1]+.35+i*.12); const e=$('st'+i); e.setAttribute('fill',f>.5?'#FBBF24':'none'); e.setAttribute('stroke',f>.5?'#FBBF24':'#A1A1AA');});
+  $('pixBtn').style.transform=`scale(${(1-.05*Math.sin(Math.PI*cl((t-SCR[1][1]-.9)/.3))).toFixed(3)})`;
+  [0,1,2,3,4,5].forEach(i=>{const e=$('ab'+i),o=seg(t,M.tudo+.05+i*.09,M.tudo+.3+i*.09); e.style.opacity=o; e.style.transform=`translateY(${(1-o)*14}px)`;});
+  $('camPop').style.opacity=seg(t,M.code,M.code+.3); $('qrHi').style.opacity=(seg(t,M.sem,M.sem+.3)*(1-seg(t,M.personaliza-.2,M.personaliza+.1))*(.7+.3*Math.sin(t*8))).toFixed(3);
+  // cenário
+  CH.forEach((c,i)=>fe($('ch'+i),seg(t,c[2]-.05,c[2]+.25)*(1-seg(t,c[3]-.05,c[3]+.2)),16));
+  // placas personalizadas em leque
+  FAN.forEach((f,i)=>{ const o=seg(t,M.personaliza-.15+i*.08,M.personaliza+.25+i*.08)*(1-seg(t,M.chama-.2,M.chama+.15)); const e=$('fp'+i);
+    e.style.opacity=o.toFixed(3); e.style.visibility=o>0?'visible':'hidden'; e.style.transform=`translateY(${((1-o)*40).toFixed(1)}px) rotate(${(f[1]*9*o).toFixed(2)}deg) scale(${(f[1]==0?1.08:.96).toFixed(2)})`; });
+  // final
+  fe($('logo'),seg(t,M.chama-.15,M.chama+.25),20); fe($('at'),seg(t,M.chama+.05,M.chama+.45),20);
+  const bo=seg(t,M.whats2-.2,M.whats2+.2), pp=t>M.whats2+.5?((t-M.whats2-.5)/1.0)%1:0, pu=t>M.whats2+.5?(1-Math.cos(2*Math.PI*pp))/2:0;
+  const b=$('cta'); b.style.opacity=bo; b.style.transform=`translateY(${(1-bo)*20}px) scale(${((.96+.04*bo)*(1+.03*pu)).toFixed(4)})`;
+  // legendas
+  for(const w of CW){ const i=seg(t,w.a-.04,w.a+.3), o=seg(t,LE[w.li],LE[w.li]+.18), e=$(w.id); e.style.opacity=(i*(1-o)).toFixed(3); e.style.transform=`translateY(${((1-i)*20-o*14).toFixed(2)}px)`; }
+}
+window.seek=seek; window.T=T; window.EV=EV; window.M=M;
+window.ready=Promise.all([document.fonts.ready,...[...document.images].map(i=>i.decode().catch(()=>0))]).then(()=>{seek(0);return true});
+</script></body></html>
