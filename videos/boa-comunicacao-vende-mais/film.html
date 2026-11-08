@@ -1,0 +1,127 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+html,body{margin:0;background:#FAFAFA}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#FAFAFA;font-family:Inter,sans-serif;color:#18181B;-webkit-font-smoothing:antialiased;letter-spacing:-.025em}
+.abs{position:absolute;left:0;top:0}
+.w{display:inline-block;white-space:pre}
+.k{color:#1E3A8A}
+.cap{position:absolute;left:0;width:1080px;top:1392px;text-align:center;font-size:74px;font-weight:700;line-height:1}
+svg.ln{position:absolute;left:0;top:0;overflow:visible}
+svg.ln .s{fill:none;stroke:#18181B;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+svg.ln .b{fill:none;stroke:#1E3A8A;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+.card{position:absolute;left:81px;top:440px;width:918px;height:800px;border-radius:32px;overflow:hidden;box-shadow:0 30px 60px -28px rgba(24,24,27,.45),0 2px 6px rgba(24,24,27,.08);background:#ddd}
+.card img{position:absolute;inset:0;width:100%;height:100%}
+.seal{position:absolute;left:0;width:1080px;top:1262px;text-align:center;display:flex;justify-content:center;align-items:center;gap:14px;font-size:40px;font-weight:700;color:#166534}
+.seal i{display:inline-flex;width:50px;height:50px;border-radius:25px;background:#16A34A;align-items:center;justify-content:center;flex:none}
+.seal span{color:#3F3F46;font-weight:600}
+.title{position:absolute;left:0;width:1080px;top:322px;text-align:center;font-size:84px;font-weight:800;letter-spacing:-.035em;line-height:1}
+.badge{position:absolute;left:836px;top:404px;width:150px;height:150px;border-radius:75px;background:#fff;box-shadow:0 14px 30px -12px rgba(24,24,27,.4)}
+.row{position:absolute;left:250px;font-size:76px;font-weight:700;display:flex;align-items:center;gap:30px;transform:translateY(-50%)}
+.num{position:absolute;top:780px;width:220px;height:220px;border-radius:110px;border:5px solid #1E3A8A;color:#1E3A8A;font-size:130px;font-weight:800;display:flex;align-items:center;justify-content:center;transform-origin:50% 50%}
+</style></head><body>
+<div id="stage">
+ <!-- gancho: olho -->
+ <svg class="ln" id="eye" width="1080" height="1920"><g transform="translate(540 800)">
+   <path id="eU" class="s" style="stroke-width:6" d="M-230 0 C-120 -150 120 -150 230 0" pathLength="1"/><path id="eD" class="s" style="stroke-width:6" d="M-230 0 C-120 150 120 150 230 0" pathLength="1"/>
+   <circle id="eI" class="b" style="stroke-width:6" r="72" pathLength="1"/><circle id="eP" r="30" fill="#1E3A8A"/></g></svg>
+ <!-- virada: loja -->
+ <svg class="ln" id="shop" width="1080" height="1920"><g transform="translate(540 800)">
+   <path id="sR" class="s" style="stroke-width:5" d="M-330 -150 L-290 -260 H290 L330 -150 Z" pathLength="1"/>
+   <rect id="sO" class="s" style="stroke-width:5" x="-310" y="-150" width="620" height="420" rx="10" pathLength="1"/>
+   <rect id="sBf" x="-280" y="-120" width="560" height="110" rx="12" fill="#1E3A8A" opacity="0"/>
+   <rect id="sB" class="s" style="stroke-width:5" x="-280" y="-120" width="560" height="110" rx="12" pathLength="1"/>
+   <text id="sT" x="0" y="-48" text-anchor="middle" font-family="Inter" font-weight="800" font-size="54" letter-spacing="4" fill="#18181B">SUA LOJA</text>
+   <rect id="sW" class="s" style="stroke-width:5" x="-270" y="30" width="200" height="170" rx="8" pathLength="1"/><rect id="sD" class="s" style="stroke-width:5" x="60" y="30" width="150" height="240" rx="6" pathLength="1"/></g></svg>
+ <div id="nums"></div>
+ <div id="titles"></div>
+ <div id="cards"></div>
+ <!-- selos de ícone -->
+ <div class="badge" id="bdg1"><svg width="150" height="150" viewBox="0 0 150 150" fill="none" stroke="#1E3A8A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path id="shd" pathLength="1" d="M75 32 L112 46 V78 C112 100 96 114 75 122 C54 114 38 100 38 78 V46 Z"/><path id="shk" pathLength="1" d="M58 78 L71 91 L94 65"/></svg></div>
+ <div class="badge" id="bdg2"><svg width="150" height="150" viewBox="0 0 150 150" fill="none" stroke="#1E3A8A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path id="hrt" pathLength="1" d="M75 118 C75 118 36 94 36 64 C36 50 47 40 60 40 C68 40 72 44 75 50 C78 44 82 40 90 40 C103 40 114 50 114 64 C114 94 75 118 75 118 Z"/></svg></div>
+ <div id="list"></div>
+ <img id="logo" src="img/ngraph.svg" class="abs" style="width:660px;left:210px;top:620px">
+ <div id="at" class="abs" style="width:1080px;top:880px;text-align:center;font-size:66px;font-weight:600">@ngraph.pe</div>
+ <div id="btn" class="abs" style="left:190px;top:1000px;width:700px;height:136px;border-radius:68px;background:#18181B;color:#fff;display:flex;align-items:center;justify-content:center;gap:22px;font-size:48px;font-weight:600;transform-origin:50% 50%">
+   <svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"><path d="M4.5 19.5l1.1-3.6A8 8 0 1 1 8.4 18.5z"/><path d="M9.2 8.6c.3-.5.7-.5 1-.1l.7 1.4c.1.3 0 .6-.2.8l-.4.4c.5 1.1 1.4 2 2.5 2.5l.4-.4c.2-.2.5-.3.8-.2l1.4.7c.4.3.4.7-.1 1-.9.7-2.2.7-3.6-.2a8.4 8.4 0 0 1-2.7-2.7c-.9-1.4-.9-2.6-.2-3.6z" fill="#fff" stroke="none"/></svg>Chama no WhatsApp</div>
+ <div id="caps"></div>
+</div>
+<script>
+const T=30, BT=.625;
+const $=id=>document.getElementById(id);
+const cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)), lerp=(a,b,x)=>a+(b-a)*x;
+function bez(x1,y1,x2,y2){ return x=>{ x=cl(x); if(x<=0||x>=1)return x; let a=0,b=1,u=x; for(let i=0;i<28;i++){u=(a+b)/2; const X=3*(1-u)*(1-u)*u*x1+3*(1-u)*u*u*x2+u*u*u; if(X<x)a=u; else b=u;}
+  return 3*(1-u)*(1-u)*u*y1+3*(1-u)*u*u*y2+u*u*u; }; }
+const EZ=bez(.65,0,.35,1), seg=(t,a,b)=>EZ((t-a)/(b-a)), D=.4, win=(t,a,b)=>seg(t,a-D,a)*(1-seg(t,b-D,b));
+const EV=[]; function dash(el,p){ el.style.strokeDasharray='1 1'; el.style.strokeDashoffset=(1-cl(p)).toFixed(4); }
+function fe(el,o,dy=20,pre=''){ el.style.opacity=o.toFixed(3); el.style.visibility=o>.001?'visible':'hidden'; el.style.transform=`${pre} translateY(${((1-o)*dy).toFixed(2)}px) scale(${(.96+.04*o).toFixed(4)})`; }
+// ---------- legendas (uma linha por vez; palavras entram em sequência) ----------
+const LINES=[['Antes de entrar na sua loja,',0.2],['o cliente <k>já</k> <k>decidiu</k>',1.3],['se confia em você.',2.2],
+ ['E quem convence ele',3.2],['é a sua',4.3],['<k>comunicação</k> <k>visual.</k>',4.9],
+ ['Ela faz <k>três</k> coisas',7.0],['por você:',8.0],
+ ['Primeiro:',9.1],['faz sua empresa',9.8],['<k>ser</k> <k>vista,</k>',10.7],['de dia e de noite.',11.7],
+ ['Segundo:',14.1],['passa <k>confiança</k>',14.8],['antes mesmo do',15.9],['primeiro contato.',16.9],
+ ['E terceiro:',19.1],['faz o cliente',19.8],['<k>lembrar</k> de você',20.8],['quando precisar.',21.9],
+ ['Fachada, letreiro, placa:',24.1],['a Ngraph cuida disso',25.3],['pra você.',26.2],['Chama no <k>WhatsApp.</k>',26.9],['Sua marca merece',28.0],['ser <k>vista.</k>',28.8]];
+const CW=[]; let h='';
+LINES.forEach(([txt,st],li)=>{ h+=`<div class="cap" id="cap${li}">`; const ws=txt.split(' ');
+  ws.forEach((w,wi)=>{ const a=st+wi*.09, id=`c${li}_${wi}`; h+=`<span class="w" id="${id}">${w.replace('<k>','<span class="k">').replace('</k>','</span>')}${wi<ws.length-1?' ':''}</span>`; CW.push({id,li,a}); if(w.includes('<k>'))EV.push(['tick',a]); });
+  h+='</div>'; });
+$('caps').innerHTML=h;
+const LE=LINES.map((l,i)=>i<LINES.length-1?LINES[i+1][1]-.16:99);
+// ---------- números 1 2 3 ----------
+$('nums').innerHTML=[1,2,3].map((n,i)=>`<div class="num" id="n${i}" style="left:${150+i*300}px">${n}</div>`).join('');
+[7.2,7.45,7.7].forEach(x=>EV.push(['pop',x]));
+// ---------- seções: título + 2 fotos na batida ----------
+const B=k=>k*BT;
+const SEC=[{title:'Ser <k>vista</k>',a:9.0,b:B(23),ph:[['q1.jpg',"D'Paleteiros",B(15)],['q4.jpg','Grupo Fibernett',B(19)]]},
+ {title:'<k>Confiança</k>',a:B(23),b:B(31),ph:[['q5.jpg','Amor Saúde',B(23)],['q6.jpg','Ramyla Melo',B(27)]]},
+ {title:'Ser <k>lembrada</k>',a:B(31),b:B(39),ph:[['q2.jpg','Espelho Meu',B(31)],['q3.jpg','Ana Silva',B(35)]]}];
+const CHK='<i><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></i>';
+$('titles').innerHTML=SEC.map((s,i)=>`<div class="title" id="tt${i}">${s.title.replace('<k>','<span class="k">').replace('</k>','</span>')}</div>`).join('');
+const PH=[]; SEC.forEach(s=>s.ph.forEach(p=>PH.push(p)));
+PH.forEach((p,i)=>{ p.a=p[2]; p.b=i<PH.length-1?PH[i+1][2]:B(39); EV.push(['swoosh',p.a-.2]); });
+$('cards').innerHTML=PH.map((p,i)=>`<div class="card" id="cd${i}"><img src="img/${p[0]}" style="object-fit:cover;filter:blur(26px) brightness(.92);transform:scale(1.15)"><img id="ci${i}" src="img/${p[0]}" style="object-fit:contain"></div>
+  <div class="seal" id="sl${i}">${CHK}Feito pela Ngraph <span>· ${p[1]}</span></div>`).join('');
+// ---------- lista final ----------
+const ITEMS=['Ser <k>vista</k>','<k>Confiança</k>','Ser <k>lembrada</k>'];
+$('list').innerHTML=ITEMS.map((s,i)=>`<div class="row" id="li${i}" style="top:${640+i*150}px"><svg width="84" height="84" viewBox="0 0 64 64"><circle cx="32" cy="32" r="29" fill="none" stroke="#D4D4D8" stroke-width="3.5"/>
+  <circle id="lcf${i}" cx="32" cy="32" r="30" fill="#1E3A8A" opacity="0"/><path id="lck${i}" d="M19 33 L28 42 L46 23" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" pathLength="1"/></svg>${s.replace('<k>','<span class="k">').replace('</k>','</span>')}</div>`).join('');
+const LA=B(39), CK=[LA+.35,LA+.6,LA+.85], LGO=26.2; CK.forEach(x=>EV.push(['check',x])); EV.push(['chime',LGO],['draw',.2],['draw',3.3],['swoosh',8.6]);
+function seek(t){
+  // olho
+  const ev=win(t,-1,3.95); $('eye').style.opacity=ev.toFixed(3); $('eye').style.visibility=ev>0?'visible':'hidden';
+  const op=.55+.45*seg(t,0,.7); dash($('eU'),op); dash($('eD'),op); dash($('eI'),.4+.6*seg(t,0,.8)); $('eP').setAttribute('opacity',(.6+.4*seg(t,0,.5)).toFixed(3));
+  const blink=Math.max(0,1-Math.abs(t-2.3)/.12); $('eye').querySelector('g').setAttribute('transform',`translate(540 800) scale(1 ${(1-.9*blink).toFixed(3)})`);
+  // loja
+  const sv=win(t,3.25,7.4); $('shop').style.opacity=sv.toFixed(3); $('shop').style.visibility=sv>0?'visible':'hidden';
+  ['sR','sO','sB','sW','sD'].forEach((id,i)=>dash($(id),seg(t,3.0+i*.12,3.8+i*.12)));
+  const lit=seg(t,5.6,6.3); $('sBf').setAttribute('opacity',lit.toFixed(3)); $('sT').setAttribute('fill',lit>.5?'#fff':'#18181B'); $('sT').setAttribute('opacity',seg(t,4.2,4.6).toFixed(3));
+  $('sBf').style.filter=`drop-shadow(0 0 ${(30*lit).toFixed(1)}px rgba(30,58,138,${(.55*lit).toFixed(2)}))`;
+  // números: entram, o "1" cresce e vira a cena seguinte
+  [0,1,2].forEach(i=>{ const e=$('n'+i); const a=7.2+i*.25; const grow=i==0?seg(t,8.5,9.3):0, out=i?seg(t,8.4,8.7):seg(t,9.0,9.35);
+    const o=seg(t,a-.3,a)*(1-out); e.style.opacity=o.toFixed(3); e.style.visibility=o>0?'visible':'hidden';
+    e.style.transform=`translate(${(grow*(540-260)).toFixed(1)}px,${(-grow*180).toFixed(1)}px) scale(${((.85+.15*seg(t,a-.3,a))*(1+1.2*grow)).toFixed(4)})`; });
+  // títulos
+  SEC.forEach((s,i)=>fe($('tt'+i),win(t,s.a+.3,s.b),20));
+  // fotos (cruzadas, com zoom leve)
+  PH.forEach((p,i)=>{ const e=$('cd'+i); const last=i==PH.length-1; const inn=seg(t,p.a-D,p.a), out=last?seg(t,p.b-D,p.b):0;
+    if(t<p.a-D||t>(last?p.b:p.b)){e.style.visibility='hidden';} else e.style.visibility='visible';
+    e.style.opacity=(inn*(1-out)).toFixed(3); e.style.transform=`scale(${(1.05-.05*inn-.03*out).toFixed(4)})`;
+    $('ci'+i).style.transform=`scale(${(1+.03*cl((t-p.a+D)/2.6)).toFixed(4)})`; fe($('sl'+i),seg(t,p.a-.12,p.a+.12)*(1-seg(t,p.b-.4,p.b-.17)),10); });
+  // ícones: escudo (confiança) e coração (lembrada)
+  const b1=win(t,SEC[1].a+.6,SEC[1].b); fe($('bdg1'),b1,12); dash($('shd'),seg(t,SEC[1].a+.6,SEC[1].a+1.2)); dash($('shk'),seg(t,SEC[1].a+1.1,SEC[1].a+1.5));
+  const b2=win(t,SEC[2].a+.6,SEC[2].b), pu=Math.sin(Math.PI*cl((t-SEC[2].a-2.4)/.4)); fe($('bdg2'),b2,12,`scale(${(1+.18*pu).toFixed(3)})`); dash($('hrt'),seg(t,SEC[2].a+.6,SEC[2].a+1.3));
+  if(Math.abs(t-SEC[1].a-1.2)<1e-9){}
+  // lista com checks → logo
+  ITEMS.forEach((s,i)=>{ fe($('li'+i),win(t,LA+.05+i*.08,LGO+.05),20,'translateY(-50%)'); const c=seg(t,CK[i],CK[i]+.22); $('lcf'+i).setAttribute('opacity',c.toFixed(3)); dash($('lck'+i),seg(t,CK[i]+.05,CK[i]+.3)); });
+  fe($('logo'),seg(t,LGO-.3,LGO+.1),20); fe($('at'),seg(t,LGO,LGO+.4),20);
+  const bo=seg(t,LGO+.4,LGO+.8), ph=t>LGO+1.2?((t-LGO-1.2)/1.1)%1:0, pul=t>LGO+1.2?(1-Math.cos(2*Math.PI*ph))/2:0;
+  const b=$('btn'); b.style.opacity=bo; b.style.transform=`translateY(${(1-bo)*20}px) scale(${((.96+.04*bo)*(1+.03*pul)).toFixed(4)})`;
+  for(const w of CW){ const i=seg(t,w.a-.04,w.a+.3), o=seg(t,LE[w.li],LE[w.li]+.16), e=$(w.id); e.style.opacity=(i*(1-o)).toFixed(3); e.style.transform=`translateY(${((1-i)*20-o*14).toFixed(2)}px)`; }
+}
+EV.push(['draw',SEC[1].a+.6],['pop',SEC[2].a+2.4]);
+window.seek=seek; window.T=T; window.EV=EV;
+window.ready=Promise.all([document.fonts.ready,...[...document.images].map(i=>i.decode().catch(()=>0))]).then(()=>{seek(0);return true});
+</script></body></html>
