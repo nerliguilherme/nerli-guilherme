@@ -126,7 +126,7 @@ const LS=CAPS.map((_,li)=>Math.min(...CW.filter(c=>c.li==li).map(c=>c.a)));
 const LE=LS.map((s,i)=>i<LS.length-1?LS[i+1]-.2:99);
 function seek(t){
   // placa: entra girando e fica; some na hora das placas personalizadas
-  const pin=seg(t,.1,.9), pout=seg(t,M.personaliza-.15,M.personaliza+.2);
+  const pin=.35+.65*seg(t,0,.8), pout=seg(t,M.personaliza-.15,M.personaliza+.2);
   const p=$('plate'); p.style.opacity=(pin*(1-pout)).toFixed(3); p.style.visibility=pin*(1-pout)>0?'visible':'hidden';
   const tapX=TAPS.reduce((m,a)=>Math.max(m,Math.sin(Math.PI*cl((t-a)/.7))),0);
   p.style.transform=`perspective(1400px) rotateY(${(40*(1-pin)).toFixed(2)}deg) translateY(${((1-pin)*60).toFixed(1)}px) scale(${(1+.02*tapX).toFixed(4)})`;
