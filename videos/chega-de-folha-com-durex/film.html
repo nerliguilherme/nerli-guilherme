@@ -92,9 +92,9 @@ const LE=LS.map((s,i)=>i<LS.length-1?Math.min(LS[i+1]-.2,s+2.6):99);
 const CTA=13.3; EV.push(['chime',CTA+.1]);
 function seek(t){
   // cenas: a próxima empurra a anterior para a esquerda (sem tela vazia)
-  ST.forEach((s,i)=>{ const e=$('sc'+i); const inn=i==0?1:seg(t,s.a-.3,s.a), out=seg(t,s.b-.3,s.b);
-    if(t<s.a-.3||t>s.b){ e.style.visibility='hidden'; } else e.style.visibility='visible';
-    const x=(1-inn)*1080-out*1080; e.style.transform=`translateX(${x.toFixed(1)}px)`;
+  ST.forEach((s,i)=>{ const e=$('sc'+i); const inn=i==0?1:seg(t,s.a-.45,s.a), out=0;
+    if(t<s.a-.45||t>s.b){ e.style.visibility='hidden'; } else e.style.visibility='visible';
+    e.style.opacity=inn.toFixed(3); e.style.transform=`scale(${(1.04-.04*inn).toFixed(4)})`;
     // wipe: a linha azul varre e revela a placa
     const u=seg(t,s.w,s.w+.4), lx=lerp(-20,1100,u);
     $('pl'+i).style.clipPath=`inset(0 0 0 ${lx.toFixed(1)}px)`; $('pt'+i).style.clipPath=`inset(0 ${(1080-lx).toFixed(1)}px 0 0)`;
@@ -103,9 +103,9 @@ function seek(t){
     const pa=$('pl'+i).firstChild; pa.style.transform=`rotate(${(SC[i].rot+Math.sin(t*2.2+i)*.6).toFixed(2)}deg)`; });
   // trabalhos reais
   RW.forEach((r,i)=>{ const a=r[3], nx=i<RW.length-1?RW[i+1][3]:RWEND, e=$('cd'+i);
-    const inn=seg(t,a-.25,a), out=seg(t,nx-.25,nx); if(t<a-.25||t>nx){e.style.visibility='hidden'; fe($('sl'+i),0); return;} e.style.visibility='visible';
-    const dir=i%2?-1:1; e.style.transform=`translateX(${((1-inn)*1100*dir-out*1100*dir).toFixed(1)}px)`; e.style.opacity=i==RW.length-1?(1-out).toFixed(3):1;
-    $('ci'+i).style.transform=`scale(${(1+.02*cl((t-a+.3)/1.3)).toFixed(4)})`; fe($('sl'+i),seg(t,a-.1,a+.12)*(1-seg(t,nx-.22,nx-.05)),14); });
+    const last=i==RW.length-1, inn=seg(t,a-.4,a), out=last?seg(t,nx-.3,nx+.1):0; if(t<a-.4||t>(last?nx+.1:nx)){e.style.visibility='hidden'; fe($('sl'+i),0); return;} e.style.visibility='visible';
+    e.style.opacity=(inn*(1-out)).toFixed(3); e.style.transform=`scale(${(1.05-.05*inn-.03*out).toFixed(4)})`;
+    $('ci'+i).style.transform=`scale(${(1+.025*cl((t-a+.4)/1.4)).toFixed(4)})`; fe($('sl'+i),seg(t,a-.12,a+.12)*(1-seg(t,nx-.4,nx-.17)),10); });
   // final
   fe($('logo'),seg(t,CTA-.15,CTA+.25),20); fe($('at'),seg(t,CTA+.05,CTA+.45),20); fe($('tagl'),seg(t,CTA+.45,CTA+.85),16);
   const bo=seg(t,CTA+.25,CTA+.65), ph=t>CTA+1?((t-CTA-1)/1.0)%1:0, pu=t>CTA+1?(1-Math.cos(2*Math.PI*ph))/2:0;
