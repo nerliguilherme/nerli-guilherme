@@ -13,7 +13,7 @@ Nenhuma crítica aparece em cima de foto de cliente.
 | 1 | A loja some no escuro | ✓ Letreiro iluminado · Espelho Meu |
 | 2 | A faixa perde a cor e uma peça cai | ✓ Cores vivas · D'Paleteiros |
 | 3 | "SUA LOJA" fino encolhe com a distância (+ olho) | ✓ Leitura de longe · Grupo Fibernett |
-| 4 | Placa lotada de texto colorido | ✓ Só o essencial · Blaser |
+| 4 | Foto fictícia "Mega Center" lotada de texto (gerada na ElevenLabs, `img/p4_lotada.jpg`), com "✗ Assim não · exemplo fictício" | ✓ Só o essencial · Blaser |
 | 5 | Perfil do Instagram ≠ placa, com o "≠" vermelho | ✓ Mesma identidade · O Rei da Pizza |
 
 ## Ritmo

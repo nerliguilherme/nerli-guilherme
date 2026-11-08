@@ -51,6 +51,8 @@ html,body{margin:0;background:#FAFAFA}
      <path d="M-130 -50 L-60 -50 L-95 20 Z" fill="#EA580C"/><text x="40" y="-6" text-anchor="middle" font-size="40" font-weight="800" font-family="Inter" fill="#18181B">SUA</text><text x="40" y="40" text-anchor="middle" font-size="40" font-weight="800" font-family="Inter" fill="#18181B">LOJA</text></g></svg>
    <svg class="ln" width="1080" height="1920"><g id="neq" transform="translate(540 800)"><circle r="56" fill="#fff" stroke="#DC2626" stroke-width="6"/><path d="M-26 -12 H26 M-26 12 H26 M14 -32 L-14 32" stroke="#DC2626" stroke-width="8" stroke-linecap="round"/></g></svg>
  </div>
+ <div class="card" id="pb4" style="left:110px;top:420px;width:860px;height:700px"><img id="pbi4" src="img/p4_lotada.jpg"></div>
+ <div class="seal" id="pt4" style="top:1196px"><i style="background:#B91C1C"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></i>Assim não <span>· exemplo fictício</span></div>
  <!-- soluções -->
  <div id="sols"></div>
  <!-- CTA -->
@@ -139,7 +141,8 @@ function seek(t){
   const fr=$('far'), f3=win(t,NUM[2]-.02,END[2]); fr.style.opacity=f3.toFixed(3); fr.style.visibility=f3>0?'visible':'hidden'; fr.style.transform=`scale(${lerp(1,.42,seg(t,NUM[2]+.5,M.longe+.1)).toFixed(4)})`;
   const ey=$('eye3'); ey.style.opacity=(f3*seg(t,NUM[2]+.6,NUM[2]+.95)).toFixed(3); dash($('eA3'),seg(t,NUM[2]+.6,NUM[2]+1.1)); dash($('eB3'),seg(t,NUM[2]+.8,NUM[2]+1.15));
   // sinal 4: placa lotada
-  const f4=win(t,NUM[3]-.02,END[3]); $('board').style.opacity=f4.toFixed(3); $('board').style.visibility=f4>0?'visible':'hidden';
+  const f4=win(t,NUM[3]-.02,END[3]); $('board').style.opacity=0; $('board').style.visibility='hidden';
+  fe($('pb4'),f4,30); fe($('pt4'),win(t,NUM[3]+.15,END[3]-.1),14); $('pbi4').style.transform=`scale(${(1+.06*cl((t-NUM[3])/(END[3]-NUM[3]))).toFixed(4)})`;
   BARS.forEach((_,i)=>$('br'+i).setAttribute('opacity',seg(t,NUM[3]+i*.06,NUM[3]+.2+i*.06).toFixed(3)));
   // sinal 5: perfil do Instagram ≠ placa
   const f5=win(t,NUM[4]-.02,END[4]); const ig=$('ig'); ig.style.opacity=f5.toFixed(3); ig.style.visibility=f5>0?'visible':'hidden';
