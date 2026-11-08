@@ -89,7 +89,7 @@ CW.forEach((c,i)=>{ if(c.a==null) c.a=CW[i+1].a-.05; });
 $('caps').innerHTML=h;
 const LS=CAPS.map((_,li)=>Math.min(...CW.filter(c=>c.li==li).map(c=>c.a)));
 const LE=LS.map((s,i)=>i<LS.length-1?Math.min(LS[i+1]-.2,s+2.6):99);
-const CTA=13.5; EV.push(['chime',CTA+.1]);
+const CTA=13.3; EV.push(['chime',CTA+.1]);
 function seek(t){
   // cenas: a próxima empurra a anterior para a esquerda (sem tela vazia)
   ST.forEach((s,i)=>{ const e=$('sc'+i); const inn=i==0?1:seg(t,s.a-.3,s.a), out=seg(t,s.b-.3,s.b);
