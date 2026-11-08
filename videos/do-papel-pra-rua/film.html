@@ -1,0 +1,123 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="fonts/fonts.css">
+<script src="words.js"></script>
+<style>
+html,body{margin:0;background:#FAFAFA}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#FAFAFA;font-family:Inter,sans-serif;color:#18181B;-webkit-font-smoothing:antialiased;letter-spacing:-.025em}
+.abs{position:absolute;left:0;top:0}
+.w{display:inline-block;white-space:pre}
+.k{color:#1E3A8A}
+.cap{position:absolute;left:0;width:1080px;top:1300px;text-align:center;font-size:72px;font-weight:700;line-height:1}
+#paper{position:absolute;left:60px;top:500px;width:960px;height:620px;background:#fff;border-radius:10px;box-shadow:0 1px 2px rgba(24,24,27,.08),0 30px 60px -30px rgba(24,24,27,.35);transform-origin:50% 50%}
+#paper .ln{position:absolute;left:60px;right:60px;height:2px;background:#EEF0F4}
+#photoBox{position:absolute;left:0;top:0;width:1600px;height:719px;transform-origin:0 0;border-radius:36px;overflow:hidden;box-shadow:0 40px 70px -30px rgba(24,24,27,.5)}
+#photoBox img{display:block;width:1600px;height:719px}
+#art{position:absolute;left:0;top:0;width:1600px;height:486px;transform-origin:0 0}
+#art > *{position:absolute}
+.tag{position:absolute;left:0;width:1080px;text-align:center;font-size:50px;font-weight:600;color:#3F3F46;display:flex;justify-content:center;align-items:center;gap:14px}
+.tag i{display:inline-flex;width:54px;height:54px;border-radius:27px;background:#1E3A8A;align-items:center;justify-content:center}
+</style></head><body>
+<div id="stage">
+ <div id="photoBox"><img src="img/real.jpg"></div>
+ <div id="paper"><div class="ln" style="top:520px"></div><div class="ln" style="top:560px"></div>
+   <div style="position:absolute;left:60px;top:46px;font-size:28px;font-weight:600;color:#A1A1AA;letter-spacing:.1em">PROJETO · O REI DA PIZZA</div></div>
+ <div id="art">
+   <img id="aCol" src="img/arte_base.jpg" style="left:0;top:0;width:1600px;height:486px">
+   <img id="tL" src="img/tile_contatos.png" style="left:196px;top:150px;width:319px;height:242px">
+   <img id="tR" src="img/tile_pizza.png" style="left:1095px;top:120px;width:350px;height:320px">
+   <img id="aSk" src="img/arte_sketch.png" style="left:0;top:0;width:1600px;height:486px">
+ </div>
+ <svg id="pencil" class="abs" width="120" height="120" viewBox="0 0 24 24" style="overflow:visible"><g fill="none" stroke="#1E3A8A" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 21l1.2-4.5L15.5 5.2a2.1 2.1 0 0 1 3 0l.3.3a2.1 2.1 0 0 1 0 3L7.5 19.8z" fill="#fff"/><path d="M13.8 6.9l3.3 3.3M3 21l4.5-1.2"/></g></svg>
+ <div id="sweep" class="abs" style="width:300px;height:1920px;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,248,225,.55),rgba(255,255,255,0));opacity:0"></div>
+ <div class="tag" id="tag" style="top:1130px"><i><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></i>O Rei da Pizza · instalada</div>
+ <img id="logo" src="img/ngraph.svg" class="abs" style="width:640px;left:220px;top:560px">
+ <div id="at" class="abs" style="width:1080px;top:810px;text-align:center;font-size:64px;font-weight:600">@ngraph.pe</div>
+ <div id="btn" class="abs" style="left:200px;top:930px;width:680px;height:132px;border-radius:66px;background:#18181B;color:#fff;display:flex;align-items:center;justify-content:center;gap:22px;font-size:46px;font-weight:600;transform-origin:50% 50%">
+   <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"><path d="M4.5 19.5l1.1-3.6A8 8 0 1 1 8.4 18.5z"/><path d="M9.2 8.6c.3-.5.7-.5 1-.1l.7 1.4c.1.3 0 .6-.2.8l-.4.4c.5 1.1 1.4 2 2.5 2.5l.4-.4c.2-.2.5-.3.8-.2l1.4.7c.4.3.4.7-.1 1-.9.7-2.2.7-3.6-.2a8.4 8.4 0 0 1-2.7-2.7c-.9-1.4-.9-2.6-.2-3.6z" fill="#fff" stroke="none"/></svg>Chama no WhatsApp</div>
+ <div id="caps"></div>
+</div>
+<script>
+const T=20;
+const $=id=>document.getElementById(id);
+const cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)), lerp=(a,b,x)=>a+(b-a)*x;
+function bez(x1,y1,x2,y2){ return x=>{ x=cl(x); if(x<=0||x>=1)return x; let a=0,b=1,u=x; for(let i=0;i<28;i++){u=(a+b)/2; const X=3*(1-u)*(1-u)*u*x1+3*(1-u)*u*u*x2+u*u*u; if(X<x)a=u; else b=u;}
+  return 3*(1-u)*(1-u)*u*y1+3*(1-u)*u*u*y2+u*u*u; }; }
+const EZ=bez(.65,0,.35,1), seg=(t,a,b)=>EZ((t-a)/(b-a));
+const norm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'');
+let cur=0; const at=w=>{ for(let i=cur;i<WORDS.length;i++) if(norm(WORDS[i][0])===norm(w)){cur=i+1;return WORDS[i][1];} throw 'palavra: '+w; };
+const EV=[];
+function fe(el,o,dy=20,pre=''){ el.style.opacity=o.toFixed(3); el.style.visibility=o>.001?'visible':'hidden'; el.style.transform=`${pre} translateY(${((1-o)*dy).toFixed(2)}px) scale(${(.96+.04*o).toFixed(4)})`; }
+// ---------- homografia: retângulo w×h -> 4 cantos (matrix3d) ----------
+function homog(w,h,q){ const src=[[0,0],[w,0],[w,h],[0,h]]; const A=[],B=[];
+  for(let i=0;i<4;i++){const [x,y]=src[i],[u,v]=q[i]; A.push([x,y,1,0,0,0,-u*x,-u*y]); B.push(u); A.push([0,0,0,x,y,1,-v*x,-v*y]); B.push(v);}
+  for(let c=0;c<8;c++){ let p=c; for(let r=c+1;r<8;r++) if(Math.abs(A[r][c])>Math.abs(A[p][c]))p=r; [A[c],A[p]]=[A[p],A[c]]; [B[c],B[p]]=[B[p],B[c]];
+    for(let r=0;r<8;r++){ if(r==c)continue; const f=A[r][c]/A[c][c]; for(let k=c;k<8;k++)A[r][k]-=f*A[c][k]; B[r]-=f*B[c]; } }
+  const s=B.map((b,i)=>b/A[i][i]); const [a,b,c,d,e,f,g,hh]=s;
+  return `matrix3d(${a},${d},0,${g},${b},${e},0,${hh},0,0,1,0,${c},${f},0,1)`; }
+// homografia arte -> foto (medida com SIFT na logo)
+const HL=[[7.85528913e-01,-4.52476034e-02,5.14777655e+01],[-1.04011351e-02,7.55285503e-01,1.72734887e+02],[-8.69208178e-06,-5.55546853e-05,1]];
+const hp=(x,y)=>{const w=HL[2][0]*x+HL[2][1]*y+1; return [(HL[0][0]*x+HL[0][1]*y+HL[0][2])/w,(HL[1][0]*x+HL[1][1]*y+HL[1][2])/w];};
+const PC=[686,358], K=.625;      // centro da placa na foto e escala base da foto no quadro
+const cam=t=>{ const z=lerp(1.38,1.0,seg(t,M.do2-.6,M.do2+1.0)); const cy=lerp(820,820,1); return {z,cy}; };
+const p2s=(px,py,c)=>[540+c.z*K*(px-PC[0]), c.cy+c.z*K*(py-PC[1])];
+// ---------- legendas ----------
+const CAPS=[['Tudo','começa','no','<k>papel</k>|papel'],['Cada','traço,','cada','<k>cor</k>|cor'],['Pensado|pensado','pra','sua','<k>marca</k>|marca'],
+ ['Tira|tira','do','<k>papel...</k>|papel'],['...e|e','coloca','na','<k>rua.</k>|rua'],['Do|do','projeto','à','<k>instalação</k>|instalacao'],
+ ['Tem','uma','<k>ideia?</k>|ideia'],['Manda|manda','no|no','<k>WhatsApp</k>|whatsapp']];
+const CW=[]; let h='';
+CAPS.forEach((ln,li)=>{ h+=`<div class="cap" id="cap${li}">`; ln.forEach((w,wi)=>{ const [d,anc]=w.split('|'); const txt=d.replace(/<\/?k>/g,''); const t=at(anc||txt);
+  const id=`c${li}_${wi}`; h+=`<span class="w" id="${id}">${d.replace('<k>','<span class="k">').replace('</k>','</span>')}${wi<ln.length-1?' ':''}</span>`; CW.push({id,li,a:t}); if(d.includes('<k>'))EV.push(['tick',t]); }); h+='</div>'; });
+$('caps').innerHTML=h;
+const LS=CAPS.map((_,li)=>Math.min(...CW.filter(c=>c.li==li).map(c=>c.a)));
+const LE=LS.map((s,i)=>i<LS.length-1?Math.min(LS[i+1]-.25,s+3.2):99); LE[5]=15.25;
+cur=0; const M={}; ['papel','traco','cor','marca','tira','papel2','coloca','rua','rei','do2','instalacao','ideia','manda','whatsapp'].forEach(k=>M[k]=at(k.replace(/2$/,'')));
+// eventos de som
+EV.push(['swoosh',.3],['draw',M.traco-.1],['draw',M.cor-.1],['swoosh',M.tira+.2],['swoosh',M.coloca],['chime',M.rua+.05],['swoosh',M.instalacao+1.0]);
+// arte no papel (plana)
+const AW=880, AH=AW*486/1600, PAPER=[[540-AW/2,780-AH/2],[540+AW/2,780-AH/2],[540+AW/2,780+AH/2],[540-AW/2,780+AH/2]];
+const ART=[[0,0],[1600,0],[1600,486],[0,486]];
+function seek(t){
+  const c=cam(t);
+  // foto da realidade (atrás), entra durante o voo
+  const pv=seg(t,M.tira+.1,M.coloca+.1)*(1-seg(t,M.instalacao+.9,M.instalacao+1.3));
+  const o=p2s(0,0,c), s=c.z*K; const pb=$('photoBox'); pb.style.transform=`translate(${o[0].toFixed(2)}px,${o[1].toFixed(2)}px) scale(${s.toFixed(5)})`;
+  pb.style.opacity=pv.toFixed(3); pb.style.visibility=pv>0?'visible':'hidden'; pb.style.borderRadius=(36/s).toFixed(1)+'px';
+  // papel: entra, segura a arte, depois cai e some
+  const pin=seg(t,0,.7), pout=seg(t,M.tira,M.tira+.9); const pp=$('paper');
+  pp.style.opacity=(pin*(1-pout)).toFixed(3); pp.style.visibility=pin*(1-pout)>0?'visible':'hidden';
+  pp.style.transform=`translateY(${((1-pin)*60+pout*260).toFixed(1)}px) rotate(${(-1.2*(1-pin)+3*pout).toFixed(2)}deg) scale(${(1-.06*pout).toFixed(4)})`;
+  // arte: desenho a lápis -> cor -> sai do papel -> voa -> pousa na placa
+  const sk=seg(t,M.traco-.25,M.cor-.05), co=seg(t,M.cor-.05,M.marca);
+  $('aSk').style.clipPath=`inset(0 ${((1-sk)*100).toFixed(2)}% 0 0)`; $('aSk').style.opacity=(1-.85*seg(t,M.marca-.3,M.marca+.3)).toFixed(3);
+  ['aCol','tL','tR'].forEach(id=>$(id).style.clipPath=`inset(0 ${((1-co)*100).toFixed(2)}% 0 0)`);
+  const u=seg(t,M.tira+.15,M.rua+.05), lift=seg(t,M.tira-.1,M.tira+.5);
+  const tgt=ART.map(([x,y])=>{const [px,py]=hp(x,y); return p2s(px,py,c);});
+  const q=PAPER.map((p,i)=>{ const X=lerp(p[0],tgt[i][0],u), Y=lerp(p[1],tgt[i][1],u);
+    const pop=Math.sin(Math.PI*u)*.10+lift*(1-u)*.04, cx=540, cy=lerp(780,820,u);           // cresce em direção à câmera no meio do voo
+    const tilt=Math.sin(Math.PI*u)*(i<2?-26:26);                                              // leve inclinação 3D
+    return [cx+(X-cx)*(1+pop)+(i==0||i==3?-1:1)*tilt*.4, cy+(Y-cy)*(1+pop)-Math.sin(Math.PI*u)*90+tilt]; });
+  const ar=$('art'); ar.style.transform=homog(1600,486,q);
+  const dis=seg(t,M.rua+.1,M.rua+.85); ar.style.opacity=(seg(t,M.traco-.3,M.traco)*(1-dis)).toFixed(3);
+  ar.style.filter=`drop-shadow(0 ${(lift*(1-u)*40).toFixed(1)}px ${(lift*(1-u)*40).toFixed(1)}px rgba(24,24,27,${(.35*lift*(1-u)).toFixed(3)}))`;
+  // contatos e pizza trocam de lado (como ficou na fachada)
+  const sw=seg(t,M.tira+.6,M.rua-.15);
+  const arc=Math.sin(Math.PI*sw);
+  $('tL').style.transform=`translate(${(sw*(1340-196)).toFixed(1)}px,${(sw*(166-150)-arc*330).toFixed(1)}px)`; $('tR').style.transform=`translate(${(sw*(112-1095)).toFixed(1)}px,${(sw*(103-120)+arc*360).toFixed(1)}px)`;
+  // lápis acompanha o traço
+  const pe=$('pencil'); const fx=lerp(PAPER[0][0],PAPER[1][0],sk), fy=780+Math.sin(sk*40)*AH*.32; pe.style.transform=`translate(${(fx-12).toFixed(1)}px,${(fy-108).toFixed(1)}px)`;
+  pe.style.opacity=(t>M.traco-.3&&t<M.cor+.05)?1:0;
+  // brilho passando na hora do pouso
+  const sv=cl((t-M.rua)/.8); const swp=$('sweep'); swp.style.opacity=(sv>0&&sv<1?Math.sin(Math.PI*sv):0).toFixed(3); swp.style.transform=`translateX(${lerp(-300,1080,sv).toFixed(1)}px)`;
+  // etiqueta
+  fe($('tag'),seg(t,M.do2,M.do2+.4)*(1-seg(t,M.instalacao+.9,M.instalacao+1.2)),16);
+  // CTA
+  fe($('logo'),seg(t,M.ideia-.6,M.ideia-.2),20); fe($('at'),seg(t,M.ideia-.4,M.ideia),20);
+  const bo=seg(t,M.manda-.2,M.manda+.2), ph=t>M.whatsapp?((t-M.whatsapp)/1.0)%1:0, pu=t>M.whatsapp?(1-Math.cos(2*Math.PI*ph))/2:0;
+  const b=$('btn'); b.style.opacity=bo; b.style.transform=`translateY(${(1-bo)*20}px) scale(${((.96+.04*bo)*(1+.03*pu)).toFixed(4)})`;
+  // legendas
+  for(const w of CW){ const i=seg(t,w.a-.04,w.a+.36), o2=seg(t,LE[w.li],LE[w.li]+.24), e=$(w.id); e.style.opacity=(i*(1-o2)).toFixed(3); e.style.transform=`translateY(${((1-i)*20-o2*14).toFixed(2)}px)`; }
+}
+window.seek=seek; window.T=T; window.EV=EV; window.M=M;
+window.ready=Promise.all([document.fonts.ready,...[...document.images].map(i=>i.decode().catch(()=>0))]).then(()=>{seek(0);return true});
+</script></body></html>
