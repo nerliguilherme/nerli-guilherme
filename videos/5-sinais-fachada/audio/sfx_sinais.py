@@ -1,6 +1,6 @@
 # Sons de UI sintetizados (determinísticos) + mix com a trilha. Cada som é posicionado pelo seu pico medido.
 import numpy as np, wave
-SR=48000; T=45.5
+SR=48000; T=51.5
 rng=np.random.default_rng(7)
 def mix(*xs):
     n=max(len(x) for x in xs);o=np.zeros(n)

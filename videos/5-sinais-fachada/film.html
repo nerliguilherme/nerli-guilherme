@@ -64,7 +64,7 @@ svg.ln .b{fill:none;stroke:var(--key);stroke-width:4;stroke-linecap:round;stroke
  <div id="ctr" class="abs" style="left:860px;top:282px;width:140px;text-align:right;font-size:44px;font-weight:700;color:var(--mut);letter-spacing:0"></div>
 </div>
 <script>
-const T=45.5;
+const T=51.5;
 const $=id=>document.getElementById(id);
 const cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)), lerp=(a,b,x)=>a+(b-a)*x;
 function bez(x1,y1,x2,y2){ return x=>{ x=cl(x); if(x<=0||x>=1)return x; let a=0,b=1,u=x; for(let i=0;i<28;i++){u=(a+b)/2; const X=3*(1-u)*(1-u)*u*x1+3*(1-u)*u*u*x2+u*u*u; if(X<x)a=u; else b=u;}
@@ -93,25 +93,31 @@ CAPS.forEach((ln,li)=>{ h+=`<div class="cap" id="cap${li}">`; ln.forEach((w,wi)=
   CW.push({id,li,a:t}); if(d.includes('<k>'))EV.push(['tick',t]); }); h+='</div>'; });
 $('caps').innerHTML=h;
 const LS=CAPS.map((_,li)=>Math.min(...CW.filter(c=>c.li==li).map(c=>c.a)));
-const LE=LS.map((s,i)=>i<LS.length-1?LS[i+1]-.28:99);
+const LX=CAPS.map((_,li)=>Math.max(...CW.filter(c=>c.li==li).map(c=>c.a)));
+const LE=LS.map((s,i)=>i<LS.length-1?Math.min(LS[i+1]-.28,LX[i]+.75):99);
 // ---------- marcos ----------
 cur=0; const M={}; [['cinco','cinco'],['primeiro','primeiro'],['escurece','escurece'],['some','some'],['segundo','segundo'],['desbotada','desbotada'],['soltando','soltando'],
  ['terceiro','terceiro'],['longe','longe'],['contraste','contraste'],['ninguem','ninguem'],['quarto','quarto'],['demais','demais'],['carro','carro'],['nome','nome'],
  ['quinto','quinto'],['diferente','diferente'],['reconhece','reconhece'],['marcou','marcou'],['foto','foto'],['melhorar','melhorar'],['enigrafi','enigrafi'],['vista','vista']].forEach(([k,w])=>M[k]=at(w));
+cur=0; [['some','some'],['abandonada','abandonada'],['ninguem','ninguem'],['so','so'],['voce','voce']].forEach(([k,w])=>M['e_'+k]=at(w));
 // ---------- fotos de solução ----------
+const SOL=(k,n)=>({a:M['e_'+k]+.35,b:n-.25});
+const PROB=[{img:'p1_apagada.jpg',a:M.primeiro+.2,b:M.e_some+.35},{img:'p2_desbotada.jpg',a:M.segundo+.2,b:M.e_abandonada+.35},
+ {img:'p3_ilegivel.jpg',a:M.terceiro+.2,b:M.e_ninguem+.55},{img:'p4_lotada.jpg',a:M.quarto+.2,b:M.e_so+.35},{img:'p5_logo.jpg',a:M.quinto+.2,b:M.e_voce+.35,h:484,y:520}];
 const CARDS=[
- {img:'s1_weyne.jpg',x:110,y:420,w:860,h:700,a:M.some-.15,b:M.segundo-.3,tag:'Weyne Modas'},
- {img:'s2_cavalcantis.jpg',x:110,y:420,w:860,h:700,a:M.soltando+1.15,b:M.terceiro-.3,tag:"Pizzaria Cavalcanti's"},
- {img:'s3_friopecas.jpg',x:110,y:420,w:860,h:700,a:M.ninguem-.05,b:M.quarto-.3,tag:'Frio Peças'},
- {img:'s4_ridente.jpg',x:110,y:420,w:860,h:700,a:M.nome+.15,b:M.quinto-.3,tag:'Ridente'},
- {img:'s5_rei_arte.jpg',x:110,y:410,w:860,h:262,a:M.reconhece-.45,b:M.marcou-.3},
- {img:'s5_rei_placa.jpg',x:110,y:712,w:860,h:440,a:M.reconhece-.05,b:M.marcou-.3,tag:'O Rei da Pizza: arte = placa'},
+ {img:'s1_weyne.jpg',x:110,y:420,w:860,h:700,...SOL('some',M.segundo),tag:'Weyne Modas'},
+ {img:'s2_cavalcantis.jpg',x:110,y:420,w:860,h:700,...SOL('abandonada',M.terceiro),tag:"Pizzaria Cavalcanti's"},
+ {img:'s3_friopecas.jpg',x:110,y:420,w:860,h:700,a:M.e_ninguem+.55,b:M.quarto-.25,tag:'Frio Peças'},
+ {img:'s4_ridente.jpg',x:110,y:420,w:860,h:700,...SOL('so',M.quinto),tag:'Ridente'},
+ {img:'s5_rei_arte.jpg',x:110,y:410,w:860,h:262,a:M.e_voce+.35,b:M.marcou-.25},
+ {img:'s5_rei_placa.jpg',x:110,y:712,w:860,h:440,a:M.e_voce+.6,b:M.marcou-.25,tag:'O Rei da Pizza'},
  {img:'c_dm_inst.jpg',x:100,y:430,w:420,h:560,a:M.foto-.1,b:M.melhorar-.95},{img:'c_dm_pronta.jpg',x:560,y:430,w:420,h:560,a:M.foto+.35,b:M.melhorar-.95},
  {img:'c_frio_inst.jpg',x:100,y:430,w:420,h:560,a:M.melhorar-.6,b:M.enigrafi-.35},{img:'c_frio_pronta.jpg',x:560,y:430,w:420,h:560,a:M.melhorar-.15,b:M.enigrafi-.35}];
-$('cards').innerHTML=CARDS.map((c,i)=>`<div class="card" id="cd${i}" style="left:${c.x}px;top:${c.y}px;width:${c.w}px;height:${c.h}px"><img src="img/${c.img}"></div>`+
-  (c.tag?`<div class="tag" id="tg${i}" style="top:${c.y+c.h+34}px"><i><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></i>${c.tag}</div>`:'')).join('')+
+$('cards').innerHTML=PROB.map((p,i)=>`<div class="card" id="pb${i}" style="left:110px;top:${p.y||420}px;width:860px;height:${p.h||700}px"><img id="pbi${i}" src="img/${p.img}"></div>
+  <div class="tag" id="pt${i}" style="top:${(p.y||420)+(p.h||700)+34}px"><i style="background:#B91C1C"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></i>Assim não</div>`).join('')+CARDS.map((c,i)=>`<div class="card" id="cd${i}" style="left:${c.x}px;top:${c.y}px;width:${c.w}px;height:${c.h}px"><img src="img/${c.img}"></div>`+
+  (c.tag?`<div class="tag" id="tg${i}" style="top:${c.y+c.h+34}px"><i><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></i>${i<6?'Feito pela Ngraph · ':''}${c.tag}</div>`:'')).join('')+
   `<div class="mini" id="mi0" style="left:100px;top:1010px">Instalando</div><div class="mini" id="mi1" style="left:560px;top:1010px">Pronta ✓</div>`;
-CARDS.forEach(c=>EV.push(['swoosh',c.a]));
+CARDS.forEach(c=>EV.push(['swoosh',c.a])); PROB.forEach(p=>EV.push(['swoosh',p.a]));
 // ---------- lista do CTA ----------
 const ITEMS=['Apaga à noite','Desbotada','Não lê de longe','Texto demais','Logo diferente'];
 $('list').innerHTML=ITEMS.map((s,i)=>`<div class="row" id="li${i}" style="top:${520+i*118}px"><svg width="64" height="64" viewBox="0 0 64 64"><circle cx="32" cy="32" r="29" fill="none" stroke="#D4D4D8" stroke-width="3.5"/>
@@ -125,7 +131,7 @@ const CTR=[[M.primeiro,'1/5'],[M.segundo,'2/5'],[M.terceiro,'3/5'],[M.quarto,'4/
 function seek(t){
   const S=$('stage');
   // noite no sinal 1
-  const nt=seg(t,M.escurece,M.escurece+.6)*(1-seg(t,M.some-.35,M.some+.05));
+  const nt=0;
   S.style.background=hexmix('#FAFAFA','#1C2230',nt); S.style.setProperty('--ink',hexmix('#18181B','#F4F4F5',nt)); S.style.setProperty('--key',hexmix('#1E3A8A','#9DB7FF',nt)); S.style.setProperty('--mut',hexmix('#71717A','#A1A1AA',nt));
   // legendas
   for(const c of CW){ const li=c.li, i=seg(t,c.a-.04,c.a+.36), o=seg(t,LE[li],LE[li]+.24), e=$(c.id); e.style.opacity=(i*(1-o)).toFixed(3); e.style.transform=`translateY(${((1-i)*20-o*14).toFixed(2)}px)`; }
@@ -170,6 +176,9 @@ function seek(t){
   dash($('iR'),seg(t,M.quinto+.15,M.quinto+.7)); dash($('iC'),seg(t,M.quinto+.3,M.quinto+.75)); dash($('iD'),seg(t,M.quinto+.45,M.quinto+.75)); dash($('sR'),seg(t,M.quinto+.35,M.quinto+.9));
   $('iLg').setAttribute('opacity',seg(t,M.quinto+.7,M.quinto+1.0).toFixed(3)); $('sLg').setAttribute('opacity',seg(t,M.quinto+.85,M.quinto+1.15).toFixed(3));
   $('neq').style.opacity=seg(t,M.diferente-.05,M.diferente+.3).toFixed(3);
+  // fotos de problema (com zoom lento) e de solução
+  PROB.forEach((p,i)=>{ const o=win(t,p.a,p.b,.42,.3); fe($('pb'+i),o,40); fe($('pt'+i),win(t,p.a+.2,p.b,.35,.3),16); $('pbi'+i).style.transform=`scale(${(1+.06*cl((t-p.a)/(p.b-p.a))).toFixed(4)})`; });
+  if(t>M.cinco){ $('fac').style.opacity=0; } ['tog','far','eye','board','idt'].forEach(id=>{$(id).style.opacity=0;$(id).style.visibility='hidden';});
   // fotos de solução
   CARDS.forEach((c,i)=>{ const o=win(t,c.a,c.b,.42,.3); const e=$('cd'+i); fe(e,o,40); const tgE=$('tg'+i); if(tgE) fe(tgE,win(t,c.a+.15,c.b,.35,.3),16); });
   fe($('mi0'),Math.max(win(t,M.foto,M.melhorar-.95,.35,.3),win(t,M.melhorar-.5,M.enigrafi-.35,.35,.3)),14);
