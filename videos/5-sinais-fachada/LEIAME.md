@@ -5,16 +5,17 @@ Saída final: `videos/reels-5-sinais-fachada.mp4`, com marca d'água.
 ## Regra de ouro
 Nenhuma crítica aparece em cima de foto de cliente.
 
-- **Problema:** só desenho de linha "SUA LOJA", com a legenda negativa.
-- **Solução:** a foto do trabalho com um selo positivo. A legenda negativa já saiu antes de a foto entrar.
+- **Problema:** foto **fictícia** gerada na ElevenLabs, com "✗ Assim não · exemplo fictício" e a legenda negativa.
+- **Solução:** foto real do trabalho com um selo positivo. A legenda negativa sai antes.
+- O desenho "SUA LOJA" aparece só na abertura.
 
-| Sinal | Problema (desenho) | Selo da solução |
+| Sinal | Problema (fictício) | Selo da solução |
 |---|---|---|
-| 1 | A loja some no escuro | ✓ Letreiro iluminado · Espelho Meu |
-| 2 | A faixa perde a cor e uma peça cai | ✓ Cores vivas · D'Paleteiros |
-| 3 | "SUA LOJA" fino encolhe com a distância (+ olho) | ✓ Leitura de longe · Grupo Fibernett |
-| 4 | Foto fictícia "Mega Center" lotada de texto (gerada na ElevenLabs, `img/p4_lotada.jpg`), com "✗ Assim não · exemplo fictício" | ✓ Só o essencial · Blaser |
-| 5 | Perfil do Instagram ≠ placa, com o "≠" vermelho | ✓ Mesma identidade · O Rei da Pizza |
+| 1 | `p1_apagada.jpg`: "Bella Moda" no escuro | ✓ Letreiro iluminado · Espelho Meu |
+| 2 | `p2_desbotada.jpg`: "Sabor da Casa" | ✓ Cores vivas · D'Paleteiros |
+| 3 | `p3_ilegivel.jpg`: ótica vista de longe | ✓ Leitura de longe · Grupo Fibernett |
+| 4 | `p4_lotada.jpg`: "Mega Center" | ✓ Só o essencial · Blaser |
+| 5 | `p5_logo.jpg`: "Doce Mel" Instagram ≠ fachada, com o "≠" vermelho | ✓ Mesma identidade · O Rei da Pizza |
 
 ## Ritmo
 - Narração curta (voz do Guilherme), sem acelerar.

@@ -51,8 +51,7 @@ html,body{margin:0;background:#FAFAFA}
      <path d="M-130 -50 L-60 -50 L-95 20 Z" fill="#EA580C"/><text x="40" y="-6" text-anchor="middle" font-size="40" font-weight="800" font-family="Inter" fill="#18181B">SUA</text><text x="40" y="40" text-anchor="middle" font-size="40" font-weight="800" font-family="Inter" fill="#18181B">LOJA</text></g></svg>
    <svg class="ln" width="1080" height="1920"><g id="neq" transform="translate(540 800)"><circle r="56" fill="#fff" stroke="#DC2626" stroke-width="6"/><path d="M-26 -12 H26 M-26 12 H26 M14 -32 L-14 32" stroke="#DC2626" stroke-width="8" stroke-linecap="round"/></g></svg>
  </div>
- <div class="card" id="pb4" style="left:110px;top:420px;width:860px;height:700px"><img id="pbi4" src="img/p4_lotada.jpg"></div>
- <div class="seal" id="pt4" style="top:1196px"><i style="background:#B91C1C"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></i>Assim não <span>· exemplo fictício</span></div>
+ <div id="probs"></div>
  <!-- soluções -->
  <div id="sols"></div>
  <!-- CTA -->
@@ -111,6 +110,12 @@ $('sols').innerHTML=SOL.map((s,i)=>(s.img=='rei'?`<div class="abs" id="sp${i}"><
   `<div class="card" id="sp${i}" style="left:110px;top:420px;width:860px;height:700px"><img id="si${i}" src="img/${s.img}"></div>`)+
   `<div class="seal" id="sl${i}" style="top:1196px">${CHK}${s.ok} <span>· ${s.who}</span></div>`).join('');
 SOL.forEach((s,i)=>EV.push(['pop',END[i]]));
+// ---------- problemas: fotos fictícias ----------
+const PRB=[{img:'p1_apagada.jpg'},{img:'p2_desbotada.jpg'},{img:'p3_ilegivel.jpg'},{img:'p4_lotada.jpg'},{img:'p5_logo.jpg',y:528,h:484}];
+const XS='<i style="background:#B91C1C"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></i>';
+$('probs').innerHTML=PRB.map((p,i)=>`<div class="card" id="pb${i}" style="left:110px;top:${p.y||420}px;width:860px;height:${p.h||700}px"><img id="pbi${i}" src="img/${p.img}"></div>
+ <div class="seal" id="pt${i}" style="top:1196px">${XS}Assim não <span>· exemplo fictício</span></div>`).join('')+
+ `<svg class="ln" width="1080" height="1920"><g id="neq5" transform="translate(540 770)"><circle r="56" fill="#fff" stroke="#DC2626" stroke-width="6"/><path d="M-26 -12 H26 M-26 12 H26 M14 -32 L-14 32" stroke="#DC2626" stroke-width="8" stroke-linecap="round"/></g></svg>`;
 // ---------- lista, barras, grade do Instagram ----------
 const ITEMS=['Apaga à noite','Desbotada','Não lê de longe','Texto demais','Logo diferente'];
 $('list').innerHTML=ITEMS.map((s,i)=>`<div class="row" id="li${i}" style="top:${520+i*118}px"><svg width="64" height="64" viewBox="0 0 64 64"><circle cx="32" cy="32" r="29" fill="none" stroke="#D4D4D8" stroke-width="3.5"/>
@@ -124,7 +129,7 @@ NUM.forEach(t=>EV.push(['swoosh',t-.05]));
 function seek(t){
   const S=$('stage');
   // noite só no problema do sinal 1
-  const nt=seg(t,M.um+.2,M.um+.7)*(1-seg(t,END[0]-.05,END[0]+.3)); S.style.background=hexmix('#FAFAFA','#1C2230',nt); S.style.setProperty('--ink',hexmix('#18181B','#F4F4F5',nt)); S.style.setProperty('--key',hexmix('#1E3A8A','#9DB7FF',nt));
+  const nt=0; S.style.background=hexmix('#FAFAFA','#1C2230',nt); S.style.setProperty('--ink',hexmix('#18181B','#F4F4F5',nt)); S.style.setProperty('--key',hexmix('#1E3A8A','#9DB7FF',nt));
   // contador
   const ci=NUM.filter(a=>t>=a-.05).length, ce=$('ctr'); ce.textContent=ci?ci+'/5':''; ce.style.opacity=(seg(t,M.um-.1,M.um+.2)*(1-seg(t,M.marcou,M.marcou+.3))).toFixed(3);
   // desenho "SUA LOJA": gancho (até o 1º sinal), sinal 1 e sinal 2
@@ -141,12 +146,14 @@ function seek(t){
   const fr=$('far'), f3=win(t,NUM[2]-.02,END[2]); fr.style.opacity=f3.toFixed(3); fr.style.visibility=f3>0?'visible':'hidden'; fr.style.transform=`scale(${lerp(1,.42,seg(t,NUM[2]+.5,M.longe+.1)).toFixed(4)})`;
   const ey=$('eye3'); ey.style.opacity=(f3*seg(t,NUM[2]+.6,NUM[2]+.95)).toFixed(3); dash($('eA3'),seg(t,NUM[2]+.6,NUM[2]+1.1)); dash($('eB3'),seg(t,NUM[2]+.8,NUM[2]+1.15));
   // sinal 4: placa lotada
-  const f4=win(t,NUM[3]-.02,END[3]); $('board').style.opacity=0; $('board').style.visibility='hidden';
-  fe($('pb4'),f4,30); fe($('pt4'),win(t,NUM[3]+.15,END[3]-.1),14); $('pbi4').style.transform=`scale(${(1+.06*cl((t-NUM[3])/(END[3]-NUM[3]))).toFixed(4)})`;
-  BARS.forEach((_,i)=>$('br'+i).setAttribute('opacity',seg(t,NUM[3]+i*.06,NUM[3]+.2+i*.06).toFixed(3)));
   // sinal 5: perfil do Instagram ≠ placa
   const f5=win(t,NUM[4]-.02,END[4]); const ig=$('ig'); ig.style.opacity=f5.toFixed(3); ig.style.visibility=f5>0?'visible':'hidden';
   const nq=seg(t,NUM[4]+.6,NUM[4]+.95); $('neq').setAttribute('transform',`translate(540 800) scale(${(.4+.6*nq).toFixed(3)})`); $('neq').setAttribute('opacity',nq.toFixed(3));
+  // problemas (fotos fictícias); desenhos só no gancho
+  PRB.forEach((p,i)=>{ const o=win(t,NUM[i]-.02,END[i]); fe($('pb'+i),o,30); fe($('pt'+i),win(t,NUM[i]+.15,END[i]-.1),14); $('pbi'+i).style.transform=`scale(${(1+.06*cl((t-NUM[i])/(END[i]-NUM[i]))).toFixed(4)})`; });
+  const nq5=seg(t,NUM[4]+.5,NUM[4]+.85)*(1-seg(t,END[4]-.1,END[4]+.2)); $('neq5').setAttribute('opacity',nq5.toFixed(3)); $('neq5').setAttribute('transform',`translate(540 770) scale(${(.4+.6*seg(t,NUM[4]+.5,NUM[4]+.85)).toFixed(3)})`);
+  if(t>NUM[0]-.02){ const fo=1-seg(t,NUM[0]-.02,NUM[0]+.33); F.style.opacity=(Math.min(+F.style.opacity,fo)).toFixed(3); }
+  ['far','eye3','board','ig'].forEach(id=>{$(id).style.opacity=0;$(id).style.visibility='hidden';});
   // soluções (entram enquanto o problema sai)
   SOL.forEach((s,i)=>{ const o=win(t,END[i]-.05,NXT[i]); fe($('sp'+i),o,30); fe($('sl'+i),win(t,END[i]+.1,NXT[i]),14); const im=$('si'+i); if(im) im.style.transform=`scale(${(1+.05*cl((t-END[i])/1.6)).toFixed(4)})`; });
   // CTA: lista -> instalando/pronta -> logo
