@@ -101,8 +101,8 @@ const LS=CAPS.map((_,li)=>Math.min(...CW.filter(c=>c.li==li).map(c=>c.a)));
 const LE=LS.map((s,i)=>i<LS.length-1?LS[i+1]-.22:99);
 [3,5,7,9,11].forEach((li,k)=>LE[li]=END[k]-.1);
 // ---------- soluções: foto + selo positivo ----------
-const SOL=[{img:'s1_weyne.jpg',ok:'Letreiro iluminado',who:'Weyne Modas'},{img:'s2_cavalcantis.jpg',ok:'Cores vivas',who:"Cavalcanti's"},
- {img:'s3_friopecas.jpg',ok:'Leitura de longe',who:'Frio Peças'},{img:'s4_ridente.jpg',ok:'Só o essencial',who:'Ridente'},{img:'rei',ok:'Mesma identidade',who:'O Rei da Pizza'}];
+const SOL=[{img:'n1_espelho.jpg',ok:'Letreiro iluminado',who:'Espelho Meu'},{img:'n2_dpaleteiros.jpg',ok:'Cores vivas',who:"D'Paleteiros"},
+ {img:'n3_fibernett.jpg',ok:'Leitura de longe',who:'Grupo Fibernett'},{img:'n4_blaser.jpg',ok:'Só o essencial',who:'Blaser'},{img:'rei',ok:'Mesma identidade',who:'O Rei da Pizza'}];
 const CHK='<i><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></i>';
 $('sols').innerHTML=SOL.map((s,i)=>(s.img=='rei'?`<div class="abs" id="sp${i}"><div class="card" style="left:110px;top:400px;width:860px;height:262px"><img src="img/s5_rei_arte.jpg"></div>
    <div class="card" style="left:110px;top:702px;width:860px;height:440px"><img src="img/s5_rei_placa.jpg"></div></div>`:

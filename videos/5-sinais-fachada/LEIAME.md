@@ -10,10 +10,10 @@ Nenhuma crítica aparece em cima de foto de cliente.
 
 | Sinal | Problema (desenho) | Selo da solução |
 |---|---|---|
-| 1 | A loja some no escuro | ✓ Letreiro iluminado · Weyne Modas |
-| 2 | A faixa perde a cor e uma peça cai | ✓ Cores vivas · Cavalcanti's |
-| 3 | "SUA LOJA" fino encolhe com a distância (+ olho) | ✓ Leitura de longe · Frio Peças |
-| 4 | Placa lotada de texto colorido | ✓ Só o essencial · Ridente |
+| 1 | A loja some no escuro | ✓ Letreiro iluminado · Espelho Meu |
+| 2 | A faixa perde a cor e uma peça cai | ✓ Cores vivas · D'Paleteiros |
+| 3 | "SUA LOJA" fino encolhe com a distância (+ olho) | ✓ Leitura de longe · Grupo Fibernett |
+| 4 | Placa lotada de texto colorido | ✓ Só o essencial · Blaser |
 | 5 | Perfil do Instagram ≠ placa, com o "≠" vermelho | ✓ Mesma identidade · O Rei da Pizza |
 
 ## Ritmo
