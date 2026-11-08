@@ -1,0 +1,116 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="fonts/fonts.css">
+<script src="words.js"></script>
+<style>
+html,body{margin:0;background:#FAFAFA}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#FAFAFA;font-family:Inter,sans-serif;color:#18181B;-webkit-font-smoothing:antialiased;letter-spacing:-.025em}
+.abs{position:absolute;left:0;top:0}
+.w{display:inline-block;white-space:pre}
+.k{color:#1E3A8A}
+.cap{position:absolute;left:0;width:1080px;top:1404px;text-align:center;font-size:66px;font-weight:700;line-height:1}
+.scene{position:absolute;left:0;top:0;width:1080px;height:1920px;overflow:hidden}
+.wall{position:absolute;inset:0}
+.wall canvas{position:absolute;inset:0;mix-blend-mode:multiply;opacity:.55}
+.layer{position:absolute;inset:0}
+.paper{position:absolute;left:320px;top:470px;width:440px;height:622px;background:linear-gradient(170deg,#FFFFFD,#F3F1EA);box-shadow:0 2px 3px rgba(0,0,0,.12),0 18px 26px -14px rgba(0,0,0,.35);transform-origin:50% 50%}
+.tape{position:absolute;width:118px;height:36px;background:rgba(244,226,160,.62);box-shadow:inset 0 0 0 1px rgba(200,180,110,.25)}
+.plate{position:absolute;left:210px;top:580px;width:660px;height:440px;border-radius:20px;overflow:hidden;box-shadow:0 2px 2px rgba(0,0,0,.10),0 22px 34px -16px rgba(0,0,0,.45)}
+.plate::after{content:"";position:absolute;inset:0;background:linear-gradient(160deg,rgba(255,255,255,.22),rgba(255,255,255,0) 40%)}
+.line{position:absolute;top:0;width:6px;height:1920px;background:#1E3A8A;box-shadow:0 0 18px 4px rgba(30,58,138,.35)}
+.card{position:absolute;left:110px;top:330px;width:860px;height:940px;border-radius:30px;overflow:hidden;box-shadow:0 30px 60px -28px rgba(24,24,27,.45),0 2px 6px rgba(24,24,27,.08);background:#ddd}
+.card img{width:100%;height:100%;object-fit:cover;display:block}
+.seal{position:absolute;left:0;width:1080px;top:1308px;text-align:center;display:flex;justify-content:center;align-items:center;gap:16px;font-size:48px;font-weight:700}
+.seal i{display:inline-flex;width:56px;height:56px;border-radius:28px;background:#1E3A8A;align-items:center;justify-content:center;flex:none}
+.seal span{color:#71717A;font-weight:600}
+</style></head><body>
+<div id="stage">
+ <div id="scenes"></div>
+ <div id="cards"></div>
+ <img id="logo" src="img/ngraph.svg" class="abs" style="width:640px;left:220px;top:560px">
+ <div id="at" class="abs" style="width:1080px;top:810px;text-align:center;font-size:64px;font-weight:600">@ngraph.pe</div>
+ <div id="btn" class="abs" style="left:200px;top:930px;width:680px;height:132px;border-radius:66px;background:#18181B;color:#fff;display:flex;align-items:center;justify-content:center;gap:22px;font-size:46px;font-weight:600;transform-origin:50% 50%">
+   <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"><path d="M4.5 19.5l1.1-3.6A8 8 0 1 1 8.4 18.5z"/><path d="M9.2 8.6c.3-.5.7-.5 1-.1l.7 1.4c.1.3 0 .6-.2.8l-.4.4c.5 1.1 1.4 2 2.5 2.5l.4-.4c.2-.2.5-.3.8-.2l1.4.7c.4.3.4.7-.1 1-.9.7-2.2.7-3.6-.2a8.4 8.4 0 0 1-2.7-2.7c-.9-1.4-.9-2.6-.2-3.6z" fill="#fff" stroke="none"/></svg>Chama no WhatsApp</div>
+ <div id="tagl" class="abs" style="width:1080px;top:1110px;text-align:center;font-size:40px;font-weight:500;color:#52525B;line-height:1.4">Placas em PS · Acrílico<br>Sinalização · Letreiros</div>
+ <div id="caps"></div>
+</div>
+<script>
+const T=15;
+const $=id=>document.getElementById(id);
+const cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)), lerp=(a,b,x)=>a+(b-a)*x;
+function bez(x1,y1,x2,y2){ return x=>{ x=cl(x); if(x<=0||x>=1)return x; let a=0,b=1,u=x; for(let i=0;i<28;i++){u=(a+b)/2; const X=3*(1-u)*(1-u)*u*x1+3*(1-u)*u*u*x2+u*u*u; if(X<x)a=u; else b=u;}
+  return 3*(1-u)*(1-u)*u*y1+3*(1-u)*u*u*y2+u*u*u; }; }
+const EZ=bez(.65,0,.35,1), seg=(t,a,b)=>EZ((t-a)/(b-a));
+const norm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'');
+let cur=0; const at=w=>{ for(let i=cur;i<WORDS.length;i++) if(norm(WORDS[i][0])===norm(w)){cur=i+1;return WORDS[i][1];} throw 'palavra: '+w; };
+const EV=[];
+function fe(el,o,dy=20,pre=''){ el.style.opacity=o.toFixed(3); el.style.visibility=o>.001?'visible':'hidden'; el.style.transform=`${pre} translateY(${((1-o)*dy).toFixed(2)}px) scale(${(.96+.04*o).toFixed(4)})`; }
+// ---------- cenas: parede + folha A4 com durex + placa em PS ----------
+const MAN='<circle cx="0" cy="-58" r="16"/><path d="M-22 -36h44l6 56h-14l-4 70h-20l-4-70h-14z"/>';
+const WOM='<circle cx="0" cy="-58" r="16"/><path d="M-14 -36h28l26 66h-18l-2 60h-40l-2-60h-18z"/>';
+const SC=[
+ {wall:['#EADFCC','#D9CBB2'],
+  paper:`<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Permanent Marker';font-size:86px;color:#1c1c1c;transform:rotate(-2deg)">BANHEIRO<div style="font-size:120px;line-height:1;margin-top:10px">→</div></div>`,rot:-3,
+  plate:`<div style="position:absolute;inset:0;background:#1E3A8A"></div><svg style="position:absolute;left:70px;top:120px" width="240" height="200" viewBox="-120 -100 240 200"><g fill="#fff" transform="translate(-50 0)">${MAN}</g><rect x="-2" y="-80" width="4" height="170" fill="rgba(255,255,255,.5)"/><g fill="#fff" transform="translate(50 0)">${WOM}</g></svg>
+   <div style="position:absolute;left:318px;top:156px;color:#fff;font-size:62px;font-weight:800;letter-spacing:-.01em;line-height:1">BANHEIRO</div><div style="position:absolute;left:320px;top:236px;color:#BFD0FF;font-size:29px;font-weight:600">Masculino · Feminino</div>
+   <div style="position:absolute;left:320px;top:296px;color:#fff;font-size:70px;font-weight:300;line-height:1">→</div>`},
+ {wall:['#ECECE8','#D8D9D4'],
+  paper:`<div style="position:absolute;inset:0;padding:70px 46px;font-family:'Courier Prime';font-weight:700;color:#2a2a2a;font-size:38px;line-height:1.45">HORÁRIO DE<br>FUNCIONAMENTO<br><br>SEG A SEX<br>8H ÀS 18H<br><br>SÁB 8H ÀS 12H</div>`,rot:2,
+  plate:`<div style="position:absolute;inset:0;background:#fff"></div><div style="position:absolute;left:0;top:0;width:660px;height:104px;background:#1E3A8A;color:#fff;font-size:40px;font-weight:800;display:flex;align-items:center;justify-content:center;letter-spacing:.02em">HORÁRIO DE FUNCIONAMENTO</div>
+   ${[['Segunda a sexta','8h às 18h'],['Sábado','8h às 12h'],['Domingo','Fechado']].map((r,i)=>`<div style="position:absolute;left:56px;right:56px;top:${148+i*86}px;display:flex;justify-content:space-between;font-size:40px;font-weight:600;color:#18181B;border-bottom:2px dotted #CBD5E1;padding-bottom:16px"><span>${r[0]}</span><span style="color:#1E3A8A;font-weight:800">${r[1]}</span></div>`).join('')}`},
+ {wall:['#E2E6EA','#CBD1D8'],
+  paper:`<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Permanent Marker';color:#C81E1E;font-size:84px;line-height:1.05;text-align:center;transform:rotate(3deg)">NÃO<br>FUME!!<svg width="220" height="140" viewBox="0 0 220 140" style="margin-top:20px" fill="none" stroke="#C81E1E" stroke-width="8" stroke-linecap="round"><rect x="30" y="58" width="150" height="26" rx="4"/><path d="M190 52c8-12 0-22 8-32M24 22L196 122"/></svg></div>`,rot:-2,
+  plate:`<div style="position:absolute;inset:0;background:#fff"></div><svg style="position:absolute;left:46px;top:70px" width="250" height="250" viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="#DC2626" stroke-width="9"/><rect x="18" y="45" width="56" height="12" fill="#18181B"/><rect x="74" y="45" width="10" height="12" fill="#F59E0B"/><path d="M80 40c3-5 0-8 3-13" stroke="#71717A" stroke-width="3" fill="none"/><path d="M19 19L81 81" stroke="#DC2626" stroke-width="9"/></svg>
+   <div style="position:absolute;left:310px;top:128px;font-size:68px;font-weight:900;line-height:.95;color:#18181B">PROIBIDO<br>FUMAR</div><div style="position:absolute;left:0;bottom:0;width:660px;height:66px;background:#1E3A8A;color:#fff;font-size:30px;font-weight:600;display:flex;align-items:center;justify-content:center">Ambiente livre de fumo</div>`}];
+// tempos: folha → (wipe na batida) → placa; cenas empurram umas às outras
+const ST=[{a:-1,w:2.5,b:3.5},{a:3.5,w:4.0,b:5.0},{a:5.0,w:5.5,b:6.5}];
+$('scenes').innerHTML=SC.map((s,i)=>`<div class="scene" id="sc${i}"><div class="wall" style="background:radial-gradient(120% 80% at 50% 38%,${s.wall[0]},${s.wall[1]})"><canvas id="nz${i}" width="540" height="960" style="width:1080px;height:1920px"></canvas></div>
+  <div class="layer" id="pl${i}"><div class="paper" style="transform:rotate(${s.rot}deg)">${s.paper}<div class="tape" style="left:-30px;top:-12px;transform:rotate(-32deg)"></div><div class="tape" style="right:-30px;top:-12px;transform:rotate(30deg)"></div></div></div>
+  <div class="layer" id="pt${i}"><div class="plate">${s.plate}</div></div><div class="line" id="ln${i}"></div></div>`).join('');
+// textura da parede (determinística)
+SC.forEach((s,i)=>{ const c=$('nz'+i).getContext('2d'), im=c.createImageData(540,960); let x=12345+i*999;
+  for(let k=0;k<im.data.length;k+=4){ x=(x*1103515245+12345)&0x7fffffff; const v=200+((x>>16)%56); im.data[k]=im.data[k+1]=im.data[k+2]=v; im.data[k+3]=255; } c.putImageData(im,0,0); });
+ST.forEach(s=>EV.push(['swoosh',s.w]));ST.slice(1).forEach(s=>EV.push(['pop',s.a]));
+// ---------- trabalhos reais, um por batida ----------
+const RW=[['r3_flash_vaga.jpg','Sinalização','Flash EV',6.5],['r1_mercatto.jpg','Display de mesa','Novo Mercatto',7.5],['r2_leve.jpg','Placa de estacionamento','Grupo Mateus',8.5],
+ ['r5_flash_letreiro.jpg','Letreiro 3D luminoso','Flash EV',9.5],['r4_flash_recarga.jpg','Placa com QR Code','Flash EV',10.5]];
+const RWEND=11.75;
+const CHK='<i><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></i>';
+$('cards').innerHTML=RW.map((r,i)=>`<div class="card" id="cd${i}"><img id="ci${i}" src="img/${r[0]}"></div><div class="seal" id="sl${i}">${CHK}${r[1]} <span>· ${r[2]}</span></div>`).join('');
+RW.forEach(r=>EV.push(['swoosh',r[3]-.1]));
+// ---------- legendas ----------
+const CAPS=[['Colando|colando','folha','com','<k>durex?</k>|durex'],['Sua','empresa','merece','<k>mais</k>|mais'],['Placa','em','<k>PS</k>|ps','·','<k>display</k>|display'],
+ ['<k>Sinalização</k>|sinalizacao','·','<k>letreiro</k>|letreiro'],['Tudo','sob','<k>medida</k>|medida'],['Chama|chama','no','<k>WhatsApp</k>|whatsapp']];
+const CW=[]; let h='';
+CAPS.forEach((ln,li)=>{ h+=`<div class="cap" id="cap${li}">`; ln.forEach((w,wi)=>{ const [d,anc]=w.split('|'); const t=d=='·'?null:at(anc||d.replace(/<\/?k>/g,''));
+  const id=`c${li}_${wi}`; h+=`<span class="w" id="${id}">${d.replace('<k>','<span class="k">').replace('</k>','</span>')}${wi<ln.length-1?' ':''}</span>`; CW.push({id,li,a:t}); if(d.includes('<k>'))EV.push(['tick',t]); }); h+='</div>'; });
+CW.forEach((c,i)=>{ if(c.a==null) c.a=CW[i+1].a-.05; });
+$('caps').innerHTML=h;
+const LS=CAPS.map((_,li)=>Math.min(...CW.filter(c=>c.li==li).map(c=>c.a)));
+const LE=LS.map((s,i)=>i<LS.length-1?Math.min(LS[i+1]-.2,s+2.6):99);
+const CTA=11.7; EV.push(['chime',CTA+.1]);
+function seek(t){
+  // cenas: a próxima empurra a anterior para a esquerda (sem tela vazia)
+  ST.forEach((s,i)=>{ const e=$('sc'+i); const inn=i==0?1:seg(t,s.a-.3,s.a), out=seg(t,s.b-.3,s.b);
+    if(t<s.a-.3||t>s.b){ e.style.visibility='hidden'; } else e.style.visibility='visible';
+    const x=(1-inn)*1080-out*1080; e.style.transform=`translateX(${x.toFixed(1)}px)`;
+    // wipe: a linha azul varre e revela a placa
+    const u=seg(t,s.w,s.w+.4), lx=lerp(-20,1100,u);
+    $('pl'+i).style.clipPath=`inset(0 0 0 ${lx.toFixed(1)}px)`; $('pt'+i).style.clipPath=`inset(0 ${(1080-lx).toFixed(1)}px 0 0)`;
+    const ln=$('ln'+i); ln.style.left=(lx-3)+'px'; ln.style.opacity=(u>0&&u<1)?1:0;
+    const pp=$('pt'+i).firstChild; pp.style.transform=`scale(${(1+.04*Math.sin(Math.PI*cl((t-s.w-.3)/.4))).toFixed(4)})`;
+    const pa=$('pl'+i).firstChild; pa.style.transform=`rotate(${(SC[i].rot+Math.sin(t*2.2+i)*.6).toFixed(2)}deg)`; });
+  // trabalhos reais
+  RW.forEach((r,i)=>{ const a=r[3], nx=i<RW.length-1?RW[i+1][3]:RWEND, e=$('cd'+i);
+    const inn=seg(t,a-.3,a), out=seg(t,nx-.3,nx); if(t<a-.3||t>nx){e.style.visibility='hidden'; fe($('sl'+i),0); return;} e.style.visibility='visible';
+    const dir=i%2?-1:1; e.style.transform=`translateX(${((1-inn)*1100*dir-out*1100*dir).toFixed(1)}px)`; e.style.opacity=i==RW.length-1?(1-out).toFixed(3):1;
+    $('ci'+i).style.transform=`scale(${(1+.05*cl((t-a+.3)/1.3)).toFixed(4)})`; fe($('sl'+i),seg(t,a-.1,a+.15)*(1-seg(t,nx-.3,nx-.1)),14); });
+  // final
+  fe($('logo'),seg(t,CTA-.15,CTA+.25),20); fe($('at'),seg(t,CTA+.05,CTA+.45),20); fe($('tagl'),seg(t,CTA+.45,CTA+.85),16);
+  const bo=seg(t,CTA+.25,CTA+.65), ph=t>CTA+1?((t-CTA-1)/1.0)%1:0, pu=t>CTA+1?(1-Math.cos(2*Math.PI*ph))/2:0;
+  const b=$('btn'); b.style.opacity=bo; b.style.transform=`translateY(${(1-bo)*20}px) scale(${((.96+.04*bo)*(1+.03*pu)).toFixed(4)})`;
+  for(const w of CW){ const i=seg(t,w.a-.04,w.a+.3), o=seg(t,LE[w.li],LE[w.li]+.18), e=$(w.id); e.style.opacity=(i*(1-o)).toFixed(3); e.style.transform=`translateY(${((1-i)*20-o*14).toFixed(2)}px)`; }
+}
+window.seek=seek; window.T=T; window.EV=EV;
+window.ready=Promise.all([document.fonts.ready,...[...document.images].map(i=>i.decode().catch(()=>0))]).then(()=>{seek(0);return true});
+</script></body></html>
