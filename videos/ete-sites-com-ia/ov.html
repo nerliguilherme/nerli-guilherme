@@ -24,7 +24,7 @@ const EZ=bez(.65,0,.35,1),seg=(t,a,b)=>EZ((t-a)/(b-a)),win=(t,a,b)=>seg(t,a,a+.4
 const W='Desenvolvimento de|Sites e Sistemas|com <k>IA</k>'.split('|');
 $('t1').innerHTML=W.map(l=>'<div>'+l.split(' ').map(w=>`<span class="w">${w.replace('<k>','<span class="k">').replace('</k>','</span>')} </span>`).join('')+'</div>').join('');
 const words=[...document.querySelectorAll('#t1 .w')];
-const END=43.6;
+const END=38.55;
 function fe(e,o,dy=24){e.style.opacity=o.toFixed(3);e.style.transform=`translateY(${((1-o)*dy).toFixed(1)}px)`;}
 function lt(e,o){e.style.opacity=o.toFixed(3);e.style.transform=`translateX(${((1-o)*-60).toFixed(1)}px)`;}
 window.seek=t=>{
