@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carcará Burguer | Hambúrguer artesanal</title>
+  <meta name="description" content="Carcará Burguer — hambúrgueres artesanais com sabor do sertão. Veja o cardápio e peça online." />
+  <meta name="theme-color" content="#5C1302" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header" id="topo">
+    <div class="container header__inner">
+      <a href="#inicio" class="logo" aria-label="Carcará Burguer - início">
+        <span class="logo__icon" aria-hidden="true">
+          <svg viewBox="0 0 64 64"><path d="M6 30c8-14 22-20 34-16 6 2 10 6 12 10l6 2-5 3c-1 9-9 16-20 17l-6 8-2-8C14 45 7 39 6 30z" fill="currentColor"/><circle cx="44" cy="22" r="2.6" fill="#5C1302"/></svg>
+        </span>
+        <span class="logo__text">Carcará <b>Burguer</b></span>
+      </a>
+      <nav class="nav" id="nav">
+        <a href="#inicio" class="nav__link">Início</a>
+        <a href="#cardapio" class="nav__link">Cardápio</a>
+        <a href="#pedido" class="nav__link">Finalizar pedido</a>
+      </nav>
+      <div class="header__actions">
+        <button class="cart-btn" id="cartBtn" aria-label="Abrir sacola">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12l-1 13H7L6 7zm3 0a3 3 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span class="cart-btn__count" id="cartCount">0</span>
+        </button>
+        <a href="#cardapio" class="btn btn--primary btn--sm hide-sm">Peça agora</a>
+        <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ===== 1. PÁGINA INICIAL ===== -->
+    <section class="hero" id="inicio">
+      <div class="hero__bg" aria-hidden="true"></div>
+      <div class="container hero__grid">
+        <div class="hero__text reveal">
+          <span class="pill">🔥 Na brasa, feito na hora</span>
+          <h1 class="hero__title">O sabor que <span>voa alto</span> no sertão</h1>
+          <p class="hero__lead">Hambúrgueres artesanais de 160g, pão brioche selado na manteiga e ingredientes regionais. Do nosso grill direto pra sua mesa.</p>
+          <div class="hero__ctas">
+            <a href="#cardapio" class="btn btn--primary btn--lg">Ver cardápio <span aria-hidden="true">→</span></a>
+            <a href="#cardapio" class="btn btn--ghost btn--lg" data-filter-link="combo">Combos do dia</a>
+          </div>
+          <ul class="hero__stats">
+            <li><strong>4.9★</strong><span>avaliação</span></li>
+            <li><strong>30 min</strong><span>entrega média</span></li>
+            <li><strong>100%</strong><span>blend artesanal</span></li>
+          </ul>
+        </div>
+
+        <!-- Hambúrguer 3D -->
+        <div class="hero__visual">
+          <div class="stage" id="stage" aria-label="Hambúrguer 3D sendo montado" role="img">
+            <div class="steam" aria-hidden="true">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div class="burger3d" id="burger3d"></div>
+            <div class="grill" aria-hidden="true"></div>
+            <div class="sparks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+          <div class="hero__badge">
+            <span>a partir de</span>
+            <strong>R$ 24,90</strong>
+          </div>
+          <button class="rebuild" id="rebuild" type="button">↻ Montar de novo</button>
+        </div>
+      </div>
+      <a href="#cardapio" class="scroll-cue" aria-label="Ir para o cardápio"><span></span></a>
+    </section>
+
+    <!-- Faixa de benefícios -->
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee__track">
+        <span>🍔 Blend 160g</span><span>🧀 Queijo coalho</span><span>🔥 Na brasa</span><span>🥓 Bacon crocante</span><span>🛵 Delivery rápido</span><span>🌵 Sabor do sertão</span>
+        <span>🍔 Blend 160g</span><span>🧀 Queijo coalho</span><span>🔥 Na brasa</span><span>🥓 Bacon crocante</span><span>🛵 Delivery rápido</span><span>🌵 Sabor do sertão</span>
+      </div>
+    </div>
+
+    <!-- ===== 2. CARDÁPIO ===== -->
+    <section class="menu" id="cardapio">
+      <div class="container">
+        <header class="section-head reveal">
+          <span class="pill pill--dark">Cardápio</span>
+          <h2>Escolha o seu <span>Carcará</span></h2>
+          <p>Toque nos ícones de cada produto para descobrir os ingredientes. Clique no lanche para ver detalhes e personalizar.</p>
+        </header>
+
+        <div class="filters" role="tablist" aria-label="Categorias">
+          <button class="filter is-active" data-filter="todos" role="tab">Todos</button>
+          <button class="filter" data-filter="burger" role="tab">🍔 Burgers</button>
+          <button class="filter" data-filter="combo" role="tab">⭐ Combos</button>
+          <button class="filter" data-filter="acompanhamento" role="tab">🍟 Acompanhamentos</button>
+          <button class="filter" data-filter="bebida" role="tab">🥤 Bebidas</button>
+        </div>
+
+        <div class="grid" id="menuGrid"></div>
+      </div>
+    </section>
+
+    <!-- Banner CTA com foto -->
+    <section class="promo">
+      <div class="container promo__inner reveal">
+        <div class="promo__img">
+          <img src="assets/burger-destaque.jpg" alt="Hambúrguer artesanal com bacon, cheddar, alface e tomate" loading="lazy" />
+          <span class="promo__tag">-15%</span>
+        </div>
+        <div class="promo__text">
+          <span class="pill">Oferta de hoje</span>
+          <h2>Lampião Duplo<br/>+ fritas + refri</h2>
+          <p>Dois blends de 160g, cheddar derretido e bacon crocante. O combo mais pedido da casa.</p>
+          <p class="promo__price"><s>R$ 58,70</s> <strong>R$ 49,90</strong></p>
+          <button class="btn btn--primary btn--lg" data-add="combo-lampiao">Quero esse combo</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 3. FINALIZAR PEDIDO ===== -->
+    <section class="checkout" id="pedido">
+      <div class="container">
+        <header class="section-head reveal">
+          <span class="pill pill--dark">Finalizar pedido</span>
+          <h2>Falta <span>pouco</span> pra matar a fome</h2>
+          <p>Confira sua sacola, preencha os dados e pronto: seu pedido vai direto pra nossa cozinha.</p>
+        </header>
+
+        <div class="checkout__grid">
+          <form class="form" id="orderForm" novalidate>
+            <fieldset>
+              <legend><span>1</span> Seus dados</legend>
+              <div class="field">
+                <label for="nome">Nome completo</label>
+                <input id="nome" name="nome" type="text" autocomplete="name" placeholder="Ex.: Maria da Silva" required />
+                <small class="error"></small>
+              </div>
+              <div class="field">
+                <label for="telefone">WhatsApp</label>
+                <input id="telefone" name="telefone" type="tel" autocomplete="tel" placeholder="(81) 9 9999-9999" required />
+                <small class="error"></small>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend><span>2</span> Como quer receber?</legend>
+              <div class="choice">
+                <label><input type="radio" name="entrega" value="delivery" checked /><span>🛵 Delivery <em>+ R$ 5,00</em></span></label>
+                <label><input type="radio" name="entrega" value="retirada" /><span>🏪 Retirar na loja <em>grátis</em></span></label>
+              </div>
+              <div id="addressFields">
+                <div class="row">
+                  <div class="field field--grow">
+                    <label for="rua">Rua / Avenida</label>
+                    <input id="rua" name="rua" type="text" autocomplete="address-line1" placeholder="Rua das Flores" required />
+                    <small class="error"></small>
+                  </div>
+                  <div class="field field--sm">
+                    <label for="numero">Nº</label>
+                    <input id="numero" name="numero" type="text" placeholder="123" required />
+                    <small class="error"></small>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="field field--grow">
+                    <label for="bairro">Bairro</label>
+                    <input id="bairro" name="bairro" type="text" placeholder="Centro" required />
+                    <small class="error"></small>
+                  </div>
+                  <div class="field field--grow">
+                    <label for="referencia">Referência <i>(opcional)</i></label>
+                    <input id="referencia" name="referencia" type="text" placeholder="Perto da praça" />
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend><span>3</span> Pagamento</legend>
+              <div class="choice choice--3">
+                <label><input type="radio" name="pagamento" value="Pix" checked /><span>⚡ Pix</span></label>
+                <label><input type="radio" name="pagamento" value="Cartão" /><span>💳 Cartão</span></label>
+                <label><input type="radio" name="pagamento" value="Dinheiro" /><span>💵 Dinheiro</span></label>
+              </div>
+              <div class="field" id="trocoField" hidden>
+                <label for="troco">Troco para quanto?</label>
+                <input id="troco" name="troco" type="text" inputmode="decimal" placeholder="Ex.: 100,00" />
+              </div>
+              <div class="field">
+                <label for="obs">Observações <i>(opcional)</i></label>
+                <textarea id="obs" name="obs" rows="2" placeholder="Ex.: sem cebola no Sertanejo, campainha quebrada..."></textarea>
+              </div>
+            </fieldset>
+
+            <button type="submit" class="btn btn--primary btn--lg btn--block" id="submitBtn">Confirmar pedido</button>
+            <p class="form__note">🔒 Seus dados são usados só para entregar seu pedido.</p>
+          </form>
+
+          <aside class="summary" aria-live="polite">
+            <h3>Sua sacola</h3>
+            <div id="summaryItems" class="summary__items"></div>
+            <dl class="summary__totals">
+              <div><dt>Subtotal</dt><dd id="sumSubtotal">R$ 0,00</dd></div>
+              <div><dt>Entrega</dt><dd id="sumFrete">R$ 5,00</dd></div>
+              <div class="summary__total"><dt>Total</dt><dd id="sumTotal">R$ 0,00</dd></div>
+            </dl>
+            <a href="#cardapio" class="btn btn--ghost-dark btn--block">+ Adicionar mais itens</a>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div>
+        <a href="#inicio" class="logo logo--footer"><span class="logo__text">Carcará <b>Burguer</b></span></a>
+        <p>Hambúrguer artesanal com alma nordestina.</p>
+      </div>
+      <div>
+        <h4>Horário</h4>
+        <p>Ter a Dom · 18h às 23h30</p>
+      </div>
+      <div>
+        <h4>Contato</h4>
+        <p>(81) 9 9999-9999<br/>@carcaraburguer</p>
+      </div>
+    </div>
+    <p class="footer__copy">© <span id="year"></span> Carcará Burguer · Imagens ilustrativas</p>
+  </footer>
+
+  <!-- CTA flutuante (mobile) -->
+  <a href="#cardapio" class="float-cta" id="floatCta">
+    <span>🍔 Ver cardápio</span>
+    <b id="floatTotal"></b>
+  </a>
+
+  <!-- ===== MODAL PRODUTO ===== -->
+  <div class="modal" id="productModal" aria-hidden="true">
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="pmTitle">
+      <button class="modal__close" data-close aria-label="Fechar">×</button>
+      <div class="pm">
+        <div class="pm__visual" id="pmVisual"></div>
+        <div class="pm__body">
+          <div class="pm__tags" id="pmTags"></div>
+          <h3 id="pmTitle"></h3>
+          <p class="pm__desc" id="pmDesc"></p>
+          <div class="pm__facts" id="pmFacts"></div>
+          <h4>Ingredientes <small>(toque para saber mais)</small></h4>
+          <div class="ing-list" id="pmIngredients"></div>
+          <p class="ing-info" id="pmIngInfo"></p>
+          <div id="pmOptions"></div>
+          <div class="pm__footer">
+            <div class="qty">
+              <button type="button" id="qtyMinus" aria-label="Diminuir">−</button>
+              <span id="qtyValue">1</span>
+              <button type="button" id="qtyPlus" aria-label="Aumentar">+</button>
+            </div>
+            <button class="btn btn--primary btn--grow" id="pmAdd">Adicionar · <span id="pmPrice"></span></button>
+          </div>
+          <button class="share" id="pmShare" type="button">🔗 Copiar link deste lanche</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SACOLA (drawer) ===== -->
+  <div class="drawer" id="cartDrawer" aria-hidden="true">
+    <div class="drawer__backdrop" data-close-cart></div>
+    <aside class="drawer__panel" role="dialog" aria-modal="true" aria-label="Sacola">
+      <header class="drawer__head">
+        <h3>Sua sacola</h3>
+        <button class="modal__close modal__close--static" data-close-cart aria-label="Fechar">×</button>
+      </header>
+      <div class="drawer__items" id="drawerItems"></div>
+      <footer class="drawer__foot">
+        <div class="drawer__total"><span>Subtotal</span><strong id="drawerTotal">R$ 0,00</strong></div>
+        <a href="#pedido" class="btn btn--primary btn--block" id="goCheckout">Finalizar pedido →</a>
+        <a href="#cardapio" class="btn btn--ghost-dark btn--block" data-close-cart>Continuar escolhendo</a>
+      </footer>
+    </aside>
+  </div>
+
+  <!-- ===== CONFIRMAÇÃO ===== -->
+  <div class="modal" id="successModal" aria-hidden="true">
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__dialog modal__dialog--sm" role="dialog" aria-modal="true" aria-labelledby="okTitle">
+      <button class="modal__close" data-close aria-label="Fechar">×</button>
+      <div class="success">
+        <div class="success__icon">✓</div>
+        <h3 id="okTitle">Pedido recebido!</h3>
+        <p>Pedido <b id="okNumber"></b> · Total <b id="okTotal"></b></p>
+        <p class="success__eta">Previsão: <b id="okEta"></b></p>
+        <p>Envie a confirmação pelo WhatsApp para a cozinha começar agora:</p>
+        <a class="btn btn--whats btn--block" id="okWhats" target="_blank" rel="noopener">Enviar pelo WhatsApp</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
