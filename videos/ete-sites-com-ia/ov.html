@@ -1,0 +1,38 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="fonts/fonts.css">
+<style>html,body{margin:0;background:transparent}#s{position:relative;width:1080px;height:1920px;overflow:hidden;font-family:Inter,sans-serif;color:#fff;-webkit-font-smoothing:antialiased;letter-spacing:-.02em}
+.abs{position:absolute;left:0;top:0}.w{display:inline-block;white-space:pre}.k{color:#7DD3FC}
+#grad{position:absolute;left:0;top:900px;width:1080px;height:1020px;background:linear-gradient(rgba(5,10,25,0),rgba(5,10,25,.82) 55%,rgba(5,10,25,.9))}
+.chip{display:inline-flex;align-items:center;gap:14px;padding:12px 26px;border-radius:999px;background:rgba(255,255,255,.14);backdrop-filter:blur(6px);box-shadow:inset 0 0 0 2px rgba(255,255,255,.35);font-size:34px;font-weight:600}
+.lt{position:absolute;left:70px;display:flex;align-items:center;gap:20px;padding:22px 34px;border-radius:26px;background:rgba(10,16,32,.78);box-shadow:0 18px 40px -16px rgba(0,0,0,.6)}
+.bar{width:8px;height:64px;border-radius:4px;background:#38BDF8}
+#end{position:absolute;inset:0;background:linear-gradient(rgba(10,30,70,.45),rgba(6,10,24,.6))}
+</style></head><body><div id="s">
+<div id="grad"></div>
+<div id="t0" class="abs" style="width:1080px;top:1150px;text-align:center"><span class="chip">🎓 Apresentação na ETE</span></div>
+<div id="t1" class="abs" style="width:1080px;top:1250px;text-align:center;font-size:84px;font-weight:800;line-height:1.05"></div>
+<div id="lt1" class="lt" style="top:1300px"><div class="bar"></div><div><div style="font-size:30px;color:#BAE6FD;font-weight:600">Quem apresentou</div><div style="font-size:46px;font-weight:800">Estudantes da Uninassau Caxangá</div></div></div>
+<div id="lt2" class="lt" style="top:1300px"><div class="bar"></div><div><div style="font-size:30px;color:#BAE6FD;font-weight:600">Na prática</div><div style="font-size:46px;font-weight:800">Criando sites com IA, ao vivo</div></div></div>
+<div id="lt3" class="lt" style="top:1300px"><div class="bar"></div><div><div style="font-size:30px;color:#BAE6FD;font-weight:600">Troca com a turma</div><div style="font-size:46px;font-weight:800">Alunos da ETE participando</div></div></div>
+<div id="end"></div>
+<div id="e1" class="abs" style="width:1080px;top:720px;text-align:center;font-size:110px;font-weight:800;line-height:1">Obrigado,<br><span class="k">ETE!</span></div>
+<div id="e2" class="abs" style="width:1080px;top:1010px;text-align:center;font-size:44px;font-weight:600;line-height:1.3;color:#E2E8F0">Desenvolvimento de Sites<br>e Sistemas com IA</div>
+<div id="e3" class="abs" style="width:1080px;top:1190px;text-align:center"><span class="chip">Uninassau Caxangá</span></div>
+</div><script>
+const $=id=>document.getElementById(id), cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+function bez(x1,y1,x2,y2){return x=>{x=cl(x);if(x<=0||x>=1)return x;let a=0,b=1,u=x;for(let i=0;i<28;i++){u=(a+b)/2;const X=3*(1-u)*(1-u)*u*x1+3*(1-u)*u*u*x2+u*u*u;if(X<x)a=u;else b=u;}return 3*(1-u)*(1-u)*u*y1+3*(1-u)*u*u*y2+u*u*u;};}
+const EZ=bez(.65,0,.35,1),seg=(t,a,b)=>EZ((t-a)/(b-a)),win=(t,a,b)=>seg(t,a,a+.45)*(1-seg(t,b,b+.4));
+const W='Desenvolvimento de|Sites e Sistemas|com <k>IA</k>'.split('|');
+$('t1').innerHTML=W.map(l=>'<div>'+l.split(' ').map(w=>`<span class="w">${w.replace('<k>','<span class="k">').replace('</k>','</span>')} </span>`).join('')+'</div>').join('');
+const words=[...document.querySelectorAll('#t1 .w')];
+const END=43.6;
+function fe(e,o,dy=24){e.style.opacity=o.toFixed(3);e.style.transform=`translateY(${((1-o)*dy).toFixed(1)}px)`;}
+function lt(e,o){e.style.opacity=o.toFixed(3);e.style.transform=`translateX(${((1-o)*-60).toFixed(1)}px)`;}
+window.seek=t=>{
+ const g=Math.max(win(t,0,4.1)*1,win(t,4.6,8.6)*.7,win(t,10.9,14.6)*.7,win(t,21.4,25.2)*.7); $('grad').style.opacity=g.toFixed(3);
+ fe($('t0'),win(t,.15,3.9)); words.forEach((w,i)=>fe(w,win(t,.35+i*.09,3.9),26));
+ lt($('lt1'),win(t,4.7,8.4)); lt($('lt2'),win(t,11.0,14.4)); lt($('lt3'),win(t,21.5,25.0));
+ const e=seg(t,END,END+.6); $('end').style.opacity=e.toFixed(3);
+ fe($('e1'),seg(t,END+.2,END+.7)); fe($('e2'),seg(t,END+.45,END+.95)); fe($('e3'),seg(t,END+.7,END+1.2));
+};
+window.ready=document.fonts.ready.then(()=>{seek(0);return true});
+</script></body></html>
