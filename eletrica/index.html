@@ -119,6 +119,8 @@ td.r,th.r{text-align:right}
 .pg img{width:100%;height:100px;object-fit:contain;background:#fff;border-radius:3px}
 .viewer{background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:auto;max-height:70vh}
 .viewer img{display:block;max-width:none}
+.crop-layer{position:absolute;inset:0;cursor:crosshair;touch-action:none;background:rgba(29,47,69,.08)}
+.crop-rect{position:absolute;border:2px dashed var(--accent);background:rgba(180,88,31,.14)}
 .comodo{border:1px solid var(--line);border-radius:var(--r);background:var(--panel)}
 .comodo-h{display:flex;gap:8px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .comodo-b{padding:8px 10px;display:flex;flex-direction:column;gap:6px}
@@ -361,7 +363,8 @@ function Provider({children}){
 
 /* ============================== CÁLCULOS ============================== */
 function custoKit(p,mats){let s=0;for(const [mid,q] of (p.kit||[])){const m=mats.find(x=>x.id===mid);if(m)s+=num(m.custo)*num(q)}return s}
-function totaisProjeto(pj){const t={};for(const c of (pj.comodos||[]))for(const [k,q] of Object.entries(c.itens||{}))if(num(q))t[k]=(t[k]||0)+num(q);return t}
+const repDe=c=>Math.max(1,num(c&&c.rep)||1);
+function totaisProjeto(pj){const t={};for(const c of (pj.comodos||[])){const r=repDe(c);for(const [k,q] of Object.entries(c.itens||{}))if(num(q))t[k]=(t[k]||0)+num(q)*r}return t}
 function metragemEstimada(tot){
   const g=k=>tot[k]||0;
   const luzes=g("luz")+g("arand")+g("int1")+g("int2")+g("int3w")+g("int4w")+g("sens")+g("lumind");
@@ -388,6 +391,7 @@ function linhasDoProjeto(pj,ctx){
     const m=mats.find(x=>x.id===mid);const c=m?num(m.custo):0;
     linhas.push({id:uid(),matId:mid,desc:lab+(temMed?"":" (estimado)"),unid:"m",qtd:q,mo:0,custoMat:c,mat:Math.round(c*(1+num(config.markupMatPct)/100)*100)/100,horas:0});
   }
+  for(const o of (pj.outros||[]))if(num(o.qtd))linhas.push({id:uid(),desc:o.desc+" (lista do projeto)",unid:o.unid||"un",qtd:num(o.qtd),mo:0,custoMat:0,mat:0,horas:0});
   return linhas;
 }
 function calcOrc(o,custoHora){
@@ -426,11 +430,12 @@ function gerarTarefas(pj,pontos){
   for(const c of (pj.comodos||[])){
     const itens=Object.entries(c.itens||{}).filter(([k,q])=>num(q)>0&&!grupoQ(k)&&k!=="qcm");
     if(!itens.length)continue;
+    const r=repDe(c);
     const desc=itens.map(([k,q])=>`${q}× ${(P(k)||{nome:k}).nome}`).join(", ");
-    const h=itens.reduce((a,[k,q])=>a+num(q)*num((P(k)||{}).horas),0);
+    const h=itens.reduce((a,[k,q])=>a+num(q)*num((P(k)||{}).horas),0)*r;
     for(const e of ["infra","enfiacao","acabamento"]){
       const E=ETAPAS_OS.find(x=>x.id===e);
-      tarefas.push({id:uid(),etapa:e,comodo:c.nome,desc:`${c.nome}: ${E.t.toLowerCase()} (${desc})`,horas:Math.round(h*E.frac*10)/10,resp:"",feito:false});
+      tarefas.push({id:uid(),etapa:e,comodo:c.nome,desc:`${c.nome}${r>1?` (×${r} unidades)`:""}: ${E.t.toLowerCase()} (${desc}${r>1?" em cada":""})`,horas:Math.round(h*E.frac*10)/10,resp:"",feito:false});
     }
   }
   const tot=totaisProjeto(pj);
@@ -484,23 +489,64 @@ async function arquivoParaPaginas(file,onProg){
     if(!window.pdfjsLib)throw new Error("Leitor de PDF não carregou. Recarregue a página.");
     const pdf=await abrirPdf(await file.arrayBuffer());
     const N=Math.min(pdf.numPages,20);
-    for(let i=1;i<=N;i++){onProg&&onProg(`Lendo página ${i} de ${N}…`);const big=await renderPagina(pdf,i,2200);const blob=await canvasBlob(big);out.push({n:i,blob,url:URL.createObjectURL(blob),w:big.width,h:big.height})}
+    for(let i=1;i<=N;i++){onProg&&onProg(`Lendo página ${i} de ${N}…`);const big=await renderPagina(pdf,i,4200);const blob=await canvasBlob(big);out.push({n:i,blob,url:URL.createObjectURL(blob),w:big.width,h:big.height})}
   }else{
     const blob=file;const url=URL.createObjectURL(blob);out.push({n:1,blob,url})
   }
   return out;
 }
+async function recortar(blob,r){
+  const bmp=await createImageBitmap(blob);
+  const sx=r.x*bmp.width,sy=r.y*bmp.height,sw=r.w*bmp.width,sh=r.h*bmp.height;
+  const k=Math.min(1,3200/Math.max(sw,sh));
+  const cv=document.createElement("canvas");cv.width=Math.round(sw*k);cv.height=Math.round(sh*k);
+  const cx=cv.getContext("2d");cx.fillStyle="#fff";cx.fillRect(0,0,cv.width,cv.height);
+  cx.drawImage(bmp,sx,sy,sw,sh,0,0,cv.width,cv.height);
+  return await canvasBlob(cv,.9);
+}
+async function caber(blob,maxB){
+  if(!maxB||blob.size<=maxB)return blob;
+  const bmp=await createImageBitmap(blob);let s=1,b=blob;
+  while(b.size>maxB&&s>.15){s*=.75;const cv=document.createElement("canvas");cv.width=Math.round(bmp.width*s);cv.height=Math.round(bmp.height*s);const cx=cv.getContext("2d");cx.fillStyle="#fff";cx.fillRect(0,0,cv.width,cv.height);cx.drawImage(bmp,0,0,cv.width,cv.height);b=await canvasBlob(cv,.82)}
+  return b;
+}
 
 /* ============================== IA ============================== */
-async function lerComIA(paginas,ctx,dica,onProg){
+const IA_DESENHO=`Projetos feitos em software (símbolos coloridos, eletrodutos em curva) seguem a mesma lógica: cada símbolo é um ponto; a linha ou curva é eletroduto e NÃO é ponto; números e letras ao lado são circuito e comando.`;
+function promptRecorte(modo,rotulo,cat,regras,dica){
+  const fim=`\nRegras da casa (o patrão definiu, obedeça):\n${regras||"(nenhuma)"}${dica?"\nObservação de quem enviou: "+dica:""}\nResponda SOMENTE com JSON.`;
+  if(modo==="unidade")return `Você é um eletricista projetista brasileiro. A imagem é um RECORTE AMPLIADO de uma prancha elétrica mostrando: ${rotulo||"uma área da planta"}.
+Conte os pontos CÔMODO POR CÔMODO usando SOMENTE os ids do catálogo abaixo. ${IA_DESENHO}
+Símbolos cortados pela borda do recorte: não conte e cite em "alertas". Se houver mais de uma unidade no recorte, avise em "alertas".
+Catálogo de ids:\n${cat}${fim}
+Formato: {"comodos":[{"nome":"Sala","itens":{"tug":4,"luz":2}}],"alertas":["..."],"confianca":"alta|média|baixa"}`;
+  if(modo==="lista")return `Você é um orçamentista de instalações elétricas. A imagem é a tabela de LISTA DE MATERIAIS (quantitativo) de um projeto elétrico.
+Transcreva TODAS as linhas da tabela, sem pular nenhuma:
+- Linha que é um dispositivo equivalente a um ponto do catálogo (tomada, interruptor, luminária / ponto de luz, disjuntor por polos, DR, DPS, quadro): some a quantidade no id do catálogo, em "itens".
+- Eletroduto e cabo: metros por bitola em "metragem" (el34 = eletroduto 3/4", el1 = 1", c15 = cabo 1,5mm², c25, c4, c6, c10, c16).
+- Caixas 4x2 e octogonais: NÃO lance (o sistema já conta pelo kit de cada ponto), mas escreva o total delas em "alertas" para conferência.
+- Todo o resto (curvas, luvas, buchas, conectores, cabos de outras bitolas, itens que não são ponto): em "outros" com desc, qtd e unid.
+Catálogo de ids:\n${cat}${fim}
+Formato: {"itens":{"tug":10},"metragem":{"el34":0,"el1":0,"c15":0,"c25":0,"c4":0,"c6":0,"c10":0,"c16":0},"outros":[{"desc":"","qtd":0,"unid":"un"}],"alertas":["..."],"confianca":"alta|média|baixa"}`;
+  return `Você é um eletricista projetista brasileiro. A imagem é um QUADRO DE CARGAS (ou diagrama unifilar) de um projeto elétrico. Liste cada circuito.${fim}
+Formato: {"circuitos":[{"num":"1","desc":"Iluminação","potencia":800,"disjuntor":10,"bitola":1.5,"polos":1}],"alertas":["..."],"confianca":"alta|média|baixa"}`;
+}
+async function lerComIA(imagens,ctx,dica,onProg,modo="pagina",rotulo=""){
   const s=await window.claude?.use?.("sample");
   if(!s)throw {code:"unavailable",message:"A leitura por IA não está disponível nesta visualização. Use a contagem manual."};
   const lim=await s.limits().catch(()=>null);
   const max=(lim&&lim.images&&lim.images.maxCount)||0;
   if(!max)throw {code:"images_unavailable",message:"Este acesso não permite enviar imagens para a IA. Use a contagem manual."};
-  const imgs=paginas.slice(0,max).map(p=>p.blob);
+  onProg&&onProg("Preparando imagens…");
+  const imgs=[];for(const b of imagens.slice(0,max))imgs.push(await caber(b,lim.images.maxInputBytes));
   const cat=ctx.pontos.map(p=>`${p.id} = ${p.nome} (${p.grupo})`).join("\n");
-  const prompt=`Você é um eletricista projetista brasileiro lendo um PROJETO ELÉTRICO (pranchas em imagem). Siga este método, na ordem:
+  if(modo!=="pagina"){
+    onProg&&onProg("Lendo o recorte com IA… de 20 s a 1 min.");
+    return await s.json(promptRecorte(modo,rotulo,cat,ctx.config.regras,dica),{images:imgs,modelTier:"complex"});
+  }
+  const prompt=`Você é um eletricista projetista brasileiro lendo um PROJETO ELÉTRICO (pranchas em imagem). ${IA_DESENHO}
+Se a prancha for densa demais para contar com segurança (ex.: prédio com vários apartamentos), conte o que der e escreva em "alertas" que é melhor recortar um apartamento tipo. Se houver tabela de LISTA DE MATERIAIS, avise em "alertas" que ela pode ser lida por recorte.
+Siga este método, na ordem:
 1) Carimbo: cliente, endereço, escala, revisão, tensão, área.
 2) Legenda: identifique como esta prancha desenha cada símbolo (NBR 5444 ou legenda própria). Use a legenda da prancha como verdade.
 3) Quadro de cargas: liste cada circuito (número, descrição, potência W, disjuntor A, bitola mm², polos).
@@ -753,19 +799,44 @@ function EditorProjeto({id,onClose,go}){
     }catch(err){setErro(err.message||"Não foi possível abrir o arquivo.")}finally{setProg("")}
   };
 
-  const rodarIA=async()=>{
+  const rodarIA=async(rc)=>{
     setErro("");
-    const pgs=paginas.filter(p=>sel.includes(p.n));
-    if(!pgs.length){setErro("Selecione ao menos uma página.");return}
+    const modo=rc?rc.modo:"pagina";
+    const imgs=rc?[rc.blob]:paginas.filter(p=>sel.includes(p.n)).map(p=>p.blob);
+    if(!imgs.length){setErro("Selecione ao menos uma página.");return}
     try{
-      const r=await lerComIA(pgs,S,dica,setProg);
+      const r=await lerComIA(imgs,S,dica,setProg,modo,rc&&rc.rotulo);
       const ids=new Set(S.pontos.map(p=>p.id));
-      const comodos=(r.comodos||[]).map(c=>({id:uid(),nome:String(c.nome||"Cômodo"),itens:Object.fromEntries(Object.entries(c.itens||{}).filter(([k,v])=>ids.has(k)&&num(v)>0).map(([k,v])=>[k,num(v)]))}));
-      const novo={...pj,comodos,circuitos:(r.circuitos||[]).map(c=>({id:uid(),...c})),metragem:r.metragem||{},alertas:r.alertas||[],confianca:r.confianca||"",carimbo:{...pj.carimbo,...(r.carimbo||{})},tipo:r.tipo==="industrial"?"industrial":pj.tipo,lidoPorIA:true,iaOriginal:totaisProjeto({comodos})};
-      if(!novo.cliente&&r.carimbo&&r.carimbo.cliente)novo.cliente=r.carimbo.cliente;
-      setPj(novo);setDirty(true);setTab("planta");S.toast("Leitura feita. Agora confira passo a passo.");
-    }catch(e){setErro((e&&e.message)||"A IA não conseguiu ler. Tente menos páginas ou faça a contagem manual.")}finally{setProg("")}
+      const filtra=o=>Object.fromEntries(Object.entries(o||{}).filter(([k,v])=>ids.has(k)&&num(v)>0).map(([k,v])=>[k,num(v)]));
+      const mapC=l=>(l||[]).map(c=>({id:uid(),nome:String(c.nome||"Cômodo"),rep:1,itens:filtra(c.itens)}));
+      let novo;
+      if(modo==="pagina"){
+        novo={...pj,comodos:mapC(r.comodos),circuitos:(r.circuitos||[]).map(c=>({id:uid(),...c})),metragem:r.metragem||{},alertas:r.alertas||[],confianca:r.confianca||"",carimbo:{...pj.carimbo,...(r.carimbo||{})},tipo:r.tipo==="industrial"?"industrial":pj.tipo};
+        if(!novo.cliente&&r.carimbo&&r.carimbo.cliente)novo.cliente=r.carimbo.cliente;
+      }else{
+        novo={...pj,alertas:[...(pj.alertas||[]),...(r.alertas||[]).map(a=>`[${rc.rotulo||"recorte"}] ${a}`)],confianca:r.confianca||pj.confianca};
+        if(modo==="unidade")novo.comodos=[...(pj.comodos||[]),...mapC(r.comodos).map(c=>({...c,nome:(rc.rotulo?rc.rotulo+" · ":"")+c.nome,rep:repDe(rc)}))];
+        if(modo==="lista"){
+          novo.comodos=[...(pj.comodos||[]),{id:uid(),nome:"Lista de materiais do projeto",rep:1,itens:filtra(r.itens)}];
+          const m={...(pj.metragem||{})};for(const [k,v] of Object.entries(r.metragem||{}))if(num(v)>0)m[k]=num(m[k])+num(v);novo.metragem=m;
+          novo.outros=[...(pj.outros||[]),...(r.outros||[]).filter(o=>o&&o.desc).map(o=>({id:uid(),desc:String(o.desc),qtd:num(o.qtd),unid:String(o.unid||"un")}))];
+        }
+        if(modo==="quadro")novo.circuitos=[...(pj.circuitos||[]),...(r.circuitos||[]).map(c=>({id:uid(),...c}))];
+      }
+      novo.lidoPorIA=true;novo.iaOriginal=totaisProjeto(novo);
+      setPj(novo);setDirty(true);setTab(modo==="quadro"?"cargas":modo==="lista"?"metragem":"planta");S.toast(rc?"Recorte lido e somado ao projeto. Confira.":"Leitura feita. Agora confira passo a passo.");
+    }catch(e){setErro((e&&e.message)||"A IA não conseguiu ler. Tente um recorte menor ou faça a contagem manual.")}finally{setProg("")}
   };
+  const [recortes,setRecortes]=useState([]);
+  const [cortando,setCortando]=useState(false);
+  const [drag,setDrag]=useState(null);
+  const upR=(rid,p)=>setRecortes(a=>a.map(x=>x.id===rid?{...x,...p}:x));
+  const pos=e=>{const b=e.currentTarget.getBoundingClientRect();return{x:Math.min(1,Math.max(0,(e.clientX-b.left)/b.width)),y:Math.min(1,Math.max(0,(e.clientY-b.top)/b.height))}};
+  const pDown=e=>{e.currentTarget.setPointerCapture(e.pointerId);const p=pos(e);setDrag({x0:p.x,y0:p.y,x1:p.x,y1:p.y})};
+  const pMove=e=>{if(!drag)return;const p=pos(e);setDrag(d=>({...d,x1:p.x,y1:p.y}))};
+  const rectDe=d=>({x:Math.min(d.x0,d.x1),y:Math.min(d.y0,d.y1),w:Math.abs(d.x1-d.x0),h:Math.abs(d.y1-d.y0)});
+  const pUp=async()=>{if(!drag)return;const r=rectDe(drag);setDrag(null);if(r.w<.02||r.h<.02)return;
+    try{const blob=await recortar(ver.blob,r);setRecortes(a=>[...a,{id:uid(),n:ver.n,blob,url:URL.createObjectURL(blob),modo:"unidade",rotulo:"Apto tipo",rep:1}]);setCortando(false);S.toast("Recorte criado. Diga o que é e toque em Ler recorte.")}catch{setErro("Não foi possível recortar.")}};
 
   const salvar=async(extra={},msg="Projeto salvo.")=>{const o={...pj,...extra};setPj(o);const ok=await S.api.set("projetos",o.id,o,msg);if(ok)setDirty(false);return ok};
   const tot=totaisProjeto(pj);
@@ -803,10 +874,18 @@ function EditorProjeto({id,onClose,go}){
           <img src=${p.url} alt=${"Página "+p.n}/><div class="row" style=${{justifyContent:"space-between"}}><span>${sel.includes(p.n)?"✓ ":""}Pág. ${p.n}</span><button class="btn sm ghost" onClick=${e=>{e.stopPropagation();setVer(p)}}>ver</button></div></div>`)}</div>
         <div class="grid" style=${{gridTemplateColumns:"1fr auto",alignItems:"end"}}>
           <${F} label="Observação para a IA (opcional)"><${Inp} id="pj-dica" value=${dica} onChange=${setDica} placeholder="Ex.: a cozinha tem 2 TUEs de forno e cooktop"/><//>
-          <button class="btn pri" disabled=${!!prog} onClick=${rodarIA}>${pj.lidoPorIA?"Ler de novo com IA":"Ler com IA"}</button>
+          <button class="btn" disabled=${!!prog} onClick=${()=>rodarIA(null)}>${pj.lidoPorIA?"Ler páginas inteiras de novo":"Ler páginas inteiras"}</button>
         </div>
-        ${ver&&html`<div class="col"><div class="row"><b>Página ${ver.n}</b><button class="btn sm" onClick=${()=>setZoom(z=>Math.max(.25,z-.25))}>Zoom −</button><button class="btn sm" onClick=${()=>setZoom(z=>Math.min(3,z+.25))}>Zoom +</button><span class="small muted mono">${Math.round(zoom*100)}%</span></div>
-          <div class="viewer"><img src=${ver.url} style=${{width:(zoom*100)+"%"}} alt=${"Prancha página "+ver.n}/></div></div>`}
+        <div class="alert info small"><div><b>Prédio ou prancha cheia?</b> Não leia a página inteira: use <b>Recortar área</b> em um apartamento tipo (e diga quantas vezes ele se repete), na tabela de lista de materiais e no quadro de cargas. Recorte ampliado = leitura muito mais certa.</div></div>
+        ${ver&&html`<div class="col"><div class="row"><b>Página ${ver.n}</b><button class="btn sm" onClick=${()=>setZoom(z=>Math.max(.25,z-.25))}>Zoom −</button><button class="btn sm" onClick=${()=>setZoom(z=>Math.min(4,z+.25))}>Zoom +</button><span class="small muted mono">${Math.round(zoom*100)}%</span>
+            <button class=${"btn sm"+(cortando?" pri":"")} onClick=${()=>{setCortando(c=>!c);setDrag(null)}}>${cortando?"Arraste sobre a área… (cancelar)":"Recortar área"}</button></div>
+          <div class="viewer"><div style=${{position:"relative",width:(zoom*100)+"%"}}><img src=${ver.url} style=${{width:"100%",display:"block"}} draggable=${false} alt=${"Prancha página "+ver.n}/>
+            ${cortando&&html`<div class="crop-layer" onPointerDown=${pDown} onPointerMove=${pMove} onPointerUp=${pUp}>${drag&&(()=>{const r=rectDe(drag);return html`<div class="crop-rect" style=${{left:r.x*100+"%",top:r.y*100+"%",width:r.w*100+"%",height:r.h*100+"%"}}></div>`})()}</div>`}</div></div></div>`}
+        ${recortes.length?html`<div class="col"><h3>Recortes para a IA ler</h3>${recortes.map(r=>html`<div class="comodo" key=${r.id}><div class="comodo-b" style=${{flexDirection:"row",flexWrap:"wrap",alignItems:"flex-end",gap:10}}>
+          <img src=${r.url} alt="Recorte" style=${{width:130,height:96,objectFit:"contain",background:"#fff",border:"1px solid var(--line)",borderRadius:4}}/>
+          <${F} label="O que é" style=${{minWidth:220,flex:1}}><${Sel} value=${r.modo} onChange=${v=>upR(r.id,{modo:v,rotulo:v==="lista"?"Lista de materiais":v==="quadro"?"Quadro de cargas":r.rotulo})} opts=${[["unidade","Apartamento / área (contar pontos)"],["lista","Tabela de lista de materiais"],["quadro","Quadro de cargas"]]}/><//>
+          ${r.modo==="unidade"&&html`<${F} label="Nome"><${Inp} value=${r.rotulo} onChange=${v=>upR(r.id,{rotulo:v})} placeholder="Apto tipo"/><//><${F} label="Repete quantas vezes na obra"><${Num} min=${1} value=${r.rep} onChange=${v=>upR(r.id,{rep:Math.max(1,v)})}/><//>`}
+          <button class="btn pri" disabled=${!!prog} onClick=${()=>rodarIA(r)}>Ler recorte</button><button class="btn ghost danger" onClick=${()=>setRecortes(a=>a.filter(x=>x.id!==r.id))}>Remover</button></div></div>`)}</div>`:null}
       `:html`<p class="muted small" style=${{margin:0}}>${salvo&&salvo.assetId?"":"Sem prancha anexada. Você pode contar os pontos à mão nas abas abaixo."}</p>`}
     </div>
 
@@ -834,13 +913,15 @@ function EditorProjeto({id,onClose,go}){
       ${!S.pontos.length&&html`<div class="alert warn">Cadastre os tipos de ponto em Preços e custos antes de contar.</div>`}
       ${(pj.comodos||[]).map(c=>html`<${Comodo} key=${c.id} c=${c} pontos=${S.pontos} onChange=${nc=>set({comodos:pj.comodos.map(x=>x.id===c.id?nc:x)})} onDel=${()=>set({comodos:pj.comodos.filter(x=>x.id!==c.id)})}/>`)}
       <div class="row"><button class="btn" onClick=${()=>set({comodos:[...(pj.comodos||[]),{id:uid(),nome:"Cômodo "+((pj.comodos||[]).length+1),itens:{}}]})}>+ Cômodo</button>
-        ${["Sala","Cozinha","Quarto","Banheiro","Área de serviço","Varanda","Quadro"].map(n=>html`<button key=${n} class="btn sm ghost" onClick=${()=>set({comodos:[...(pj.comodos||[]),{id:uid(),nome:n,itens:{}}]})}>+ ${n}</button>`)}</div>
+        ${["Apto tipo","Sala","Cozinha","Quarto","Banheiro","Área de serviço","Varanda","Quadro"].map(n=>html`<button key=${n} class="btn sm ghost" onClick=${()=>set({comodos:[...(pj.comodos||[]),{id:uid(),nome:n,itens:{}}]})}>+ ${n}</button>`)}</div>
       <${PassoChk} pj=${pj} ids=${["planta"]} passo=${passo}/></div>`}
 
     ${tab==="metragem"&&html`<div class="col">
       <p class="small muted" style=${{margin:0}}>Meça na prancha com a escala. Deixando tudo zerado, o orçamento usa a média por ponto e avisa que é estimativa.</p>
       <div class="grid g4">${METRAGENS.map(([k,l])=>html`<${F} key=${k} label=${l+" (m)"}><${Num} id=${"mt-"+k} step=${5} value=${(pj.metragem||{})[k]||0} onChange=${v=>set({metragem:{...pj.metragem,[k]:v}})}/><//>`)}</div>
       <div class="small muted">Estimativa pela média: ${Object.entries(metragemEstimada(tot)).filter(([,v])=>v).map(([k,v])=>`${(METRAGENS.find(m=>m[0]===k)||[k,k])[1]} ${v} m`).join(" · ")||"—"}</div>
+      ${(pj.outros||[]).length?html`<h3 style=${{marginTop:8}}>Outros materiais da lista do projeto</h3><p class="small muted" style=${{margin:0}}>Entram no orçamento com preço zero para você preencher.</p>
+        <div class="tbl-wrap"><table><thead><tr><th>Material</th><th class="r">Qtd</th><th>Un.</th><th></th></tr></thead><tbody>${pj.outros.map(o=>{const up=p=>set({outros:pj.outros.map(x=>x.id===o.id?{...x,...p}:x)});return html`<tr key=${o.id}><td><${Inp} value=${o.desc} onChange=${v=>up({desc:v})}/></td><td class="r" style=${{width:110}}><${Inp} type="number" value=${o.qtd} onChange=${v=>up({qtd:v})}/></td><td style=${{width:80}}><${Inp} value=${o.unid} onChange=${v=>up({unid:v})}/></td><td><button class="btn sm ghost danger" aria-label="Remover" onClick=${()=>set({outros:pj.outros.filter(x=>x.id!==o.id)})}>✕</button></td></tr>`})}</tbody></table></div>`:null}
       <${PassoChk} pj=${pj} ids=${["caminhos"]} passo=${passo}/></div>`}
 
     ${tab==="quadro"&&html`<div class="col">
@@ -850,6 +931,7 @@ function EditorProjeto({id,onClose,go}){
             return html`<tr key=${k}><td>${nomeP(k)}</td><td class="r num">${q}</td>${pj.iaOriginal?html`<td class="r small">${dif?html`<span class="pill warn">IA: ${ia||0}</span>`:html`<span class="muted">igual IA</span>`}</td>`:null}</tr>`})}</tbody></table></div>`:html`<p class="muted" style=${{margin:0}}>Nada contado ainda.</p>`}
           <div class="small"><b class="num">${total}</b> itens · <b class="num">${(pj.circuitos||[]).length}</b> circuitos no quadro de cargas · disjuntores contados: <b class="num">${(tot.dj1||0)+(tot.dj2||0)+(tot.dj3||0)}</b></div>
           ${(pj.circuitos||[]).length&&((tot.dj1||0)+(tot.dj2||0)+(tot.dj3||0))!==(pj.circuitos||[]).length?html`<div class="alert warn">O número de disjuntores (${(tot.dj1||0)+(tot.dj2||0)+(tot.dj3||0)}) não bate com o de circuitos (${pj.circuitos.length}). Confira o unifilar.</div>`:null}
+          ${(pj.comodos||[]).some(c=>/^Lista de materiais/.test(c.nome))&&(pj.comodos||[]).some(c=>!/^Lista de materiais/.test(c.nome)&&Object.keys(c.itens||{}).length)?html`<div class="alert bad">Há a lista de materiais do projeto E contagem por cômodo. A lista já é o total da obra: use uma ou outra, senão o orçamento conta tudo duas vezes. Use a outra só para comparar e depois remova.</div>`:null}
           ${(tot.chuv||tot.ar||tot.tue)&&!(pj.circuitos||[]).some(c=>num(c.disjuntor)>=25)?html`<div class="alert warn">Há chuveiro/ar/TUE mas nenhum circuito de 25A ou mais no quadro de cargas.</div>`:null}
         </div>
         <div class="card col"><h3>Passos</h3>
@@ -870,8 +952,10 @@ function Comodo({c,pontos,onChange,onDel}){
   const it=Object.entries(c.itens||{});
   const P=k=>pontos.find(p=>p.id===k);
   const grupos=[...new Set(pontos.map(p=>p.grupo))];
+  const r=repDe(c);const n=it.reduce((a,[,q])=>a+num(q),0);
   return html`<div class="comodo"><div class="comodo-h"><input class="i" style=${{flex:1,minWidth:140,fontWeight:600}} value=${c.nome} onChange=${e=>onChange({...c,nome:e.target.value})} aria-label="Nome do cômodo"/>
-    <span class="small muted num">${it.reduce((a,[,q])=>a+num(q),0)} itens</span><button class="btn sm ghost danger" onClick=${onDel}>Remover</button></div>
+    <span class="small muted">repete ×</span><${Num} min=${1} value=${r} onChange=${v=>onChange({...c,rep:Math.max(1,v)})}/>
+    <span class="small muted num">${n} itens${r>1?` · ${n*r} na obra`:""}</span><button class="btn sm ghost danger" onClick=${onDel}>Remover</button></div>
     <div class="comodo-b">
       ${it.map(([k,q])=>html`<div class="it" key=${k}><span class="nm">${(P(k)||{nome:k+" (não cadastrado)"}).nome}</span><${Num} value=${q} onChange=${v=>{const n={...c.itens};if(v>0)n[k]=v;else delete n[k];onChange({...c,itens:n})}}/></div>`)}
       <div class="it"><select class="i" style=${{flex:1,minWidth:180}} value=${add} onChange=${e=>{const k=e.target.value;if(!k)return;onChange({...c,itens:{...c.itens,[k]:(num(c.itens[k])||0)+1}});setAdd("")}} aria-label="Adicionar ponto">
