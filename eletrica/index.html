@@ -946,103 +946,131 @@ function EditorProjeto({id,onClose,go}){
     if(nid){onClose();go("orcamentos",nid)}
   };
 
-  const actions=html`<span class=${"pill "+(pj.status==="conferido"?"ok":"warn")}>${pj.status==="conferido"?"Conferido":`${nPass}/7 passos`}</span>`;
+  const temPrancha=paginas.length>0||!!pj.assetId;
+  const orcDoPj=S.data.orcamentos.find(o=>o.projetoId===pj.id);
+  const [pw,setPw]=useState(()=>{if(!salvo)return 1;if(salvo.status==="conferido")return 4;if(Object.keys(totaisProjeto(salvo)).length)return 3;return salvo.assetId?2:1});
+  const irPara=n=>{setPw(n);document.querySelector(".modal-bg")?.scrollTo(0,0)};
+  const ETW=[["Enviar a prancha",temPrancha],["Contar os pontos",total>0],["Patrão confere",pj.status==="conferido"],["Gerar orçamento",!!orcDoPj]];
+  const INSTR={
+    1:"Dê um nome ao projeto, escolha o cliente e envie o PDF da prancha. Não tem PDF? Toque em Próximo e conte à mão.",
+    2:"Escolha um jeito de contar: a IA lê a prancha ou você conta à mão, cômodo por cômodo. A lista de pontos aparece embaixo, e você pode corrigir tudo.",
+    3:S.admin?"Compare a contagem com a prancha. Marque cada passo conforme conferir. No fim, toque em Marcar como conferido.":"Agora é com o patrão: ele compara a contagem com a prancha e libera. Avise que está pronto.",
+    4:"Com o projeto conferido, o sistema monta o orçamento sozinho a partir da contagem."
+  };
+  const actions=html`<span class=${"pill "+(pj.status==="conferido"?"ok":"warn")}>${pj.status==="conferido"?"Conferido":"Em leitura"}</span>`;
   const hora=salvoEm?new Date(salvoEm).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}):"";
-  const prox=pj.status==="conferido"&&S.admin?html`<button class="btn pri" onClick=${gerarOrc}>Gerar orçamento</button>`:total>0&&tab!=="quadro"?html`<button class="btn pri" onClick=${()=>setTab("quadro")}>Ir para conferir</button>`:null;
+  const prox=pw===1?html`<button class="btn pri" onClick=${()=>irPara(2)}>Próximo: contar os pontos</button>`
+    :pw===2?html`<button class="btn pri" onClick=${()=>irPara(3)}>Próximo: conferência</button>`
+    :pw===3&&pj.status==="conferido"?html`<button class="btn pri" onClick=${()=>irPara(4)}>Próximo: orçamento</button>`:null;
   const footer=html`<${StatusSalvo} salvando=${salvando} dirty=${dirty} ok=${temConteudo} hora=${hora} vazio="Dê um nome ou envie a prancha para começar a salvar"/>
-    <div class="row">${prox}<button class=${"btn"+(prox?"":" pri")} onClick=${sair}>Salvar e fechar</button></div>`;
+    <div class="row">${pw>1&&html`<button class="btn" onClick=${()=>irPara(pw-1)}>Voltar</button>`}${prox}<button class=${"btn"+(prox?" ghost":" pri")} onClick=${sair}>Salvar e fechar</button></div>`;
+
+  const visor=ver&&html`<div class="col"><div class="row"><b>Página ${ver.n}</b><button class="btn sm" onClick=${()=>setZoom(z=>Math.max(.25,z-.25))}>Zoom −</button><button class="btn sm" onClick=${()=>setZoom(z=>Math.min(4,z+.25))}>Zoom +</button><span class="small muted">${Math.round(zoom*100)}%</span>
+      ${pw===2&&html`<button class=${"btn sm"+(cortando?" pri":"")} onClick=${()=>{setCortando(c=>!c);setDrag(null)}}>${cortando?"Arraste sobre a área… (cancelar)":"Recortar área"}</button>`}</div>
+    <div class="viewer"><div style=${{position:"relative",width:(zoom*100)+"%"}}><img src=${ver.url} style=${{width:"100%",display:"block"}} draggable=${false} alt=${"Prancha página "+ver.n}/>
+      ${cortando&&pw===2&&html`<div class="crop-layer" onPointerDown=${pDown} onPointerMove=${pMove} onPointerUp=${pUp}>${drag&&(()=>{const r=rectDe(drag);return html`<div class="crop-rect" style=${{left:r.x*100+"%",top:r.y*100+"%",width:r.w*100+"%",height:r.h*100+"%"}}></div>`})()}</div>`}</div></div></div>`;
+  const miniaturas=(selec)=>paginas.length>1&&html`<div class="pages">${paginas.map(p=>html`<div key=${p.n} class="pg" role="button" tabindex="0" aria-pressed=${selec?sel.includes(p.n):ver&&ver.n===p.n} onClick=${()=>{if(selec)setSel(s=>s.includes(p.n)?s.filter(x=>x!==p.n):[...s,p.n]);else setVer(p)}}>
+    <img src=${p.url} alt=${"Página "+p.n}/><div class="row" style=${{justifyContent:"space-between"}}><span>${selec&&sel.includes(p.n)?"✓ ":""}Pág. ${p.n}</span>${selec&&html`<button class="btn sm ghost" onClick=${e=>{e.stopPropagation();setVer(p)}}>ver</button>`}</div></div>`)}</div>`;
+  const avisos=html`${prog&&html`<div class="alert info"><span class="spin"></span><span>${prog}</span></div>`}${erro&&html`<div class="alert bad">${erro}</div>`}`;
 
   return html`<${Modal} title=${pj.nome||"Novo projeto"} onClose=${sair} actions=${actions} footer=${footer}>
-    ${(()=>{const temOrc=S.data.orcamentos.some(o=>o.projetoId===pj.id);const et=[["Enviar a prancha",paginas.length>0||!!pj.assetId],["Contar os pontos",total>0],["Patrão confere",pj.status==="conferido"],["Gerar orçamento",temOrc]];
-      return html`<div class="flow" style=${{gap:8}}>${et.map(([t,ok],i)=>html`<div key=${i} class="row" style=${{flexWrap:"nowrap",gap:8,padding:"10px 12px",borderRadius:10,background:ok?"var(--ok-soft)":"var(--panel)",border:"1px solid var(--line)"}}><span class="n" style=${{width:26,height:26,borderRadius:"50%",display:"grid",placeItems:"center",fontWeight:800,fontSize:13,flex:"none",background:ok?"var(--ok)":"var(--accent)",color:ok?"#fff":"var(--accent-fg)"}}>${ok?"✓":i+1}</span><b style=${{fontSize:14}}>${t}</b></div>`)}</div>`})()}
-    <div class="grid g3">
-      <${F} label="Nome do projeto"><${Inp} id="pj-nome" value=${pj.nome} onChange=${v=>set({nome:v})} placeholder="Ex.: Residência Silva"/><//>
-      <${F} label="Cliente"><${Inp} id="pj-cli" value=${pj.cliente} onChange=${v=>set({cliente:v})} list="lst-cli"/><//>
-      <${F} label="Tipo de obra"><${Sel} id="pj-tipo" value=${pj.tipo} onChange=${v=>set({tipo:v})} opts=${[["residencial","Residencial / predial"],["industrial","Industrial"]]}/><//>
-    </div>
+    <div class="flow" style=${{gap:8}}>${ETW.map(([t,ok],i)=>{const n=i+1,at=pw===n;return html`<button key=${n} onClick=${()=>irPara(n)} class="row" style=${{flexWrap:"nowrap",gap:8,padding:"10px 12px",borderRadius:10,cursor:"pointer",textAlign:"left",background:at?"var(--brand-soft)":ok?"var(--ok-soft)":"var(--panel)",border:at?"2px solid var(--brand)":"1px solid var(--line)"}}>
+      <span style=${{width:26,height:26,borderRadius:"50%",display:"grid",placeItems:"center",fontWeight:800,fontSize:13,flex:"none",background:ok?"var(--ok)":"var(--accent)",color:ok?"#fff":"var(--accent-fg)"}}>${ok?"✓":n}</span><b style=${{fontSize:14}}>${t}</b></button>`})}</div>
+    <div class="col" style=${{gap:4}}><span class="small muted" style=${{fontWeight:600}}>Passo ${pw} de 4</span><h2>${ETW[pw-1][0]}</h2><p style=${{margin:0}} class="muted">${INSTR[pw]}</p></div>
     <datalist id="lst-cli">${S.data.clientes.map(c=>html`<option value=${c.nome}/>`)}</datalist>
+    <input ref=${fileRef} type="file" accept="application/pdf,image/*" hidden onChange=${onFile}/>
 
-    <div class="card col">
-      <div class="row" style=${{justifyContent:"space-between"}}><h3>Prancha</h3>
-        <div class="row"><input ref=${fileRef} type="file" accept="application/pdf,image/*" hidden onChange=${onFile}/><button class="btn" onClick=${()=>fileRef.current.click()}>${paginas.length?"Trocar arquivo":"Enviar PDF ou foto"}</button></div></div>
-      ${prog&&html`<div class="alert info"><span class="spin"></span><span>${prog}</span></div>`}
-      ${erro&&html`<div class="alert bad">${erro}</div>`}
-      ${paginas.length?html`
-        <div class="small muted">Toque nas páginas que têm planta, quadro de cargas ou unifilar (a IA lê só as marcadas). Clique em "ver" para abrir grande.</div>
-        <div class="pages">${paginas.map(p=>html`<div key=${p.n} class="pg" role="button" tabindex="0" aria-pressed=${sel.includes(p.n)} onClick=${()=>setSel(s=>s.includes(p.n)?s.filter(x=>x!==p.n):[...s,p.n])}>
-          <img src=${p.url} alt=${"Página "+p.n}/><div class="row" style=${{justifyContent:"space-between"}}><span>${sel.includes(p.n)?"✓ ":""}Pág. ${p.n}</span><button class="btn sm ghost" onClick=${e=>{e.stopPropagation();setVer(p)}}>ver</button></div></div>`)}</div>
-        <div class="grid" style=${{gridTemplateColumns:"1fr auto",alignItems:"end"}}>
-          <${F} label="Observação para a IA (opcional)"><${Inp} id="pj-dica" value=${dica} onChange=${setDica} placeholder="Ex.: a cozinha tem 2 TUEs de forno e cooktop"/><//>
-          <button class="btn" disabled=${!!prog} onClick=${()=>rodarIA(null)}>${pj.lidoPorIA?"Ler páginas inteiras de novo":"Ler páginas inteiras"}</button>
-        </div>
-        <div class="alert info small"><div><b>Prancha cheia ou prédio?</b> Use <b>Recortar área</b> em um apartamento tipo, na lista de materiais e no quadro de cargas. A leitura fica bem mais certa.</div></div>
-        ${ver&&html`<div class="col"><div class="row"><b>Página ${ver.n}</b><button class="btn sm" onClick=${()=>setZoom(z=>Math.max(.25,z-.25))}>Zoom −</button><button class="btn sm" onClick=${()=>setZoom(z=>Math.min(4,z+.25))}>Zoom +</button><span class="small muted mono">${Math.round(zoom*100)}%</span>
-            <button class=${"btn sm"+(cortando?" pri":"")} onClick=${()=>{setCortando(c=>!c);setDrag(null)}}>${cortando?"Arraste sobre a área… (cancelar)":"Recortar área"}</button></div>
-          <div class="viewer"><div style=${{position:"relative",width:(zoom*100)+"%"}}><img src=${ver.url} style=${{width:"100%",display:"block"}} draggable=${false} alt=${"Prancha página "+ver.n}/>
-            ${cortando&&html`<div class="crop-layer" onPointerDown=${pDown} onPointerMove=${pMove} onPointerUp=${pUp}>${drag&&(()=>{const r=rectDe(drag);return html`<div class="crop-rect" style=${{left:r.x*100+"%",top:r.y*100+"%",width:r.w*100+"%",height:r.h*100+"%"}}></div>`})()}</div>`}</div></div></div>`}
-        ${recortes.length?html`<div class="col"><h3>Recortes para a IA ler</h3>${recortes.map(r=>html`<div class="comodo" key=${r.id}><div class="comodo-b" style=${{flexDirection:"row",flexWrap:"wrap",alignItems:"flex-end",gap:10}}>
-          <img src=${r.url} alt="Recorte" style=${{width:130,height:96,objectFit:"contain",background:"#fff",border:"1px solid var(--line)",borderRadius:4}}/>
-          <${F} label="O que é" style=${{minWidth:220,flex:1}}><${Sel} value=${r.modo} onChange=${v=>upR(r.id,{modo:v,rotulo:v==="lista"?"Lista de materiais":v==="quadro"?"Quadro de cargas":r.rotulo})} opts=${[["unidade","Apartamento / área (contar pontos)"],["lista","Tabela de lista de materiais"],["quadro","Quadro de cargas"]]}/><//>
-          ${r.modo==="unidade"&&html`<${F} label="Nome"><${Inp} value=${r.rotulo} onChange=${v=>upR(r.id,{rotulo:v})} placeholder="Apto tipo"/><//><${F} label="Repete quantas vezes na obra"><${Num} min=${1} value=${r.rep} onChange=${v=>upR(r.id,{rep:Math.max(1,v)})}/><//>`}
-          <button class="btn pri" disabled=${!!prog} onClick=${()=>rodarIA(r)}>Ler recorte</button><button class="btn ghost danger" onClick=${()=>setRecortes(a=>a.filter(x=>x.id!==r.id))}>Remover</button></div></div>`)}</div>`:null}
-      `:html`<p class="muted small" style=${{margin:0}}>${salvo&&salvo.assetId?"":"Sem prancha anexada. Você pode contar os pontos à mão nas abas abaixo."}</p>`}
-    </div>
+    ${pw===1&&html`<div class="col">
+      <div class="grid g3">
+        <${F} label="Nome do projeto"><${Inp} id="pj-nome" value=${pj.nome} onChange=${v=>set({nome:v})} placeholder="Ex.: Residência Silva"/><//>
+        <${F} label="Cliente"><${Inp} id="pj-cli" value=${pj.cliente} onChange=${v=>set({cliente:v})} list="lst-cli"/><//>
+        <${F} label="Tipo de obra"><${Sel} id="pj-tipo" value=${pj.tipo} onChange=${v=>set({tipo:v})} opts=${[["residencial","Residencial / predial"],["industrial","Industrial"]]}/><//>
+      </div>
+      ${avisos}
+      ${temPrancha&&paginas.length?html`<div class="alert ok" style=${{alignItems:"center"}}><div style=${{flex:1}}><b>Prancha enviada:</b> ${pj.arquivo||"arquivo"} · ${paginas.length} página(s)</div><button class="btn sm" onClick=${()=>fileRef.current.click()}>Trocar arquivo</button></div>
+        ${miniaturas(false)}${visor}`
+      :temPrancha?html`<div class="alert info"><span class="spin"></span>Abrindo a prancha salva…</div>`
+      :html`<button class="empty" style=${{cursor:"pointer",width:"100%"}} onClick=${()=>fileRef.current.click()}><h3>Toque aqui para enviar a prancha</h3><span>PDF do projeto elétrico (de preferência o original do projetista)</span><span class="btn pri big">Escolher arquivo</span></button>`}
+    </div>`}
 
-    ${(pj.alertas||[]).length?html`<div class="alert warn"><div><b>Dúvidas da leitura${pj.confianca?` (confiança ${pj.confianca})`:""}:</b><ul style=${{margin:"4px 0 0",paddingLeft:18}}>${pj.alertas.map((a,i)=>html`<li key=${i}>${a}</li>`)}</ul></div></div>`:null}
-
-    <${Tabs} value=${tab} onChange=${setTab} tabs=${[["planta","Pontos"],["cargas","Circuitos"],["metragem","Metros"],["carimbo","Dados da prancha"],["quadro","Conferir"]]}/>
-
-    ${tab==="carimbo"&&html`<div class="col">
-      <div class="grid g3">${[["cliente","Cliente"],["endereco","Endereço"],["escala","Escala"],["revisao","Revisão"],["tensao","Tensão"],["area","Área"]].map(([k,l])=>html`<${F} key=${k} label=${l}><${Inp} id=${"cb-"+k} value=${pj.carimbo[k]} onChange=${v=>set({carimbo:{...pj.carimbo,[k]:v}})}/><//>`)}</div>
-      <${PassoChk} pj=${pj} ids=${["carimbo","legenda"]} passo=${passo}/></div>`}
-
-    ${tab==="cargas"&&html`<div class="col">
-      <div class="tbl-wrap"><table><thead><tr><th>Nº</th><th>Descrição</th><th class="r">Potência (W)</th><th class="r">Disjuntor (A)</th><th class="r">Bitola (mm²)</th><th>Polos</th><th></th></tr></thead><tbody>
-      ${(pj.circuitos||[]).map((c,i)=>{const up=p=>set({circuitos:pj.circuitos.map(x=>x.id===c.id?{...x,...p}:x)});
-        return html`<tr key=${c.id}><td style=${{width:60}}><${Inp} value=${c.num} onChange=${v=>up({num:v})}/></td><td><${Inp} value=${c.desc} onChange=${v=>up({desc:v})}/></td>
-        <td style=${{width:110}}><${Inp} type="number" value=${c.potencia} onChange=${v=>up({potencia:v})}/></td><td style=${{width:100}}><${Inp} type="number" value=${c.disjuntor} onChange=${v=>up({disjuntor:v})}/></td>
-        <td style=${{width:100}}><${Inp} type="number" value=${c.bitola} onChange=${v=>up({bitola:v})}/></td><td style=${{width:80}}><${Sel} value=${String(c.polos||1)} onChange=${v=>up({polos:num(v)})} opts=${[["1","1"],["2","2"],["3","3"]]}/></td>
-        <td><button class="btn sm ghost danger" aria-label="Remover circuito" onClick=${()=>set({circuitos:pj.circuitos.filter(x=>x.id!==c.id)})}>✕</button></td></tr>`})}
-      </tbody></table></div>
-      <div class="row"><button class="btn sm" onClick=${()=>set({circuitos:[...(pj.circuitos||[]),{id:uid(),num:String((pj.circuitos||[]).length+1),desc:"",potencia:0,disjuntor:0,bitola:2.5,polos:1}]})}>+ Circuito</button>
-        ${(pj.circuitos||[]).length?html`<span class="small muted">Total instalado: <b class="num">${n2((pj.circuitos||[]).reduce((a,c)=>a+num(c.potencia),0))} W</b></span>`:null}</div>
-      <${PassoChk} pj=${pj} ids=${["cargas"]} passo=${passo}/></div>`}
-
-    ${tab==="planta"&&html`<div class="col">
-      ${!S.pontos.length&&html`<div class="alert warn">Cadastre os tipos de ponto em Preços e custos antes de contar.</div>`}
-      ${(pj.comodos||[]).map(c=>html`<${Comodo} key=${c.id} c=${c} pontos=${S.pontos} onChange=${nc=>set({comodos:pj.comodos.map(x=>x.id===c.id?nc:x)})} onDel=${()=>set({comodos:pj.comodos.filter(x=>x.id!==c.id)})}/>`)}
-      <div class="row"><button class="btn" onClick=${()=>set({comodos:[...(pj.comodos||[]),{id:uid(),nome:"Cômodo "+((pj.comodos||[]).length+1),itens:{}}]})}>+ Cômodo</button>
-        ${["Apto tipo","Sala","Cozinha","Quarto","Banheiro","Área de serviço","Varanda","Quadro"].map(n=>html`<button key=${n} class="btn sm ghost" onClick=${()=>set({comodos:[...(pj.comodos||[]),{id:uid(),nome:n,itens:{}}]})}>+ ${n}</button>`)}</div>
-      <${PassoChk} pj=${pj} ids=${["planta"]} passo=${passo}/></div>`}
-
-    ${tab==="metragem"&&html`<div class="col">
-      <p class="small muted" style=${{margin:0}}>Meça na prancha com a escala. Deixando tudo zerado, o orçamento usa a média por ponto e avisa que é estimativa.</p>
-      <div class="grid g4">${METRAGENS.map(([k,l])=>html`<${F} key=${k} label=${l+" (m)"}><${Num} id=${"mt-"+k} step=${5} value=${(pj.metragem||{})[k]||0} onChange=${v=>set({metragem:{...pj.metragem,[k]:v}})}/><//>`)}</div>
-      <div class="small muted">Estimativa pela média: ${Object.entries(metragemEstimada(tot)).filter(([,v])=>v).map(([k,v])=>`${(METRAGENS.find(m=>m[0]===k)||[k,k])[1]} ${v} m`).join(" · ")||"—"}</div>
-      ${(pj.outros||[]).length?html`<h3 style=${{marginTop:8}}>Outros materiais da lista do projeto</h3><p class="small muted" style=${{margin:0}}>Entram no orçamento com preço zero para você preencher.</p>
-        <div class="tbl-wrap"><table><thead><tr><th>Material</th><th class="r">Qtd</th><th>Un.</th><th></th></tr></thead><tbody>${pj.outros.map(o=>{const up=p=>set({outros:pj.outros.map(x=>x.id===o.id?{...x,...p}:x)});return html`<tr key=${o.id}><td><${Inp} value=${o.desc} onChange=${v=>up({desc:v})}/></td><td class="r" style=${{width:110}}><${Inp} type="number" value=${o.qtd} onChange=${v=>up({qtd:v})}/></td><td style=${{width:80}}><${Inp} value=${o.unid} onChange=${v=>up({unid:v})}/></td><td><button class="btn sm ghost danger" aria-label="Remover" onClick=${()=>set({outros:pj.outros.filter(x=>x.id!==o.id)})}>✕</button></td></tr>`})}</tbody></table></div>`:null}
-      <${PassoChk} pj=${pj} ids=${["caminhos"]} passo=${passo}/></div>`}
-
-    ${tab==="quadro"&&html`<div class="col">
+    ${pw===2&&html`<div class="col">
+      ${avisos}
       <div class="grid g2" style=${{alignItems:"start"}}>
-        <div class="card col"><h3>Resumo da contagem</h3>
-          ${total?html`<div class="tbl-wrap"><table><tbody>${Object.entries(tot).map(([k,q])=>{const ia=pj.iaOriginal&&pj.iaOriginal[k];const dif=pj.iaOriginal&&(ia||0)!==q;
-            return html`<tr key=${k}><td>${nomeP(k)}</td><td class="r num">${q}</td>${pj.iaOriginal?html`<td class="r small">${dif?html`<span class="pill warn">IA: ${ia||0}</span>`:html`<span class="muted">igual IA</span>`}</td>`:null}</tr>`})}</tbody></table></div>`:html`<p class="muted" style=${{margin:0}}>Nada contado ainda.</p>`}
-          <div class="small"><b class="num">${total}</b> itens · <b class="num">${(pj.circuitos||[]).length}</b> circuitos no quadro de cargas · disjuntores contados: <b class="num">${(tot.dj1||0)+(tot.dj2||0)+(tot.dj3||0)}</b></div>
-          ${(pj.circuitos||[]).length&&((tot.dj1||0)+(tot.dj2||0)+(tot.dj3||0))!==(pj.circuitos||[]).length?html`<div class="alert warn">O número de disjuntores (${(tot.dj1||0)+(tot.dj2||0)+(tot.dj3||0)}) não bate com o de circuitos (${pj.circuitos.length}). Confira o unifilar.</div>`:null}
-          ${(pj.comodos||[]).some(c=>/^Lista de materiais/.test(c.nome))&&(pj.comodos||[]).some(c=>!/^Lista de materiais/.test(c.nome)&&Object.keys(c.itens||{}).length)?html`<div class="alert bad">Há a lista de materiais do projeto E contagem por cômodo. A lista já é o total da obra: use uma ou outra, senão o orçamento conta tudo duas vezes. Use a outra só para comparar e depois remova.</div>`:null}
-          ${(tot.chuv||tot.ar||tot.tue)&&!(pj.circuitos||[]).some(c=>num(c.disjuntor)>=25)?html`<div class="alert warn">Há chuveiro/ar/TUE mas nenhum circuito de 25A ou mais no quadro de cargas.</div>`:null}
+        <div class="card col"><h3>Jeito 1 · A IA conta pela prancha</h3>
+          ${temPrancha&&paginas.length?html`
+            <p class="small muted" style=${{margin:0}}>Marque as páginas com planta, quadro de cargas ou lista de materiais.</p>
+            ${miniaturas(true)}
+            <${F} label="Recado para a IA (opcional)"><${Inp} id="pj-dica" value=${dica} onChange=${setDica} placeholder="Ex.: a cozinha tem forno e cooktop"/><//>
+            <button class="btn pri" disabled=${!!prog} onClick=${()=>rodarIA(null)}>${pj.lidoPorIA?"Ler de novo com IA":"Ler com IA"}</button>
+            <p class="small muted" style=${{margin:0}}><b>Prédio ou prancha cheia?</b> Abra a página abaixo, toque em <b>Recortar área</b> e marque um apartamento tipo, a lista de materiais ou o quadro de cargas.</p>`
+          :html`<p class="small muted" style=${{margin:0}}>Precisa da prancha.</p><button class="btn" onClick=${()=>irPara(1)}>Enviar a prancha</button>`}
         </div>
-        <div class="card col"><h3>Passos</h3>
-          ${PASSOS.map((p,i)=>html`<label class="chk" key=${p.id}><input type="checkbox" checked=${!!pj.passos[p.id]} onChange=${e=>passo(p.id,e.target.checked)}/> ${i+1}. ${p.t}</label>`)}
-          ${S.admin?html`<button class="btn pri" disabled=${nPass<7||!total} onClick=${()=>setConferir(true)}>${pj.status==="conferido"?"Conferido ✓ (conferir de novo)":"Marcar como conferido"}</button>
-            ${nPass<7&&html`<span class="small muted">Marque os 7 passos para liberar.</span>`}`:html`<span class="small muted">Só o patrão marca o projeto como conferido.</span>`}
-          ${pj.status==="conferido"&&S.admin&&html`<button class="btn" onClick=${gerarOrc}>Gerar orçamento deste projeto</button>`}
+        <div class="card col"><h3>Jeito 2 · Contar à mão</h3>
+          <p class="small muted" style=${{margin:0}}>Crie um cômodo e adicione cada ponto que vê na prancha. Apartamento que se repete: crie um "Apto tipo" e diga quantas vezes ele repete.</p>
+          <div class="row">${["Apto tipo","Sala","Cozinha","Quarto","Banheiro","Área de serviço","Varanda","Quadro"].map(n=>html`<button key=${n} class="btn sm" onClick=${()=>set({comodos:[...(pj.comodos||[]),{id:uid(),nome:n,itens:{}}]})}>+ ${n}</button>`)}
+            <button class="btn sm" onClick=${()=>set({comodos:[...(pj.comodos||[]),{id:uid(),nome:"Cômodo "+((pj.comodos||[]).length+1),itens:{}}]})}>+ Outro</button></div>
         </div>
-      </div></div>`}
+      </div>
+      ${visor}
+      ${recortes.length?html`<div class="col"><h3>Recortes para a IA ler</h3>${recortes.map(r=>html`<div class="comodo" key=${r.id}><div class="comodo-b" style=${{flexDirection:"row",flexWrap:"wrap",alignItems:"flex-end",gap:10}}>
+        <img src=${r.url} alt="Recorte" style=${{width:130,height:96,objectFit:"contain",background:"#fff",border:"1px solid var(--line)",borderRadius:4}}/>
+        <${F} label="O que é" style=${{minWidth:220,flex:1}}><${Sel} value=${r.modo} onChange=${v=>upR(r.id,{modo:v,rotulo:v==="lista"?"Lista de materiais":v==="quadro"?"Quadro de cargas":r.rotulo})} opts=${[["unidade","Apartamento / área (contar pontos)"],["lista","Tabela de lista de materiais"],["quadro","Quadro de cargas"]]}/><//>
+        ${r.modo==="unidade"&&html`<${F} label="Nome"><${Inp} value=${r.rotulo} onChange=${v=>upR(r.id,{rotulo:v})} placeholder="Apto tipo"/><//><${F} label="Repete quantas vezes na obra"><${Num} min=${1} value=${r.rep} onChange=${v=>upR(r.id,{rep:Math.max(1,v)})}/><//>`}
+        <button class="btn pri" disabled=${!!prog} onClick=${()=>rodarIA(r)}>Ler recorte</button><button class="btn ghost danger" onClick=${()=>setRecortes(a=>a.filter(x=>x.id!==r.id))}>Remover</button></div></div>`)}</div>`:null}
+      ${(pj.alertas||[]).length?html`<div class="alert warn"><div><b>Dúvidas da leitura${pj.confianca?` (confiança ${pj.confianca})`:""}:</b><ul style=${{margin:"4px 0 0",paddingLeft:18}}>${pj.alertas.map((a,i)=>html`<li key=${i}>${a}</li>`)}</ul></div></div>`:null}
+      <div class="row" style=${{justifyContent:"space-between"}}><h3>Pontos contados</h3><span class="pill acc">${total} itens no total</span></div>
+      ${!S.pontos.length&&html`<div class="alert warn">Cadastre os tipos de ponto em Preços antes de contar.</div>`}
+      ${(pj.comodos||[]).length?(pj.comodos||[]).map(c=>html`<${Comodo} key=${c.id} c=${c} pontos=${S.pontos} onChange=${nc=>set({comodos:pj.comodos.map(x=>x.id===c.id?nc:x)})} onDel=${()=>set({comodos:pj.comodos.filter(x=>x.id!==c.id)})}/>`)
+        :html`<div class="card muted">Nada contado ainda. Use a IA ou crie um cômodo acima.</div>`}
+      <details class="card"><summary style=${{cursor:"pointer",fontWeight:600}}>Opcional: circuitos do quadro de cargas (${(pj.circuitos||[]).length})</summary><div class="col" style=${{marginTop:12}}>
+        <div class="tbl-wrap"><table><thead><tr><th>Nº</th><th>Descrição</th><th class="r">Potência (W)</th><th class="r">Disjuntor (A)</th><th class="r">Cabo (mm²)</th><th>Polos</th><th></th></tr></thead><tbody>
+        ${(pj.circuitos||[]).map(c=>{const up=p=>set({circuitos:pj.circuitos.map(x=>x.id===c.id?{...x,...p}:x)});
+          return html`<tr key=${c.id}><td style=${{width:60}}><${Inp} value=${c.num} onChange=${v=>up({num:v})}/></td><td><${Inp} value=${c.desc} onChange=${v=>up({desc:v})}/></td>
+          <td style=${{width:110}}><${Inp} type="number" value=${c.potencia} onChange=${v=>up({potencia:v})}/></td><td style=${{width:100}}><${Inp} type="number" value=${c.disjuntor} onChange=${v=>up({disjuntor:v})}/></td>
+          <td style=${{width:100}}><${Inp} type="number" value=${c.bitola} onChange=${v=>up({bitola:v})}/></td><td style=${{width:80}}><${Sel} value=${String(c.polos||1)} onChange=${v=>up({polos:num(v)})} opts=${[["1","1"],["2","2"],["3","3"]]}/></td>
+          <td><button class="btn sm ghost danger" aria-label="Remover circuito" onClick=${()=>set({circuitos:pj.circuitos.filter(x=>x.id!==c.id)})}>✕</button></td></tr>`})}
+        </tbody></table></div>
+        <div class="row"><button class="btn sm" onClick=${()=>set({circuitos:[...(pj.circuitos||[]),{id:uid(),num:String((pj.circuitos||[]).length+1),desc:"",potencia:0,disjuntor:0,bitola:2.5,polos:1}]})}>+ Circuito</button></div></div></details>
+      <details class="card"><summary style=${{cursor:"pointer",fontWeight:600}}>Opcional: metros de cabo e eletroduto</summary><div class="col" style=${{marginTop:12}}>
+        <p class="small muted" style=${{margin:0}}>Meça na prancha com a escala. Se deixar zerado, o orçamento usa uma média e avisa que é estimativa.</p>
+        <div class="grid g4">${METRAGENS.map(([k,l])=>html`<${F} key=${k} label=${l+" (m)"}><${Num} id=${"mt-"+k} step=${5} value=${(pj.metragem||{})[k]||0} onChange=${v=>set({metragem:{...pj.metragem,[k]:v}})}/><//>`)}</div>
+        ${(pj.outros||[]).length?html`<h3>Outros materiais da lista do projeto</h3>
+          <div class="tbl-wrap"><table><thead><tr><th>Material</th><th class="r">Qtd</th><th>Un.</th><th></th></tr></thead><tbody>${pj.outros.map(o=>{const up=p=>set({outros:pj.outros.map(x=>x.id===o.id?{...x,...p}:x)});return html`<tr key=${o.id}><td><${Inp} value=${o.desc} onChange=${v=>up({desc:v})}/></td><td class="r" style=${{width:110}}><${Inp} type="number" value=${o.qtd} onChange=${v=>up({qtd:v})}/></td><td style=${{width:80}}><${Inp} value=${o.unid} onChange=${v=>up({unid:v})}/></td><td><button class="btn sm ghost danger" aria-label="Remover" onClick=${()=>set({outros:pj.outros.filter(x=>x.id!==o.id)})}>✕</button></td></tr>`})}</tbody></table></div>`:null}</div></details>
+      <details class="card"><summary style=${{cursor:"pointer",fontWeight:600}}>Opcional: dados do carimbo (escala, tensão, endereço)</summary>
+        <div class="grid g3" style=${{marginTop:12}}>${[["cliente","Cliente"],["endereco","Endereço"],["escala","Escala"],["revisao","Revisão"],["tensao","Tensão"],["area","Área"]].map(([k,l])=>html`<${F} key=${k} label=${l}><${Inp} id=${"cb-"+k} value=${pj.carimbo[k]} onChange=${v=>set({carimbo:{...pj.carimbo,[k]:v}})}/><//>`)}</div></details>
+    </div>`}
+
+    ${pw===3&&html`<div class="grid g2" style=${{alignItems:"start"}}>
+      <div class="card col"><h3>O que foi contado</h3>
+        ${total?html`<div class="tbl-wrap"><table><tbody>${Object.entries(tot).map(([k,q])=>{const ia=pj.iaOriginal&&pj.iaOriginal[k];const dif=pj.iaOriginal&&(ia||0)!==q;
+          return html`<tr key=${k}><td>${nomeP(k)}</td><td class="r num"><b>${q}</b></td>${pj.iaOriginal?html`<td class="r small">${dif?html`<span class="pill warn">IA leu ${ia||0}</span>`:html`<span class="muted">igual à IA</span>`}</td>`:null}</tr>`})}</tbody></table></div>`
+          :html`<div class="alert warn" style=${{alignItems:"center"}}><div style=${{flex:1}}>Nenhum ponto contado ainda.</div><button class="btn sm" onClick=${()=>irPara(2)}>Contar os pontos</button></div>`}
+        ${(pj.circuitos||[]).length&&((tot.dj1||0)+(tot.dj2||0)+(tot.dj3||0))!==(pj.circuitos||[]).length?html`<div class="alert warn">Disjuntores contados (${(tot.dj1||0)+(tot.dj2||0)+(tot.dj3||0)}) não batem com os circuitos (${pj.circuitos.length}).</div>`:null}
+        ${(pj.comodos||[]).some(c=>/^Lista de materiais/.test(c.nome))&&(pj.comodos||[]).some(c=>!/^Lista de materiais/.test(c.nome)&&Object.keys(c.itens||{}).length)?html`<div class="alert bad">Tem lista de materiais E contagem por cômodo: o orçamento vai contar tudo duas vezes. Remova uma das duas no passo 2.</div>`:null}
+        ${(tot.chuv||tot.ar||tot.tue)&&(pj.circuitos||[]).length&&!(pj.circuitos||[]).some(c=>num(c.disjuntor)>=25)?html`<div class="alert warn">Há chuveiro/ar/TUE mas nenhum circuito de 25A ou mais.</div>`:null}
+        ${total>0&&html`<button class="btn sm" onClick=${()=>irPara(2)}>Corrigir a contagem</button>`}
+      </div>
+      <div class="card col"><h3>${S.admin?"Conferência do patrão":"Mandar para o patrão"}</h3>
+        ${S.admin?html`
+          ${PASSOS.map((p,i)=>html`<label class="chk" key=${p.id} style=${{alignItems:"flex-start",padding:"6px 0",borderBottom:"1px solid var(--line)"}}><input type="checkbox" style=${{marginTop:3}} checked=${!!pj.passos[p.id]} onChange=${e=>passo(p.id,e.target.checked)}/><div><b>${i+1}. ${p.t}</b><div class="small muted">${p.d}</div></div></label>`)}
+          <button class="btn pri big" disabled=${nPass<7||!total} onClick=${()=>setConferir(true)}>${pj.status==="conferido"?"Conferido ✓ (conferir de novo)":"Marcar como conferido"}</button>
+          ${nPass<7&&html`<span class="small muted">Faltam ${7-nPass} passo(s) para liberar.</span>`}`
+        :html`${pj.prontoConferir?html`<div class="alert ok">Patrão avisado. Assim que ele conferir, o projeto vira orçamento.</div>`
+            :html`<button class="btn pri big" disabled=${!total} onClick=${()=>set({prontoConferir:true,prontoPor:S.me.id,prontoEm:new Date().toISOString()})}>Avisar que está pronto para conferir</button>`}`}
+      </div>
+    </div>`}
+
+    ${pw===4&&html`<div class="col">
+      ${pj.status!=="conferido"?html`<div class="alert warn" style=${{alignItems:"center"}}><div style=${{flex:1}}>Falta o patrão conferir o projeto.</div><button class="btn sm" onClick=${()=>irPara(3)}>Ir para a conferência</button></div>`
+      :html`<div class="card col"><h3>${total} itens contados em ${(pj.comodos||[]).length} cômodo(s)</h3>
+        ${orcDoPj?html`<div class="alert ok" style=${{alignItems:"center"}}><div style=${{flex:1}}>Já existe o orçamento <b>${orcDoPj.numero}</b> deste projeto.</div><button class="btn pri" onClick=${()=>{onClose();go("orcamentos",orcDoPj.id)}}>Abrir orçamento</button></div>
+          ${S.admin&&html`<button class="btn" onClick=${gerarOrc}>Gerar outro orçamento</button>`}`
+        :S.admin?html`<button class="btn pri big" onClick=${gerarOrc}>Gerar orçamento</button>`:html`<p class="muted" style=${{margin:0}}>O patrão ou o escritório gera o orçamento.</p>`}</div>`}
+    </div>`}
+
     ${conferir&&html`<${ConferirModal} pj=${pj} tot=${tot} nomeP=${nomeP} onClose=${()=>setConferir(false)} onOk=${async regra=>{
       if(regra&&regra.trim()){const r=(S.config.regras?S.config.regras+"\n":"")+"• "+regra.trim();await S.api.setMeta("config",{...S.config,regras:r},null)}
-      await salvar({status:"conferido",conferidoEm:new Date().toISOString(),conferidoPor:S.me.id},"Projeto conferido. Já pode gerar o orçamento.");setConferir(false)}}/>`}
+      await salvar({status:"conferido",conferidoEm:new Date().toISOString(),conferidoPor:S.me.id},"Projeto conferido. Já pode gerar o orçamento.");setConferir(false);irPara(4)}}/>`}
   <//>`;
 }
 function PassoChk({pj,ids,passo}){return html`<div class="row" style=${{borderTop:"1px solid var(--line)",paddingTop:10}}>${ids.map(k=>{const p=PASSOS.find(x=>x.id===k);return html`<label class="chk" key=${k}><input type="checkbox" checked=${!!pj.passos[k]} onChange=${e=>passo(k,e.target.checked)}/> Conferi: ${p.t}</label>`})}<span class="small muted" style=${{flexBasis:"100%"}}>${ids.map(k=>PASSOS.find(x=>x.id===k).d).join(" ")}</span></div>`}
