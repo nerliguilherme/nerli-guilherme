@@ -1,0 +1,1333 @@
+<title>Elétrica Gestão</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: trilho lateral fixo (quadro de distribuição) + área de trabalho; no celular o trilho vira barra de abas rolável no topo.
+   Cores dos fios (NBR 5410) viram as cores semânticas das etapas. */
+:root{
+  --bg:#f3f5f7; --panel:#ffffff; --sunk:#e8ecf0; --line:#d5dbe2; --fg:#16202b; --muted:#5b6876;
+  --ink:#1d2f45; --ink-fg:#e9eef4; --accent:#b4581f; --accent-soft:#f6e3d6; --accent-fg:#ffffff;
+  --ok:#1f7a45; --ok-soft:#dcf0e3; --warn:#9a6400; --warn-soft:#f8ecd0; --bad:#b3261e; --bad-soft:#f9dedb;
+  --fio-fase:#c0392b; --fio-neutro:#3d8fd1; --fio-terra:#3f9b45; --fio-retorno:#2b2b2b; --fio-cinza:#8a96a3;
+  --f-disp:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --f-body:"IBM Plex Sans",-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:6px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10161d; --panel:#18212b; --sunk:#0c1117; --line:#2a3644; --fg:#e6ebf0; --muted:#94a2b1;
+  --ink:#0b1622; --ink-fg:#d7e0ea; --accent:#e08a4c; --accent-soft:#3b2416; --accent-fg:#1a0e06;
+  --ok:#5cc58a; --ok-soft:#163323; --warn:#e7b44c; --warn-soft:#352812; --bad:#f08079; --bad-soft:#3a1715;
+  --fio-retorno:#cfd6dd; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10161d; --panel:#18212b; --sunk:#0c1117; --line:#2a3644; --fg:#e6ebf0; --muted:#94a2b1;
+  --ink:#0b1622; --ink-fg:#d7e0ea; --accent:#e08a4c; --accent-soft:#3b2416; --accent-fg:#1a0e06;
+  --ok:#5cc58a; --ok-soft:#163323; --warn:#e7b44c; --warn-soft:#352812; --bad:#f08079; --bad-soft:#3a1715;
+  --fio-retorno:#cfd6dd; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font:14px/1.5 var(--f-body)}
+*{box-sizing:border-box}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{font-family:var(--f-disp);font-weight:700;letter-spacing:.01em;margin:0;text-wrap:balance;line-height:1.1}
+h1{font-size:30px} h2{font-size:22px} h3{font-size:17px}
+.num,.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)} .small{font-size:12.5px}
+.app{display:flex;height:100%}
+.rail{width:232px;flex:none;background:var(--ink);color:var(--ink-fg);display:flex;flex-direction:column;padding:18px 12px;gap:4px;overflow-y:auto}
+.brand{padding:4px 10px 16px;border-bottom:1px solid #ffffff1c;margin-bottom:10px}
+.brand b{font-family:var(--f-disp);font-size:24px;display:block;letter-spacing:.02em}
+.brand span{font-size:11.5px;opacity:.7;text-transform:uppercase;letter-spacing:.08em}
+.navgrp{font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;opacity:.55;padding:12px 10px 4px}
+.nav{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r);background:none;border:0;color:inherit;text-align:left;cursor:pointer;width:100%;font-size:13.5px}
+.nav:hover{background:#ffffff12}
+.nav[aria-current="page"]{background:#ffffff1f;box-shadow:inset 3px 0 0 var(--accent)}
+.nav .badge{margin-left:auto}
+.rail .me{margin-top:auto;padding:12px 10px 0;border-top:1px solid #ffffff1c;font-size:12.5px;opacity:.85}
+.main{flex:1;min-width:0;overflow-y:auto}
+.page{max-width:1180px;margin:0 auto;padding-block:24px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+.phead{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;justify-content:space-between}
+.phead p{margin:4px 0 0;color:var(--muted);max-width:640px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;min-width:0}
+.card.flat{background:transparent}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.col{display:flex;flex-direction:column;gap:10px;min-width:0}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);background:var(--panel);padding:7px 13px;border-radius:var(--r);cursor:pointer;font-weight:500;white-space:nowrap}
+.btn:hover{border-color:var(--muted)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.btn.pri:hover{filter:brightness(1.07)}
+.btn.ghost{border-color:transparent;background:transparent}
+.btn.danger{color:var(--bad)}
+.btn.sm{padding:4px 9px;font-size:12.5px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);min-width:0}
+input.i,select.i,textarea.i{border:1px solid var(--line);background:var(--panel);border-radius:var(--r);padding:7px 9px;width:100%;min-width:0}
+textarea.i{min-height:76px;resize:vertical}
+input.i:focus,select.i:focus,textarea.i:focus{border-color:var(--accent);outline:none}
+.stepper{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.stepper button{border:0;background:var(--sunk);width:28px;height:28px;cursor:pointer;font-weight:600}
+.stepper input{width:46px;border:0;text-align:center;background:var(--panel);height:28px;font-family:var(--f-mono)}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);text-align:left;background:var(--sunk);font-weight:600}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+td.r,th.r{text-align:right}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:99px;font-size:11.5px;font-weight:600;background:var(--sunk);color:var(--muted);white-space:nowrap}
+.pill.ok{background:var(--ok-soft);color:var(--ok)} .pill.warn{background:var(--warn-soft);color:var(--warn)} .pill.bad{background:var(--bad-soft);color:var(--bad)} .pill.acc{background:var(--accent-soft);color:var(--accent)}
+.badge{background:var(--accent);color:var(--accent-fg);font-size:11px;border-radius:99px;padding:0 7px;font-weight:600}
+.kpi{display:flex;flex-direction:column;gap:2px}
+.kpi b{font-family:var(--f-mono);font-size:22px;font-weight:500}
+.kpi span{font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.wire{width:4px;border-radius:2px;align-self:stretch;flex:none}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{border:0;background:none;padding:9px 14px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;font-weight:500}
+.tab[aria-selected="true"]{color:var(--fg);border-color:var(--accent)}
+.kanban{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(230px,1fr);gap:12px;overflow-x:auto;padding-bottom:6px}
+.kcol{background:var(--sunk);border-radius:var(--r);padding:10px;display:flex;flex-direction:column;gap:8px;min-height:120px}
+.kcol h3{font-size:15px;display:flex;align-items:center;gap:8px}
+.kcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:10px;cursor:pointer;display:flex;gap:9px;text-align:left;width:100%}
+.kcard:hover{border-color:var(--muted)}
+.alert{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:var(--r);font-size:13px}
+.alert.warn{background:var(--warn-soft);color:var(--warn)} .alert.bad{background:var(--bad-soft);color:var(--bad)} .alert.ok{background:var(--ok-soft);color:var(--ok)} .alert.info{background:var(--accent-soft);color:var(--accent)}
+.alert b{font-weight:600}
+.empty{border:1.5px dashed var(--line);border-radius:var(--r);padding:28px 20px;text-align:center;color:var(--muted);display:flex;flex-direction:column;gap:10px;align-items:center}
+.empty h3{color:var(--fg)}
+.toast{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--ink-fg);padding:10px 16px;border-radius:var(--r);box-shadow:0 6px 24px #0004;z-index:50;max-width:min(420px,calc(100vw - 32px))}
+.modal-bg{position:fixed;inset:0;background:#0008;z-index:40;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:max(16px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 24px max(12px,env(safe-area-inset-left,0px))}
+.modal{background:var(--bg);border-radius:8px;width:min(1100px,100%);margin-top:16px;display:flex;flex-direction:column}
+.modal-h{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--panel);border-radius:8px 8px 0 0;position:sticky;top:0;z-index:2}
+.modal-b{padding:16px;display:flex;flex-direction:column;gap:16px}
+.steps{display:flex;flex-direction:column;gap:0}
+.step{display:grid;grid-template-columns:34px 1fr;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.step:last-child{border:0}
+.step .n{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-mono);border:2px solid var(--line);font-size:13px}
+.step.done .n{background:var(--ok);border-color:var(--ok);color:#fff}
+.sym{display:grid;grid-template-columns:56px 1fr;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.sym svg{width:52px;height:40px}
+.sym svg *{stroke:var(--fg);fill:none;stroke-width:1.6}
+.sym svg .fill{fill:var(--fg)}
+.sym svg text{fill:var(--fg);stroke:none;font:600 10px var(--f-body)}
+.pages{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px}
+.pg{flex:none;width:140px;border:2px solid var(--line);border-radius:var(--r);padding:4px;background:var(--panel);cursor:pointer;display:flex;flex-direction:column;gap:4px;font-size:12px}
+.pg[aria-pressed="true"]{border-color:var(--accent)}
+.pg img{width:100%;height:100px;object-fit:contain;background:#fff;border-radius:3px}
+.viewer{background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:auto;max-height:70vh}
+.viewer img{display:block;max-width:none}
+.comodo{border:1px solid var(--line);border-radius:var(--r);background:var(--panel)}
+.comodo-h{display:flex;gap:8px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.comodo-b{padding:8px 10px;display:flex;flex-direction:column;gap:6px}
+.it{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.it .nm{flex:1;min-width:150px}
+.bar{height:8px;background:var(--sunk);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+.task{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}
+.task:last-child{border:0}
+.task input[type=checkbox]{width:20px;height:20px;margin-top:2px;accent-color:var(--ok);flex:none}
+.task.done .t{text-decoration:line-through;color:var(--muted)}
+.chk{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer}
+.chk input{accent-color:var(--accent);width:16px;height:16px}
+.total-box{background:var(--ink);color:var(--ink-fg);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:6px}
+.total-box .ln{display:flex;justify-content:space-between;gap:10px;font-size:13px}
+.total-box .big{font-family:var(--f-mono);font-size:28px}
+.spin{width:16px;height:16px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp .8s linear infinite;display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.spin{animation-duration:3s}}
+.gate{min-height:100%;display:grid;place-items:center;padding:24px max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px))}
+.gate .card{max-width:440px;display:flex;flex-direction:column;gap:12px}
+@media (max-width: 860px){
+  .app{flex-direction:column}
+  .rail{width:auto;flex-direction:row;padding:8px max(10px,env(safe-area-inset-right,0px)) 8px max(10px,env(safe-area-inset-left,0px));overflow-x:auto;overflow-y:hidden;gap:2px;position:sticky;top:0;z-index:5}
+  .brand,.navgrp,.rail .me{display:none}
+  .nav{width:auto;white-space:nowrap;padding:7px 10px;font-size:13px}
+  .nav[aria-current="page"]{box-shadow:inset 0 -3px 0 var(--accent)}
+  body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--ink)}
+  h1{font-size:26px}
+}
+</style>
+
+<div id="root"><div class="gate"><div class="card"><h2>Carregando sistema…</h2><p class="muted">Conectando ao banco de dados da empresa.</p></div></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/htm@3.1.1/dist/htm.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+"use strict";
+const {useState,useEffect,useMemo,useRef,useCallback,createContext,useContext}=React;
+const html=htm.bind(React.createElement);
+
+/* ============================== CATÁLOGO MODELO ==============================
+   Valores de referência para começar. O patrão ajusta em "Preços & custos". */
+const MODELO={
+ materiais:[
+  ["cx42","Caixa 4x2 (embutir)","un",2.5],["cx44","Caixa octogonal 4x4 (laje)","un",5.5],
+  ["int1","Interruptor simples c/ placa","un",12],["int2","Interruptor 2 teclas c/ placa","un",18],["int3w","Interruptor paralelo (three-way)","un",15],["int4w","Interruptor intermediário (four-way)","un",35],
+  ["tom10","Tomada 10A c/ placa","un",12],["tom20","Tomada 20A c/ placa","un",15],["conch","Conector p/ chuveiro + saída de fio","un",10],
+  ["rj45","Tomada RJ45 c/ placa","un",25],["coax","Tomada TV coaxial c/ placa","un",12],["camp","Campainha","un",45],["sens","Sensor de presença","un",40],
+  ["qd24","Quadro de distribuição 24 disj.","un",180],["dj1","Disjuntor DIN monopolar","un",14],["dj2","Disjuntor DIN bipolar","un",55],["dj3","Disjuntor DIN tripolar","un",85],
+  ["dr","Interruptor DR 40A 30mA","un",160],["dps","DPS 275V","un",45],["padrao","Kit padrão de entrada","un",900],
+  ["tomind","Tomada industrial 3P+T","un",75],["eletcal","Eletrocalha perfurada (m)","m",35],["haste","Haste de aterramento 2,4m + conector","un",45],
+  ["el34","Eletroduto corrugado 3/4\" (m)","m",2.8],["el1","Eletroduto corrugado 1\" (m)","m",4.5],
+  ["c15","Cabo 1,5mm² (m)","m",1.6],["c25","Cabo 2,5mm² (m)","m",2.5],["c4","Cabo 4mm² (m)","m",4],["c6","Cabo 6mm² (m)","m",6],["c10","Cabo 10mm² (m)","m",10],["c16","Cabo 16mm² (m)","m",16]
+ ],
+ pontos:[
+  // id, nome, grupo, unid, mão de obra (venda), horas, kit
+  ["luz","Ponto de luz no teto","Residencial","pt",70,1.0,[["cx44",1]]],
+  ["arand","Ponto de luz na parede (arandela)","Residencial","pt",70,1.0,[["cx42",1]]],
+  ["int1","Interruptor simples","Residencial","pt",60,0.8,[["cx42",1],["int1",1]]],
+  ["int2","Interruptor 2 teclas","Residencial","pt",70,0.9,[["cx42",1],["int2",1]]],
+  ["int3w","Interruptor paralelo (three-way)","Residencial","pt",85,1.2,[["cx42",1],["int3w",1]]],
+  ["int4w","Interruptor intermediário (four-way)","Residencial","pt",95,1.4,[["cx42",1],["int4w",1]]],
+  ["tug","Tomada de uso geral (TUG 10A)","Residencial","pt",60,0.8,[["cx42",1],["tom10",1]]],
+  ["tug20","Tomada 20A","Residencial","pt",70,0.9,[["cx42",1],["tom20",1]]],
+  ["chuv","Chuveiro (TUE)","Residencial","pt",120,1.5,[["conch",1]]],
+  ["ar","Ar-condicionado (TUE)","Residencial","pt",150,2.0,[["cx42",1],["tom20",1]]],
+  ["tue","Outra TUE (forno, cooktop, máquina)","Residencial","pt",120,1.5,[["cx42",1],["tom20",1]]],
+  ["rede","Ponto de rede (RJ45)","Residencial","pt",70,1.0,[["cx42",1],["rj45",1]]],
+  ["tv","Ponto de TV","Residencial","pt",60,0.8,[["cx42",1],["coax",1]]],
+  ["camp","Campainha","Residencial","pt",70,1.0,[["cx42",1],["camp",1]]],
+  ["sens","Sensor de presença","Residencial","pt",80,1.0,[["cx42",1],["sens",1]]],
+  ["qdc","Montagem de quadro (QDC)","Quadro","un",350,4,[["qd24",1]]],
+  ["dj1","Disjuntor monopolar","Quadro","un",25,0.3,[["dj1",1]]],
+  ["dj2","Disjuntor bipolar","Quadro","un",35,0.4,[["dj2",1]]],
+  ["dj3","Disjuntor tripolar","Quadro","un",45,0.5,[["dj3",1]]],
+  ["dr","Interruptor DR","Quadro","un",60,0.6,[["dr",1]]],
+  ["dps","DPS","Quadro","un",40,0.4,[["dps",1]]],
+  ["padrao","Entrada / padrão de energia","Quadro","un",600,8,[["padrao",1]]],
+  ["aterr","Haste de aterramento","Quadro","un",120,1.5,[["haste",1]]],
+  ["tomind","Tomada industrial 3P+T","Industrial","pt",120,1.5,[["tomind",1]]],
+  ["motor","Ponto de força / motor","Industrial","pt",250,3,[]],
+  ["qcm","Quadro de comando (montagem)","Industrial","un",1200,16,[]],
+  ["lumind","Luminária industrial (high bay)","Industrial","pt",110,1.5,[]],
+  ["eletcal","Eletrocalha / perfilado","Industrial","m",25,0.4,[["eletcal",1]]]
+ ]
+};
+const METRAGENS=[["el34","Eletroduto 3/4\""],["el1","Eletroduto 1\""],["c15","Cabo 1,5mm²"],["c25","Cabo 2,5mm²"],["c4","Cabo 4mm²"],["c6","Cabo 6mm²"],["c10","Cabo 10mm²"],["c16","Cabo 16mm²"]];
+const CONFIG_PADRAO={empresa:"Elétrica",cidade:"",telefone:"",impostoPct:6,markupMatPct:20,fatorIndustrial:1.3,deslocamentoPadrao:80,margemMin:25,
+  folhaMensal:9000,encargosPct:40,custosFixos:3500,horasProdutivas:440,regras:""};
+const PASSOS=[
+ {id:"carimbo",t:"Carimbo e notas",d:"Canto inferior direito da prancha. Anote cliente, endereço, escala (ex.: 1:50), revisão, tensão (127/220V) e área. Escala errada estraga toda a metragem."},
+ {id:"legenda",t:"Legenda de símbolos",d:"Cada projetista desenha um pouco diferente. Antes de contar, confira na legenda da própria prancha o que é tomada baixa, média, alta, TUE e cada tipo de interruptor."},
+ {id:"cargas",t:"Quadro de cargas",d:"Tabela com os circuitos: número, o que alimenta, potência (W), disjuntor (A) e bitola do cabo (mm²). Vira a lista de circuitos e de disjuntores do quadro."},
+ {id:"planta",t:"Planta baixa, cômodo por cômodo",d:"Entre em um cômodo por vez e conte cada símbolo. Marque com caneta o que já contou. Ao lado de cada ponto vem o número do circuito; a letra minúscula liga a lâmpada ao interruptor que a comanda."},
+ {id:"caminhos",t:"Caminhos e metragem",d:"Meça os eletrodutos com a escala (régua × escala). Cabo = eletroduto × nº de condutores + descidas até a caixa (pé-direito − altura da caixa) + 10% de sobra."},
+ {id:"unifilar",t:"Diagrama unifilar e quadro",d:"Mostra o quadro: disjuntor geral, DR, DPS, barramentos e cada disjuntor de circuito. Confirme quantidade e polos (mono, bi, tri)."},
+ {id:"conferencia",t:"Conferência final",d:"Some os pontos da planta e compare com o quadro de cargas. Itens especiais (chuveiro, ar, motor) precisam de circuito próprio. Só depois disso o projeto vira orçamento e tarefas."}
+];
+const ETAPAS_OS=[
+ {id:"material",t:"Aguardando material",c:"var(--fio-cinza)",frac:0},
+ {id:"infra",t:"Infraestrutura",sub:"eletrodutos e caixas",c:"var(--fio-retorno)",frac:.4},
+ {id:"enfiacao",t:"Enfiação",sub:"passagem de cabos",c:"var(--fio-fase)",frac:.25},
+ {id:"quadro",t:"Quadro e ligações",sub:"montagem e identificação",c:"var(--fio-neutro)",frac:1},
+ {id:"acabamento",t:"Acabamento",sub:"tomadas, interruptores, luminárias",c:"var(--accent)",frac:.25},
+ {id:"testes",t:"Testes e entrega",sub:"isolamento, polaridade, DR",c:"var(--fio-terra)",frac:.1},
+ {id:"concluida",t:"Concluída",c:"var(--ok)",frac:0}
+];
+const PIPE=[
+ {id:"contato",t:"Contato inicial"},{id:"visita",t:"Visita / leitura do projeto"},{id:"orcamento",t:"Orçamento enviado"},
+ {id:"negociacao",t:"Negociação"},{id:"aprovado",t:"Fechado"},{id:"perdido",t:"Perdido"}
+];
+const PAPEIS={patrao:"Patrão / gestor",escritorio:"Escritório (orçamento e financeiro)",eletricista:"Eletricista",ajudante:"Ajudante"};
+const COLS=["clientes","fornecedores","materiais","movimentos","projetos","orcamentos","os","financeiro","team","access_requests"];
+
+/* ============================== UTILITÁRIOS ============================== */
+const brl=v=>(Number(v)||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const n2=v=>(Number(v)||0).toLocaleString("pt-BR",{maximumFractionDigits:2});
+const num=v=>{if(typeof v==="number")return v;const s=String(v??"").replace(/\s/g,"").replace(/\./g,"").replace(",",".");const x=parseFloat(s);return isFinite(x)?x:0};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const hoje=()=>new Date().toISOString().slice(0,10);
+const dataBR=s=>s?new Date(s+(s.length===10?"T12:00":"")).toLocaleDateString("pt-BR"):"—";
+const clean=o=>JSON.parse(JSON.stringify(o,(k,v)=>v===undefined?null:v));
+const lsGet=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
+const proxNumero=(lista,pref)=>{let m=0;for(const x of lista){const k=parseInt(String(x.numero||"").replace(/\D/g,""),10);if(k>m)m=k}return pref+String(m+1).padStart(4,"0")};
+
+/* ============================== STORE ============================== */
+const Ctx=createContext(null);
+const useS=()=>useContext(Ctx);
+
+function useBackend(){
+  const [st,setSt]=useState({status:"loading"});
+  useEffect(()=>{
+    let dead=false;
+    const c=window.claude;
+    if(!c||typeof c.use!=="function"){setSt({status:"local"});return}
+    const t=setTimeout(()=>{if(!dead)setSt(s=>s.status==="loading"?{status:"local"}:s)},11000);
+    (async()=>{
+      try{
+        const [db,user]=await Promise.all([c.use("db"),c.use("user")]);
+        if(dead)return;
+        if(!db||!user){setSt({status:user?"signedout":"local"});return}
+        const me=await user.me();
+        const isOwner=!!(await user.isOwner?.());
+        const canEdit=!!(await user.canEdit?.());
+        if(!me||!me.id){setSt({status:"signedout"});return}
+        setSt({status:"ready",db,user,me:{id:me.id,name:me.name||"",isOwner,canEdit}});
+      }catch(e){console.error(e);if(!dead)setSt({status:"local"})}
+    })();
+    return()=>{dead=true;clearTimeout(t)};
+  },[]);
+  return st;
+}
+
+function Provider({children}){
+  const be=useBackend();
+  const [data,setData]=useState(()=>Object.fromEntries(COLS.map(c=>[c,[]])));
+  const [config,setConfig]=useState(null);
+  const [precos,setPrecos]=useState(null);
+  const [loaded,setLoaded]=useState(false);
+  const [toastMsg,setToastMsg]=useState(null);
+  const [names,setNames]=useState({});
+  const local=useRef(null);
+  const toast=useCallback(m=>{setToastMsg(m);clearTimeout(toast._t);toast._t=setTimeout(()=>setToastMsg(null),3800)},[]);
+
+  // carregar dados
+  useEffect(()=>{
+    if(be.status==="local"){
+      const d=lsGet("elet_local",null)||{};
+      local.current={cols:Object.fromEntries(COLS.map(c=>[c,d[c]||[]])),config:d.config||null,precos:d.precos||null};
+      setData(local.current.cols);setConfig(local.current.config);setPrecos(local.current.precos);setLoaded(true);return;
+    }
+    if(be.status!=="ready")return;
+    const db=be.db,unsubs=[];let pend=COLS.length+2;
+    const done=()=>{pend--;if(pend<=0)setLoaded(true)};
+    for(const c of COLS){
+      let first=true;
+      if(c==="access_requests"&&!(be.me.isOwner||be.me.canEdit)){done();continue}
+      unsubs.push(db.collection(c).onSnapshot(s=>{setData(p=>({...p,[c]:s.docs.map(d=>({...(d.data()||{}),id:d.id}))}));if(first){first=false;done()}},()=>{if(first){first=false;done()}}));
+    }
+    let f1=true,f2=true;
+    unsubs.push(db.doc("meta/config").onSnapshot(s=>{setConfig(s.exists?s.data():null);if(f1){f1=false;done()}},()=>{if(f1){f1=false;done()}}));
+    unsubs.push(db.doc("meta/precos").onSnapshot(s=>{setPrecos(s.exists?s.data():null);if(f2){f2=false;done()}},()=>{if(f2){f2=false;done()}}));
+    const t=setTimeout(()=>setLoaded(true),6000);
+    return()=>{unsubs.forEach(u=>{try{u()}catch{}});clearTimeout(t)};
+  },[be.status]);
+
+  // nomes da equipe
+  useEffect(()=>{
+    if(be.status!=="ready")return;
+    const ids=[...new Set([...data.team.map(t=>t.id),...data.access_requests.map(r=>r.id),be.me.id])].filter(Boolean);
+    if(!ids.length)return;
+    be.user.profiles(ids).then(ps=>{const o={};for(const id of ids)o[id]=(ps&&ps[id]&&ps[id].name)||"";setNames(o)}).catch(()=>{});
+  },[be.status,data.team.length,data.access_requests.length]);
+
+  const persistLocal=()=>lsSet("elet_local",{...local.current.cols,config:local.current.config,precos:local.current.precos});
+  const wrap=async(fn,ok)=>{try{await fn();if(ok)toast(ok);return true}catch(e){console.error(e);toast(e&&e.code==="not_granted"?"Você não tem permissão para salvar isso.":"Não foi possível salvar: "+(e&&e.message||"erro"));return false}};
+
+  const api=useMemo(()=>{
+    if(be.status==="ready"){
+      const db=be.db;
+      return{
+        add:(c,o,ok)=>{const id=o.id||uid();return wrap(()=>db.doc(`${c}/${id}`).set(clean({...o,id})),ok).then(r=>r?id:null)},
+        set:(c,id,o,ok)=>wrap(()=>db.doc(`${c}/${id}`).set(clean({...o,id})),ok),
+        update:(c,id,p,ok)=>wrap(()=>db.doc(`${c}/${id}`).update(clean(p)),ok),
+        del:(c,id,ok)=>wrap(()=>db.doc(`${c}/${id}`).delete(),ok),
+        setMeta:(k,o,ok)=>wrap(()=>db.doc(`meta/${k}`).set(clean(o)),ok)
+      };
+    }
+    const L=()=>local.current;
+    const upd=(c,f)=>{L().cols={...L().cols,[c]:f(L().cols[c]||[])};setData(L().cols);persistLocal()};
+    return{
+      add:async(c,o,ok)=>{const id=o.id||uid();upd(c,a=>[...a,clean({...o,id})]);ok&&toast(ok);return id},
+      set:async(c,id,o,ok)=>{upd(c,a=>[...a.filter(x=>x.id!==id),clean({...o,id})]);ok&&toast(ok);return true},
+      update:async(c,id,p,ok)=>{upd(c,a=>a.map(x=>x.id===id?clean({...x,...p}):x));ok&&toast(ok);return true},
+      del:async(c,id,ok)=>{upd(c,a=>a.filter(x=>x.id!==id));ok&&toast(ok);return true},
+      setMeta:async(k,o,ok)=>{L()[k]=clean(o);k==="config"?setConfig(L().config):setPrecos(L().precos);persistLocal();ok&&toast(ok);return true}
+    };
+  },[be.status]);
+
+  // papel do usuário
+  const me=be.status==="ready"?be.me:{id:"local",name:"Você",isOwner:true,canEdit:true};
+  const membro=data.team.find(t=>t.id===me.id);
+  const admin=me.isOwner||me.canEdit;
+  const papel=admin?"patrao":(membro&&membro.active!==false?membro.role:null);
+  const cfg={...CONFIG_PADRAO,...(config||{})};
+  const custoHora=(num(cfg.folhaMensal)*(1+num(cfg.encargosPct)/100)+num(cfg.custosFixos))/Math.max(1,num(cfg.horasProdutivas));
+  const mats=data.materiais;
+  const pontos=(precos&&precos.pontos)||[];
+  const nome=id=>id===me.id?(names[id]||me.name||"Você"):(names[id]||"Pessoa da equipe");
+
+  const value={be,data,config:cfg,configSalva:!!config,precos,pontos,mats,api,toast,me,papel,admin,membro,custoHora,nome,loaded};
+  return html`<${Ctx.Provider} value=${value}>${children}${toastMsg&&html`<div class="toast" role="status">${toastMsg}</div>`}<//>`;
+}
+
+/* ============================== CÁLCULOS ============================== */
+function custoKit(p,mats){let s=0;for(const [mid,q] of (p.kit||[])){const m=mats.find(x=>x.id===mid);if(m)s+=num(m.custo)*num(q)}return s}
+function totaisProjeto(pj){const t={};for(const c of (pj.comodos||[]))for(const [k,q] of Object.entries(c.itens||{}))if(num(q))t[k]=(t[k]||0)+num(q);return t}
+function metragemEstimada(tot){
+  const g=k=>tot[k]||0;
+  const luzes=g("luz")+g("arand")+g("int1")+g("int2")+g("int3w")+g("int4w")+g("sens")+g("lumind");
+  const tugs=g("tug")+g("tug20")+g("rede")+g("tv")+g("camp")+g("tomind");
+  const tues=g("chuv")+g("ar")+g("tue")+g("motor");
+  const tot_=Object.entries(tot).filter(([k])=>!["qdc","dj1","dj2","dj3","dr","dps","padrao","aterr","qcm","eletcal"].includes(k)).reduce((a,[,v])=>a+v,0);
+  return{el34:Math.round(tot_*5),el1:tues?Math.round(tues*4):0,c15:Math.round(luzes*10),c25:Math.round(tugs*12),c4:0,c6:Math.round(tues*20),c10:0,c16:0};
+}
+function linhasDoProjeto(pj,ctx){
+  const {pontos,mats,config}=ctx;
+  const tot=totaisProjeto(pj);
+  const ind=pj.tipo==="industrial";
+  const linhas=[];
+  for(const p of pontos){
+    const q=tot[p.id];if(!q)continue;
+    const ck=custoKit(p,mats);
+    linhas.push({id:uid(),tipoId:p.id,desc:p.nome,unid:p.unid,qtd:q,mo:Math.round(num(p.mo)*(ind?num(config.fatorIndustrial):1)*100)/100,custoMat:ck,mat:Math.round(ck*(1+num(config.markupMatPct)/100)*100)/100,horas:num(p.horas)});
+  }
+  for(const k of Object.keys(tot))if(!pontos.find(p=>p.id===k))linhas.push({id:uid(),tipoId:k,desc:"Item não cadastrado: "+k,unid:"un",qtd:tot[k],mo:0,custoMat:0,mat:0,horas:0});
+  const med=pj.metragem||{};const temMed=Object.values(med).some(v=>num(v)>0);
+  const mt=temMed?med:metragemEstimada(tot);
+  for(const [mid,lab] of METRAGENS){
+    const q=num(mt[mid]);if(!q)continue;
+    const m=mats.find(x=>x.id===mid);const c=m?num(m.custo):0;
+    linhas.push({id:uid(),matId:mid,desc:lab+(temMed?"":" (estimado)"),unid:"m",qtd:q,mo:0,custoMat:c,mat:Math.round(c*(1+num(config.markupMatPct)/100)*100)/100,horas:0});
+  }
+  return linhas;
+}
+function calcOrc(o,custoHora){
+  const L=o.linhas||[];
+  const mo=L.reduce((a,l)=>a+num(l.qtd)*num(l.mo),0);
+  const mat=o.clienteMaterial?0:L.reduce((a,l)=>a+num(l.qtd)*num(l.mat),0);
+  const custoMat=o.clienteMaterial?0:L.reduce((a,l)=>a+num(l.qtd)*num(l.custoMat),0);
+  const horas=L.reduce((a,l)=>a+num(l.qtd)*num(l.horas),0);
+  const desloc=num(o.deslocamento),desc=num(o.desconto);
+  const subtotal=mo+mat+desloc-desc;
+  const imposto=subtotal*num(o.impostoPct)/100;
+  const custoMO=horas*custoHora;
+  const custo=custoMO+custoMat+desloc;
+  const lucro=subtotal-imposto-custo;
+  const margem=subtotal>0?lucro/subtotal*100:0;
+  const moHora=horas>0?mo/horas:0;
+  return{mo,mat,custoMat,horas,desloc,desc,subtotal,imposto,custoMO,custo,lucro,margem,moHora,total:subtotal};
+}
+function saudeOrc(o,c,cfg,custoHora){
+  const a=[];
+  if(!(o.linhas||[]).length)a.push(["bad","Orçamento sem itens."]);
+  if(c.horas>0&&c.moHora<custoHora)a.push(["bad",`A mão de obra está saindo a ${brl(c.moHora)} por hora trabalhada, abaixo do custo da sua hora (${brl(custoHora)}). Cada hora nessa obra dá prejuízo.`]);
+  if(c.margem<0)a.push(["bad",`Margem negativa (${n2(c.margem)}%). Esse preço não paga a obra.`]);
+  else if(c.margem<num(cfg.margemMin))a.push(["warn",`Margem de ${n2(c.margem)}%, abaixo do mínimo definido (${n2(cfg.margemMin)}%).`]);
+  if(!num(o.impostoPct))a.push(["warn","Imposto zerado. Se emite nota, o imposto sai do seu lucro."]);
+  if(!num(o.deslocamento))a.push(["warn","Sem deslocamento. Combustível e tempo de ida e volta ficam por sua conta."]);
+  if((o.linhas||[]).some(l=>/estimado/.test(l.desc||"")))a.push(["warn","Metragem de cabo e eletroduto estimada pela média. Meça no projeto (passo 5) para fechar o preço certo."]);
+  if((o.linhas||[]).some(l=>num(l.qtd)>0&&!num(l.mo)&&!num(l.mat)))a.push(["warn","Há itens com preço zero."]);
+  if(!a.length)a.push(["ok","Preço saudável: cobre a hora da equipe, o material, o imposto e deixa margem acima do mínimo."]);
+  return a;
+}
+function gerarTarefas(pj,pontos){
+  const tarefas=[];
+  const P=id=>pontos.find(p=>p.id===id);
+  const grupoQ=id=>{const p=P(id);return p&&p.grupo==="Quadro"};
+  for(const c of (pj.comodos||[])){
+    const itens=Object.entries(c.itens||{}).filter(([k,q])=>num(q)>0&&!grupoQ(k)&&k!=="qcm");
+    if(!itens.length)continue;
+    const desc=itens.map(([k,q])=>`${q}× ${(P(k)||{nome:k}).nome}`).join(", ");
+    const h=itens.reduce((a,[k,q])=>a+num(q)*num((P(k)||{}).horas),0);
+    for(const e of ["infra","enfiacao","acabamento"]){
+      const E=ETAPAS_OS.find(x=>x.id===e);
+      tarefas.push({id:uid(),etapa:e,comodo:c.nome,desc:`${c.nome}: ${E.t.toLowerCase()} (${desc})`,horas:Math.round(h*E.frac*10)/10,resp:"",feito:false});
+    }
+  }
+  const tot=totaisProjeto(pj);
+  const q=Object.entries(tot).filter(([k])=>grupoQ(k)||k==="qcm");
+  if(q.length){
+    const h=q.reduce((a,[k,v])=>a+v*num((P(k)||{}).horas),0);
+    tarefas.push({id:uid(),etapa:"quadro",comodo:"Quadro",desc:"Montar e ligar o quadro: "+q.map(([k,v])=>`${v}× ${(P(k)||{nome:k}).nome}`).join(", "),horas:Math.round(h*10)/10,resp:"",feito:false});
+    tarefas.push({id:uid(),etapa:"quadro",comodo:"Quadro",desc:"Identificar circuitos no quadro (etiquetas conforme quadro de cargas)",horas:0.5,resp:"",feito:false});
+  }
+  tarefas.push({id:uid(),etapa:"testes",comodo:"Geral",desc:"Testar isolamento, polaridade das tomadas, aterramento e botão de teste do DR",horas:1.5,resp:"",feito:false});
+  tarefas.push({id:uid(),etapa:"testes",comodo:"Geral",desc:"Entregar ao cliente: mostrar o quadro, explicar circuitos e tirar fotos finais",horas:0.5,resp:"",feito:false});
+  return tarefas;
+}
+
+/* ============================== COMPONENTES BASE ============================== */
+function Num({value,onChange,step=1,min=0,id}){
+  const [v,setV]=useState(String(value??""));
+  useEffect(()=>{if(num(v)!==num(value))setV(String(value??""))},[value]);
+  return html`<span class="stepper"><button type="button" aria-label="Diminuir" onClick=${()=>onChange(Math.max(min,num(value)-step))}>−</button><input id=${id} inputmode="decimal" value=${v} onChange=${e=>{setV(e.target.value);onChange(num(e.target.value))}}/><button type="button" aria-label="Aumentar" onClick=${()=>onChange(num(value)+step)}>+</button></span>`;
+}
+function F({label,children,style}){return html`<label class="f" style=${style}>${label}${children}</label>`}
+function Inp({value,onChange,type="text",placeholder,id,...r}){return html`<input class="i" id=${id} type=${type} value=${value??""} placeholder=${placeholder} onChange=${e=>onChange(type==="number"?num(e.target.value):e.target.value)} ...${r}/>`}
+function Sel({value,onChange,opts,id}){return html`<select class="i" id=${id} value=${value??""} onChange=${e=>onChange(e.target.value)}>${opts.map(o=>Array.isArray(o)?html`<option value=${o[0]}>${o[1]}</option>`:html`<option value=${o}>${o}</option>`)}</select>`}
+function Modal({title,onClose,children,actions}){
+  useEffect(()=>{const k=e=>e.key==="Escape"&&onClose();addEventListener("keydown",k);return()=>removeEventListener("keydown",k)},[]);
+  return html`<div class="modal-bg" onMouseDown=${e=>e.target===e.currentTarget&&onClose()}><div class="modal" role="dialog" aria-label=${title}>
+    <div class="modal-h"><h2 style=${{flex:1,minWidth:0}}>${title}</h2>${actions}<button class="btn ghost" onClick=${onClose} aria-label="Fechar">✕</button></div>
+    <div class="modal-b">${children}</div></div></div>`;
+}
+function Confirm({text,onYes,onNo,yes="Excluir"}){
+  return html`<div class="modal-bg"><div class="modal" style=${{width:"min(420px,100%)",marginTop:"20vh"}}><div class="modal-b"><p style=${{margin:0}}>${text}</p><div class="row" style=${{justifyContent:"flex-end"}}><button class="btn" onClick=${onNo}>Cancelar</button><button class="btn pri" onClick=${onYes}>${yes}</button></div></div></div></div>`;
+}
+function Empty({title,text,children}){return html`<div class="empty"><h3>${title}</h3><p style=${{margin:0,maxWidth:460}}>${text}</p>${children}</div>`}
+function Tabs({tabs,value,onChange}){return html`<div class="tabs" role="tablist">${tabs.map(([k,l])=>html`<button class="tab" role="tab" aria-selected=${value===k} onClick=${()=>onChange(k)}>${l}</button>`)}</div>`}
+const etapaOS=id=>ETAPAS_OS.find(e=>e.id===id)||ETAPAS_OS[0];
+
+/* ============================== PDF (pdf.js) ============================== */
+if(window.pdfjsLib){try{pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"}catch{}}
+async function abrirPdf(buf){return await pdfjsLib.getDocument({data:buf,isEvalSupported:false}).promise}
+async function renderPagina(pdf,n,maxLado){
+  const pg=await pdf.getPage(n);const v0=pg.getViewport({scale:1});
+  const sc=maxLado/Math.max(v0.width,v0.height);const v=pg.getViewport({scale:sc});
+  const cv=document.createElement("canvas");cv.width=Math.round(v.width);cv.height=Math.round(v.height);
+  const cx=cv.getContext("2d");cx.fillStyle="#fff";cx.fillRect(0,0,cv.width,cv.height);
+  await pg.render({canvasContext:cx,viewport:v}).promise;return cv;
+}
+const canvasBlob=(cv,q=.85)=>new Promise(r=>cv.toBlob(b=>r(b),"image/jpeg",q));
+async function arquivoParaPaginas(file,onProg){
+  const out=[];
+  if(file.type==="application/pdf"||/\.pdf$/i.test(file.name)){
+    if(!window.pdfjsLib)throw new Error("Leitor de PDF não carregou. Recarregue a página.");
+    const pdf=await abrirPdf(await file.arrayBuffer());
+    const N=Math.min(pdf.numPages,20);
+    for(let i=1;i<=N;i++){onProg&&onProg(`Lendo página ${i} de ${N}…`);const big=await renderPagina(pdf,i,2200);const blob=await canvasBlob(big);out.push({n:i,blob,url:URL.createObjectURL(blob),w:big.width,h:big.height})}
+  }else{
+    const blob=file;const url=URL.createObjectURL(blob);out.push({n:1,blob,url})
+  }
+  return out;
+}
+
+/* ============================== IA ============================== */
+async function lerComIA(paginas,ctx,dica,onProg){
+  const s=await window.claude?.use?.("sample");
+  if(!s)throw {code:"unavailable",message:"A leitura por IA não está disponível nesta visualização. Use a contagem manual."};
+  const lim=await s.limits().catch(()=>null);
+  const max=(lim&&lim.images&&lim.images.maxCount)||0;
+  if(!max)throw {code:"images_unavailable",message:"Este acesso não permite enviar imagens para a IA. Use a contagem manual."};
+  const imgs=paginas.slice(0,max).map(p=>p.blob);
+  const cat=ctx.pontos.map(p=>`${p.id} = ${p.nome} (${p.grupo})`).join("\n");
+  const prompt=`Você é um eletricista projetista brasileiro lendo um PROJETO ELÉTRICO (pranchas em imagem). Siga este método, na ordem:
+1) Carimbo: cliente, endereço, escala, revisão, tensão, área.
+2) Legenda: identifique como esta prancha desenha cada símbolo (NBR 5444 ou legenda própria). Use a legenda da prancha como verdade.
+3) Quadro de cargas: liste cada circuito (número, descrição, potência W, disjuntor A, bitola mm², polos).
+4) Planta baixa: conte, CÔMODO POR CÔMODO, cada ponto usando SOMENTE os ids do catálogo abaixo.
+5) Metragem: se houver escala e traçado de eletrodutos, estime metros de eletroduto e cabos por bitola; se não der para medir, deixe 0.
+6) Quadro/unifilar: conte disjuntores por polos, DR, DPS. Coloque esses itens num cômodo chamado "Quadro".
+7) Conferência: compare a soma da planta com o quadro de cargas e liste divergências e dúvidas em "alertas".
+
+Catálogo de ids (use exatamente estes ids):
+${cat}
+
+Regras da casa (o patrão definiu, obedeça):
+${ctx.config.regras||"(nenhuma)"}
+${dica?"\nObservação de quem enviou: "+dica:""}
+
+Seja conservador: se não tiver certeza de um símbolo, conte na categoria mais provável e escreva a dúvida em "alertas". Não invente cômodos que não aparecem.
+Responda SOMENTE com JSON neste formato:
+{"carimbo":{"cliente":"","endereco":"","escala":"","revisao":"","tensao":"","area":""},
+ "tipo":"residencial|industrial",
+ "comodos":[{"nome":"Sala","itens":{"tug":4,"luz":2}}],
+ "circuitos":[{"num":"1","desc":"Iluminação social","potencia":800,"disjuntor":10,"bitola":1.5,"polos":1}],
+ "metragem":{"el34":0,"el1":0,"c15":0,"c25":0,"c4":0,"c6":0,"c10":0,"c16":0},
+ "alertas":["..."],
+ "confianca":"alta|média|baixa"}`;
+  onProg&&onProg(`Analisando ${imgs.length} página(s) com IA… isso leva de 30 s a 2 min.`);
+  const r=await s.json(prompt,{images:imgs,modelTier:"complex"});
+  return r;
+}
+
+/* ============================== APP / NAVEGAÇÃO ============================== */
+const MENU=[
+ {g:"Hoje"},
+ {id:"painel",t:"Painel",r:["patrao","escritorio"]},
+ {id:"tarefas",t:"Minhas tarefas",r:["patrao","escritorio","eletricista","ajudante"],b:"tarefas"},
+ {g:"Obra"},
+ {id:"projetos",t:"Leitura de projeto",r:["patrao","escritorio","eletricista"]},
+ {id:"guia",t:"Como ler um projeto",r:["patrao","escritorio","eletricista","ajudante"]},
+ {id:"os",t:"Ordens de serviço",r:["patrao","escritorio","eletricista","ajudante"]},
+ {id:"estoque",t:"Almoxarifado",r:["patrao","escritorio","eletricista","ajudante"],b:"estoque"},
+ {g:"Comercial"},
+ {id:"orcamentos",t:"Precificação",r:["patrao","escritorio"]},
+ {id:"pipeline",t:"Funil de vendas",r:["patrao","escritorio"]},
+ {id:"financeiro",t:"Financeiro",r:["patrao","escritorio"]},
+ {id:"cadastros",t:"Clientes e fornecedores",r:["patrao","escritorio"]},
+ {g:"Ajustes"},
+ {id:"precos",t:"Preços e custos",r:["patrao"]},
+ {id:"equipe",t:"Equipe e acessos",r:["patrao"],b:"pedidos"}
+];
+const PAGES={};
+
+function App(){
+  const S=useS();
+  const [pg,setPg]=useState(()=>{const h=location.hash.slice(1);return h||lsGet("elet_pg","")||""});
+  const [arg,setArg]=useState(null);
+  useEffect(()=>{const f=()=>{const h=location.hash.slice(1);if(h)setPg(h)};addEventListener("hashchange",f);return()=>removeEventListener("hashchange",f)},[]);
+  const go=useCallback((p,a=null)=>{setPg(p);setArg(a);lsSet("elet_pg",p);try{history.replaceState(null,"","#"+p)}catch{}document.querySelector(".main")?.scrollTo(0,0)},[]);
+  if(S.be.status==="loading"||(!S.loaded&&S.be.status==="ready"))return html`<div class="gate"><div class="card"><h2>Carregando…</h2><p class="muted">Buscando os dados da empresa.</p></div></div>`;
+  if(S.be.status==="signedout")return html`<div class="gate"><div class="card"><h2>Entre na sua conta</h2><p class="muted">Faça login no claude.ai para acessar o sistema da empresa.</p></div></div>`;
+  if(!S.papel)return html`<${PedirAcesso}/>`;
+  const itens=MENU.filter(m=>m.g||m.r.includes(S.papel));
+  const vis=itens.filter(m=>!m.g);
+  const atual=vis.find(m=>m.id===pg)?pg:(vis[0]&&vis[0].id);
+  const minhas=S.data.os.filter(o=>o.etapa!=="concluida").flatMap(o=>(o.tarefas||[]).filter(t=>!t.feito&&t.resp===S.me.id)).length;
+  const baixo=S.data.materiais.filter(m=>num(m.minimo)>0&&num(m.estoque)<num(m.minimo)).length;
+  const bdg={tarefas:minhas,estoque:baixo,pedidos:S.data.access_requests.length};
+  const Page=PAGES[atual]||(()=>null);
+  const grupos=[];let cur=null;
+  for(const m of itens){if(m.g){cur={g:m.g,itens:[]};grupos.push(cur)}else cur&&cur.itens.push(m)}
+  return html`<div class="app">
+    <nav class="rail" aria-label="Menu">
+      <div class="brand"><b>${S.config.empresa||"Elétrica"}</b><span>Gestão de obras elétricas</span></div>
+      ${grupos.filter(g=>g.itens.length).map(g=>html`<${React.Fragment} key=${g.g}><div class="navgrp">${g.g}</div>
+        ${g.itens.map(m=>html`<button key=${m.id} class="nav" aria-current=${atual===m.id?"page":undefined} onClick=${()=>go(m.id)}>${m.t}${m.b&&bdg[m.b]?html`<span class="badge">${bdg[m.b]}</span>`:null}</button>`)}<//>`)}
+      <div class="me">${S.nome(S.me.id)}<br/><span style=${{opacity:.7}}>${PAPEIS[S.papel]}</span>${S.be.status==="local"?html`<br/><span class="pill warn" style=${{marginTop:6}}>Modo local</span>`:null}</div>
+    </nav>
+    <main class="main"><div class="page">
+      ${S.be.status==="local"?html`<div class="alert warn"><b>Modo local.</b> Os dados ficam só neste navegador. Abra pelo link do claude.ai, logado, para usar o banco compartilhado com a equipe.</div>`:null}
+      <${Page} go=${go} arg=${arg}/>
+    </div></main>
+  </div>`;
+}
+
+function PedirAcesso(){
+  const S=useS();const [env,setEnv]=useState(false);
+  const pedido=S.data.access_requests.find(r=>r.id===S.me.id);
+  useEffect(()=>{
+    if(S.be.status!=="ready")return;
+    S.be.db.doc(`access_requests/${S.me.id}`).get().then(s=>{if(s.exists)setEnv(true)}).catch(()=>{});
+  },[]);
+  const pedir=async()=>{try{await S.be.db.doc(`access_requests/${S.me.id}`).set({id:S.me.id,requestedAt:new Date().toISOString()});setEnv(true)}catch(e){S.toast("Não foi possível enviar o pedido. Peça ao patrão para compartilhar o link com permissão de edição.")}};
+  const inativo=S.membro&&S.membro.active===false;
+  return html`<div class="gate"><div class="card">
+    <h2>${inativo?"Acesso pausado":"Peça acesso ao sistema"}</h2>
+    <p class="muted" style=${{margin:0}}>${inativo?"Seu acesso foi pausado pelo patrão. Fale com ele para reativar.":"Este é o sistema interno da empresa. O patrão precisa liberar seu acesso e definir sua função (eletricista, ajudante ou escritório)."}</p>
+    ${!inativo&&(env||pedido?html`<div class="alert ok">Pedido enviado. Assim que for liberado, esta página abre sozinha.</div>`:html`<button class="btn pri" onClick=${pedir}>Pedir acesso</button>`)}
+  </div></div>`;
+}
+
+/* ============================== PAINEL ============================== */
+PAGES.painel=function Painel({go}){
+  const S=useS();const {orcamentos,os,financeiro,materiais,projetos}=S.data;
+  const mes=hoje().slice(0,7);
+  const abertos=orcamentos.filter(o=>["contato","visita","orcamento","negociacao"].includes(o.etapa||"orcamento"));
+  const valAberto=abertos.reduce((a,o)=>a+calcOrc(o,S.custoHora).total,0);
+  const fechMes=orcamentos.filter(o=>o.etapa==="aprovado"&&(o.aprovadoEm||"").slice(0,7)===mes);
+  const valFech=fechMes.reduce((a,o)=>a+calcOrc(o,S.custoHora).total,0);
+  const margens=fechMes.map(o=>calcOrc(o,S.custoHora).margem);
+  const osAtivas=os.filter(o=>o.etapa!=="concluida");
+  const receber=financeiro.filter(f=>f.tipo==="entrada"&&f.status!=="pago").reduce((a,f)=>a+num(f.valor),0);
+  const pagar=financeiro.filter(f=>f.tipo==="saida"&&f.status!=="pago").reduce((a,f)=>a+num(f.valor),0);
+  const vencidos=financeiro.filter(f=>f.status!=="pago"&&f.venc&&f.venc<hoje());
+  const baixo=materiais.filter(m=>num(m.minimo)>0&&num(m.estoque)<num(m.minimo));
+  const semConf=projetos.filter(p=>p.status!=="conferido");
+  return html`
+  <div class="phead"><div><h1>Painel</h1><p>O que está em andamento hoje e onde está o dinheiro.</p></div>
+    <div class="row"><button class="btn" onClick=${()=>go("projetos")}>Ler projeto</button><button class="btn pri" onClick=${()=>go("orcamentos","novo")}>Novo orçamento</button></div></div>
+  ${!S.pontos.length&&html`<div class="alert info"><div><b>Primeiro passo:</b> cadastre a tabela de preços por ponto e o custo da hora da equipe. Sem isso o sistema não consegue precificar. <button class="btn sm" style=${{marginLeft:6}} onClick=${()=>go("precos")}>Abrir Preços e custos</button></div></div>`}
+  <div class="grid g4">
+    <div class="card kpi"><span>Em negociação</span><b>${brl(valAberto)}</b><small class="muted">${abertos.length} orçamento(s)</small></div>
+    <div class="card kpi"><span>Fechado no mês</span><b>${brl(valFech)}</b><small class="muted">${fechMes.length} obra(s)${margens.length?` · margem média ${n2(margens.reduce((a,b)=>a+b,0)/margens.length)}%`:""}</small></div>
+    <div class="card kpi"><span>A receber</span><b>${brl(receber)}</b><small class="muted">a pagar ${brl(pagar)}</small></div>
+    <div class="card kpi"><span>Custo da hora</span><b>${brl(S.custoHora)}</b><small class="muted">equipe + fixos ÷ horas produtivas</small></div>
+  </div>
+  <div class="grid g2">
+    <div class="card col"><div class="row" style=${{justifyContent:"space-between"}}><h3>Obras em andamento</h3><button class="btn sm" onClick=${()=>go("os")}>Ver todas</button></div>
+      ${osAtivas.length?osAtivas.slice(0,6).map(o=>{const t=o.tarefas||[];const f=t.filter(x=>x.feito).length;const E=etapaOS(o.etapa);
+        return html`<div class="row" key=${o.id} style=${{flexWrap:"nowrap"}}><span class="wire" style=${{background:E.c}}></span><div style=${{flex:1,minWidth:0}}><b>${o.numero}</b> · ${o.cliente}<div class="small muted">${E.t} · ${f}/${t.length} tarefas</div><div class="bar"><i style=${{width:(t.length?f/t.length*100:0)+"%"}}></i></div></div></div>`}):html`<p class="muted" style=${{margin:0}}>Nenhuma OS aberta. Elas nascem quando um orçamento é fechado.</p>`}
+    </div>
+    <div class="card col"><h3>Precisa de atenção</h3>
+      ${semConf.length?html`<div class="alert warn"><div><b>${semConf.length} projeto(s) lido(s) sem conferência do patrão.</b> Só projeto conferido gera tarefas.</div></div>`:null}
+      ${vencidos.length?html`<div class="alert bad"><div><b>${vencidos.length} lançamento(s) vencido(s)</b> no financeiro, total ${brl(vencidos.reduce((a,f)=>a+num(f.valor),0))}.</div></div>`:null}
+      ${baixo.length?html`<div class="alert warn"><div><b>${baixo.length} material(is) abaixo do mínimo:</b> ${baixo.slice(0,4).map(m=>m.nome).join(", ")}${baixo.length>4?"…":""}</div></div>`:null}
+      ${!semConf.length&&!vencidos.length&&!baixo.length?html`<div class="alert ok">Tudo em ordem por aqui.</div>`:null}
+    </div>
+  </div>`;
+};
+
+/* ============================== MINHAS TAREFAS ============================== */
+PAGES.tarefas=function Tarefas({go}){
+  const S=useS();
+  const [todas,setTodas]=useState(false);
+  const lista=[];
+  for(const o of S.data.os.filter(o=>o.etapa!=="concluida"))for(const t of (o.tarefas||[]))if(todas||t.resp===S.me.id)lista.push({o,t});
+  const pend=lista.filter(x=>!x.t.feito);const feitas=lista.filter(x=>x.t.feito);
+  const marcar=(o,t)=>{
+    const tarefas=o.tarefas.map(x=>x.id===t.id?{...x,feito:!x.feito,feitoPor:S.me.id,feitoEm:new Date().toISOString()}:x);
+    S.api.update("os",o.id,{tarefas},t.feito?"Tarefa reaberta.":"Tarefa concluída.");
+  };
+  const Row=({o,t})=>{const E=etapaOS(t.etapa);return html`<div class=${"task"+(t.feito?" done":"")} key=${t.id}>
+    <input type="checkbox" id=${"tk"+t.id} checked=${!!t.feito} onChange=${()=>marcar(o,t)}/>
+    <span class="wire" style=${{background:E.c}}></span>
+    <label for=${"tk"+t.id} style=${{flex:1,minWidth:0,cursor:"pointer"}}><div class="t">${t.desc}</div>
+      <div class="small muted">${o.numero} · ${o.cliente}${o.endereco?" · "+o.endereco:""} · ${E.t}${t.horas?` · ~${n2(t.horas)} h`:""}${todas?` · ${t.resp?S.nome(t.resp):"sem responsável"}`:""}</div></label>
+    <button class="btn sm" onClick=${()=>go("os",o.id)}>Abrir OS</button></div>`};
+  return html`<div class="phead"><div><h1>Minhas tarefas</h1><p>O que você tem para fazer nas obras. Marque ao terminar: o patrão vê na hora.</p></div>
+    ${S.admin&&html`<label class="chk"><input type="checkbox" checked=${todas} onChange=${e=>setTodas(e.target.checked)}/> Ver tarefas de toda a equipe</label>`}</div>
+  <div class="card">${pend.length?pend.map(x=>html`<${Row} key=${x.t.id} ...${x}/>`):html`<${Empty} title="Nada pendente" text=${todas?"Nenhuma tarefa aberta nas obras.":"Nenhuma tarefa atribuída a você agora. Quando o patrão distribuir o serviço de uma OS, ela aparece aqui."}/>`}</div>
+  ${feitas.length?html`<details class="card"><summary style=${{cursor:"pointer"}}><b>Concluídas (${feitas.length})</b></summary>${feitas.map(x=>html`<${Row} key=${x.t.id} ...${x}/>`)}</details>`:null}`;
+};
+
+/* ============================== GUIA: COMO LER UM PROJETO ============================== */
+const SIMBOLOS=[
+ ["Ponto de luz no teto",html`<svg viewBox="0 0 52 40"><circle cx="26" cy="20" r="11"/><line x1="18" y1="12" x2="34" y2="28"/><line x1="34" y1="12" x2="18" y2="28"/></svg>`,"Círculo no teto. Ao lado vem: letra do comando (a, b…), potência em W e número do circuito. Ex.: a · 100 · 2"],
+ ["Arandela (luz na parede)",html`<svg viewBox="0 0 52 40"><line x1="10" y1="30" x2="42" y2="30"/><path d="M16 30a10 10 0 0 1 20 0"/></svg>`,"Meio círculo encostado na parede."],
+ ["Interruptor simples",html`<svg viewBox="0 0 52 40"><circle cx="26" cy="20" r="9"/><text x="23" y="24">S</text></svg>`,"Círculo pequeno com a letra do comando. 2 letras = 2 teclas."],
+ ["Interruptor paralelo",html`<svg viewBox="0 0 52 40"><circle cx="26" cy="20" r="11"/><text x="17" y="24">3W</text></svg>`,"Three-way: liga a mesma luz de 2 lugares (escada, corredor). Sempre em par."],
+ ["Interruptor intermediário",html`<svg viewBox="0 0 52 40"><circle cx="26" cy="20" r="11"/><text x="17" y="24">4W</text></svg>`,"Four-way: fica entre dois paralelos, para 3 ou mais pontos de comando."],
+ ["Tomada baixa (≈30 cm)",html`<svg viewBox="0 0 52 40"><path d="M14 30 L26 10 L38 30 Z"/></svg>`,"Triângulo vazio. Altura e preenchimento variam: confira a legenda da prancha."],
+ ["Tomada média (≈1,10 m)",html`<svg viewBox="0 0 52 40"><path d="M14 30 L26 10 L38 30 Z"/><path class="fill" d="M20 30 L26 20 L32 30 Z"/></svg>`,"Triângulo meio cheio. Comum em bancada de cozinha e banheiro."],
+ ["Tomada alta (≈2,00 m)",html`<svg viewBox="0 0 52 40"><path class="fill" d="M14 30 L26 10 L38 30 Z"/></svg>`,"Triângulo cheio. Comum para ar-condicionado e TV na parede."],
+ ["Tomada de uso específico (TUE)",html`<svg viewBox="0 0 52 40"><path d="M14 30 L26 10 L38 30 Z"/><text x="20" y="38">TUE</text></svg>`,"Chuveiro, ar, forno, cooktop. Sempre com circuito exclusivo e potência anotada."],
+ ["Quadro de distribuição",html`<svg viewBox="0 0 52 40"><rect x="10" y="10" width="32" height="20"/><path class="fill" d="M10 10 L42 30 L42 10 Z"/></svg>`,"Retângulo hachurado. De onde saem todos os circuitos."],
+ ["Eletroduto embutido",html`<svg viewBox="0 0 52 40"><line x1="6" y1="20" x2="46" y2="20"/></svg>`,"Linha contínua: no teto/laje. Tracejada: no piso. Ao lado, o diâmetro (ex.: Ø 3/4\")."],
+ ["Fios dentro do eletroduto",html`<svg viewBox="0 0 52 40"><line x1="4" y1="20" x2="48" y2="20"/><line x1="14" y1="12" x2="14" y2="28"/><line x1="22" y1="12" x2="18" y2="28"/><line x1="30" y1="12" x2="30" y2="28"/><line x1="38" y1="12" x2="38" y2="20"/></svg>`,"Tracinhos sobre o eletroduto: cada um é um fio. O formato diz se é fase, neutro, retorno ou terra (veja a legenda)."]
+];
+PAGES.guia=function Guia({go}){
+  const S=useS();
+  return html`<div class="phead"><div><h1>Como ler um projeto elétrico</h1><p>O método que o sistema usa, em 7 passos. Serve para treinar a equipe e para conferir o que a IA leu. A ordem importa: quem pula direto para a planta erra a contagem.</p></div>
+    <button class="btn pri" onClick=${()=>go("projetos","novo")}>Ler um projeto agora</button></div>
+  <div class="grid g2" style=${{alignItems:"start"}}>
+    <div class="card"><h2 style=${{marginBottom:6}}>Os 7 passos</h2><div class="steps">
+      ${PASSOS.map((p,i)=>html`<div class="step" key=${p.id}><span class="n">${i+1}</span><div><h3>${p.t}</h3><p style=${{margin:"4px 0 0"}} class="muted">${p.d}</p></div></div>`)}
+    </div></div>
+    <div class="col">
+      <div class="card"><h2>Símbolos mais comuns</h2><p class="small muted" style=${{margin:"4px 0 6px"}}>Base: NBR 5444 (cancelada em 2014, mas ainda é o que a maioria dos projetistas usa). A legenda da prancha sempre manda.</p>
+        ${SIMBOLOS.map(([n,svg,d])=>html`<div class="sym" key=${n}>${svg}<div><b>${n}</b><div class="small muted">${d}</div></div></div>`)}</div>
+      <div class="card col"><h2>Contas rápidas</h2>
+        <div class="small"><b>Metro na planta</b> = medida na régua (cm) × escala ÷ 100. Em 1:50, 4 cm na régua = 2 m de eletroduto.</div>
+        <div class="small"><b>Cabo de um trecho</b> = metros de eletroduto × nº de fios + descidas + 10% de sobra.</div>
+        <div class="small"><b>Descida</b> = pé-direito (≈2,80 m) − altura da caixa. Tomada baixa ≈2,50 m de descida; interruptor ≈1,50 m.</div>
+        <div class="small"><b>Circuito exclusivo</b> para todo aparelho acima de 10A (chuveiro, ar, forno), conforme NBR 5410.</div>
+      </div>
+      <div class="card col"><h2>Regras da casa</h2>
+        ${S.config.regras?html`<pre style=${{whiteSpace:"pre-wrap",margin:0,font:"inherit"}}>${S.config.regras}</pre>`:html`<p class="muted small" style=${{margin:0}}>O jeito do patrão ler projeto ainda não foi escrito. Cada vez que ele corrige a leitura da IA, o sistema pergunta o porquê e guarda aqui. ${S.admin?"Também dá para escrever direto em Preços e custos → Parâmetros.":""}</p>`}
+      </div>
+    </div>
+  </div>`;
+};
+
+/* ============================== LEITURA DE PROJETO ============================== */
+PAGES.projetos=function Projetos({go,arg}){
+  const S=useS();
+  const [aberto,setAberto]=useState(arg==="novo"?"novo":(arg||null));
+  const [del,setDel]=useState(null);
+  useEffect(()=>{if(arg)setAberto(arg)},[arg]);
+  const lista=[...S.data.projetos].sort((a,b)=>(b.criadoEm||"").localeCompare(a.criadoEm||""));
+  return html`<div class="phead"><div><h1>Leitura de projeto</h1><p>Envie a prancha em PDF. A IA faz a primeira leitura seguindo os 7 passos; o patrão confere, corrige e libera. Projeto conferido vira orçamento e tarefas para a equipe.</p></div>
+    <button class="btn pri" onClick=${()=>setAberto("novo")}>Novo projeto</button></div>
+  ${lista.length?html`<div class="tbl-wrap"><table><thead><tr><th>Projeto</th><th>Cliente</th><th>Tipo</th><th class="r">Pontos</th><th>Situação</th><th></th></tr></thead><tbody>
+    ${lista.map(p=>{const t=totaisProjeto(p);const tot=Object.values(t).reduce((a,b)=>a+b,0);const pass=PASSOS.filter(x=>(p.passos||{})[x.id]).length;
+      return html`<tr key=${p.id}><td><b>${p.nome||"Sem nome"}</b><div class="small muted">${dataBR((p.criadoEm||"").slice(0,10))}${p.arquivo?" · "+p.arquivo:""}</div></td><td>${p.cliente||"—"}</td><td>${p.tipo==="industrial"?"Industrial":"Residencial / predial"}</td><td class="r num">${tot}</td>
+      <td>${p.status==="conferido"?html`<span class="pill ok">Conferido</span>`:html`<span class="pill warn">${pass}/7 passos</span>`}</td>
+      <td class="r"><div class="row" style=${{justifyContent:"flex-end",flexWrap:"nowrap"}}><button class="btn sm" onClick=${()=>setAberto(p.id)}>Abrir</button>${S.admin&&html`<button class="btn sm ghost danger" onClick=${()=>setDel(p)}>Excluir</button>`}</div></td></tr>`})}
+  </tbody></table></div>`:html`<${Empty} title="Nenhum projeto lido ainda" text="Comece enviando o PDF de um projeto elétrico. Sem PDF, dá para criar o projeto e contar os pontos à mão, cômodo por cômodo."><button class="btn pri" onClick=${()=>setAberto("novo")}>Ler o primeiro projeto</button><//>`}
+  ${aberto&&html`<${EditorProjeto} id=${aberto} onClose=${()=>setAberto(null)} go=${go}/>`}
+  ${del&&html`<${Confirm} text=${`Excluir o projeto "${del.nome}"? Orçamentos já gerados continuam salvos.`} onNo=${()=>setDel(null)} onYes=${()=>{S.api.del("projetos",del.id,"Projeto excluído.");setDel(null)}}/>`}`;
+};
+
+function EditorProjeto({id,onClose,go}){
+  const S=useS();
+  const salvo=id!=="novo"&&S.data.projetos.find(p=>p.id===id);
+  const [pj,setPj]=useState(()=>salvo?JSON.parse(JSON.stringify(salvo)):{id:uid(),nome:"",cliente:"",tipo:"residencial",carimbo:{},comodos:[],circuitos:[],metragem:{},passos:{},alertas:[],status:"rascunho",criadoEm:new Date().toISOString()});
+  const [paginas,setPaginas]=useState([]);
+  const [sel,setSel]=useState([]);
+  const [ver,setVer]=useState(null);
+  const [zoom,setZoom]=useState(1);
+  const [prog,setProg]=useState("");
+  const [erro,setErro]=useState("");
+  const [dica,setDica]=useState("");
+  const [tab,setTab]=useState("planta");
+  const [dirty,setDirty]=useState(id==="novo");
+  const [conferir,setConferir]=useState(false);
+  const fileRef=useRef(null);
+  const set=p=>{setPj(x=>({...x,...p}));setDirty(true)};
+  const passo=(k,v)=>set({passos:{...pj.passos,[k]:v}});
+
+  // abrir prancha salva
+  useEffect(()=>{
+    if(!salvo||!salvo.assetId||paginas.length)return;
+    (async()=>{try{setProg("Abrindo a prancha salva…");const r=await fetch("/_blob/"+salvo.assetId);if(!r.ok)throw 0;const b=await r.blob();const f=new File([b],salvo.arquivo||"projeto.pdf",{type:b.type||"application/pdf"});const ps=await arquivoParaPaginas(f,setProg);setPaginas(ps);setSel(ps.map(p=>p.n));setVer(ps[0]||null)}catch{}finally{setProg("")}})();
+  },[]);
+
+  const onFile=async e=>{
+    const f=e.target.files&&e.target.files[0];if(!f)return;setErro("");
+    try{
+      const ps=await arquivoParaPaginas(f,setProg);setPaginas(ps);setSel(ps.slice(0,6).map(p=>p.n));setVer(ps[0]);
+      set({arquivo:f.name,nome:pj.nome||f.name.replace(/\.[^.]+$/,"")});
+      const as=await window.claude?.use?.("assets");
+      if(as&&f.size<20e6){setProg("Guardando a prancha para a equipe consultar…");try{const r=await as.upload(f);set({assetId:r.id,arquivo:f.name})}catch(err){console.warn(err)}}
+    }catch(err){setErro(err.message||"Não foi possível abrir o arquivo.")}finally{setProg("")}
+  };
+
+  const rodarIA=async()=>{
+    setErro("");
+    const pgs=paginas.filter(p=>sel.includes(p.n));
+    if(!pgs.length){setErro("Selecione ao menos uma página.");return}
+    try{
+      const r=await lerComIA(pgs,S,dica,setProg);
+      const ids=new Set(S.pontos.map(p=>p.id));
+      const comodos=(r.comodos||[]).map(c=>({id:uid(),nome:String(c.nome||"Cômodo"),itens:Object.fromEntries(Object.entries(c.itens||{}).filter(([k,v])=>ids.has(k)&&num(v)>0).map(([k,v])=>[k,num(v)]))}));
+      const novo={...pj,comodos,circuitos:(r.circuitos||[]).map(c=>({id:uid(),...c})),metragem:r.metragem||{},alertas:r.alertas||[],confianca:r.confianca||"",carimbo:{...pj.carimbo,...(r.carimbo||{})},tipo:r.tipo==="industrial"?"industrial":pj.tipo,lidoPorIA:true,iaOriginal:totaisProjeto({comodos})};
+      if(!novo.cliente&&r.carimbo&&r.carimbo.cliente)novo.cliente=r.carimbo.cliente;
+      setPj(novo);setDirty(true);setTab("planta");S.toast("Leitura feita. Agora confira passo a passo.");
+    }catch(e){setErro((e&&e.message)||"A IA não conseguiu ler. Tente menos páginas ou faça a contagem manual.")}finally{setProg("")}
+  };
+
+  const salvar=async(extra={},msg="Projeto salvo.")=>{const o={...pj,...extra};setPj(o);const ok=await S.api.set("projetos",o.id,o,msg);if(ok)setDirty(false);return ok};
+  const tot=totaisProjeto(pj);
+  const nomeP=k=>(S.pontos.find(p=>p.id===k)||{nome:k}).nome;
+  const total=Object.values(tot).reduce((a,b)=>a+b,0);
+  const nPass=PASSOS.filter(p=>pj.passos[p.id]).length;
+
+  const gerarOrc=async()=>{
+    if(dirty&&!(await salvar({},null)))return;
+    const linhas=linhasDoProjeto(pj,S);
+    const o={id:uid(),numero:proxNumero(S.data.orcamentos,"ORC-"),cliente:pj.cliente||pj.carimbo.cliente||"",endereco:pj.carimbo.endereco||"",telefone:"",projetoId:pj.id,tipo:pj.tipo,linhas,deslocamento:S.config.deslocamentoPadrao,desconto:0,impostoPct:S.config.impostoPct,clienteMaterial:false,etapa:"orcamento",probabilidade:50,criadoEm:new Date().toISOString(),condicoes:"50% de entrada e 50% na entrega.",prazo:""};
+    const nid=await S.api.add("orcamentos",o,"Orçamento criado a partir do projeto.");
+    if(nid){onClose();go("orcamentos",nid)}
+  };
+
+  const actions=html`<span class=${"pill "+(pj.status==="conferido"?"ok":"warn")}>${pj.status==="conferido"?"Conferido":`${nPass}/7 passos`}</span>
+    <button class="btn" disabled=${!dirty} onClick=${()=>salvar()}>${dirty?"Salvar":"Salvo"}</button>`;
+
+  return html`<${Modal} title=${pj.nome||"Novo projeto"} onClose=${()=>{onClose()}} actions=${actions}>
+    <div class="grid g3">
+      <${F} label="Nome do projeto"><${Inp} id="pj-nome" value=${pj.nome} onChange=${v=>set({nome:v})} placeholder="Ex.: Residência Silva"/><//>
+      <${F} label="Cliente"><${Inp} id="pj-cli" value=${pj.cliente} onChange=${v=>set({cliente:v})} list="lst-cli"/><//>
+      <${F} label="Tipo de obra"><${Sel} id="pj-tipo" value=${pj.tipo} onChange=${v=>set({tipo:v})} opts=${[["residencial","Residencial / predial"],["industrial","Industrial"]]}/><//>
+    </div>
+    <datalist id="lst-cli">${S.data.clientes.map(c=>html`<option value=${c.nome}/>`)}</datalist>
+
+    <div class="card col">
+      <div class="row" style=${{justifyContent:"space-between"}}><h3>Prancha</h3>
+        <div class="row"><input ref=${fileRef} type="file" accept="application/pdf,image/*" hidden onChange=${onFile}/><button class="btn" onClick=${()=>fileRef.current.click()}>${paginas.length?"Trocar arquivo":"Enviar PDF ou foto"}</button></div></div>
+      ${prog&&html`<div class="alert info"><span class="spin"></span><span>${prog}</span></div>`}
+      ${erro&&html`<div class="alert bad">${erro}</div>`}
+      ${paginas.length?html`
+        <div class="small muted">Toque nas páginas que têm planta, quadro de cargas ou unifilar (a IA lê só as marcadas). Clique em "ver" para abrir grande.</div>
+        <div class="pages">${paginas.map(p=>html`<div key=${p.n} class="pg" role="button" tabindex="0" aria-pressed=${sel.includes(p.n)} onClick=${()=>setSel(s=>s.includes(p.n)?s.filter(x=>x!==p.n):[...s,p.n])}>
+          <img src=${p.url} alt=${"Página "+p.n}/><div class="row" style=${{justifyContent:"space-between"}}><span>${sel.includes(p.n)?"✓ ":""}Pág. ${p.n}</span><button class="btn sm ghost" onClick=${e=>{e.stopPropagation();setVer(p)}}>ver</button></div></div>`)}</div>
+        <div class="grid" style=${{gridTemplateColumns:"1fr auto",alignItems:"end"}}>
+          <${F} label="Observação para a IA (opcional)"><${Inp} id="pj-dica" value=${dica} onChange=${setDica} placeholder="Ex.: a cozinha tem 2 TUEs de forno e cooktop"/><//>
+          <button class="btn pri" disabled=${!!prog} onClick=${rodarIA}>${pj.lidoPorIA?"Ler de novo com IA":"Ler com IA"}</button>
+        </div>
+        ${ver&&html`<div class="col"><div class="row"><b>Página ${ver.n}</b><button class="btn sm" onClick=${()=>setZoom(z=>Math.max(.25,z-.25))}>Zoom −</button><button class="btn sm" onClick=${()=>setZoom(z=>Math.min(3,z+.25))}>Zoom +</button><span class="small muted mono">${Math.round(zoom*100)}%</span></div>
+          <div class="viewer"><img src=${ver.url} style=${{width:(zoom*100)+"%"}} alt=${"Prancha página "+ver.n}/></div></div>`}
+      `:html`<p class="muted small" style=${{margin:0}}>${salvo&&salvo.assetId?"":"Sem prancha anexada. Você pode contar os pontos à mão nas abas abaixo."}</p>`}
+    </div>
+
+    ${(pj.alertas||[]).length?html`<div class="alert warn"><div><b>Dúvidas da leitura${pj.confianca?` (confiança ${pj.confianca})`:""}:</b><ul style=${{margin:"4px 0 0",paddingLeft:18}}>${pj.alertas.map((a,i)=>html`<li key=${i}>${a}</li>`)}</ul></div></div>`:null}
+
+    <${Tabs} value=${tab} onChange=${setTab} tabs=${[["carimbo","1–2 · Carimbo e legenda"],["cargas","3 · Quadro de cargas"],["planta","4 · Planta por cômodo"],["metragem","5 · Metragem"],["quadro","6–7 · Quadro e conferência"]]}/>
+
+    ${tab==="carimbo"&&html`<div class="col">
+      <div class="grid g3">${[["cliente","Cliente"],["endereco","Endereço"],["escala","Escala"],["revisao","Revisão"],["tensao","Tensão"],["area","Área"]].map(([k,l])=>html`<${F} key=${k} label=${l}><${Inp} id=${"cb-"+k} value=${pj.carimbo[k]} onChange=${v=>set({carimbo:{...pj.carimbo,[k]:v}})}/><//>`)}</div>
+      <${PassoChk} pj=${pj} ids=${["carimbo","legenda"]} passo=${passo}/></div>`}
+
+    ${tab==="cargas"&&html`<div class="col">
+      <div class="tbl-wrap"><table><thead><tr><th>Nº</th><th>Descrição</th><th class="r">Potência (W)</th><th class="r">Disjuntor (A)</th><th class="r">Bitola (mm²)</th><th>Polos</th><th></th></tr></thead><tbody>
+      ${(pj.circuitos||[]).map((c,i)=>{const up=p=>set({circuitos:pj.circuitos.map(x=>x.id===c.id?{...x,...p}:x)});
+        return html`<tr key=${c.id}><td style=${{width:60}}><${Inp} value=${c.num} onChange=${v=>up({num:v})}/></td><td><${Inp} value=${c.desc} onChange=${v=>up({desc:v})}/></td>
+        <td style=${{width:110}}><${Inp} type="number" value=${c.potencia} onChange=${v=>up({potencia:v})}/></td><td style=${{width:100}}><${Inp} type="number" value=${c.disjuntor} onChange=${v=>up({disjuntor:v})}/></td>
+        <td style=${{width:100}}><${Inp} type="number" value=${c.bitola} onChange=${v=>up({bitola:v})}/></td><td style=${{width:80}}><${Sel} value=${String(c.polos||1)} onChange=${v=>up({polos:num(v)})} opts=${[["1","1"],["2","2"],["3","3"]]}/></td>
+        <td><button class="btn sm ghost danger" aria-label="Remover circuito" onClick=${()=>set({circuitos:pj.circuitos.filter(x=>x.id!==c.id)})}>✕</button></td></tr>`})}
+      </tbody></table></div>
+      <div class="row"><button class="btn sm" onClick=${()=>set({circuitos:[...(pj.circuitos||[]),{id:uid(),num:String((pj.circuitos||[]).length+1),desc:"",potencia:0,disjuntor:0,bitola:2.5,polos:1}]})}>+ Circuito</button>
+        ${(pj.circuitos||[]).length?html`<span class="small muted">Total instalado: <b class="num">${n2((pj.circuitos||[]).reduce((a,c)=>a+num(c.potencia),0))} W</b></span>`:null}</div>
+      <${PassoChk} pj=${pj} ids=${["cargas"]} passo=${passo}/></div>`}
+
+    ${tab==="planta"&&html`<div class="col">
+      ${!S.pontos.length&&html`<div class="alert warn">Cadastre os tipos de ponto em Preços e custos antes de contar.</div>`}
+      ${(pj.comodos||[]).map(c=>html`<${Comodo} key=${c.id} c=${c} pontos=${S.pontos} onChange=${nc=>set({comodos:pj.comodos.map(x=>x.id===c.id?nc:x)})} onDel=${()=>set({comodos:pj.comodos.filter(x=>x.id!==c.id)})}/>`)}
+      <div class="row"><button class="btn" onClick=${()=>set({comodos:[...(pj.comodos||[]),{id:uid(),nome:"Cômodo "+((pj.comodos||[]).length+1),itens:{}}]})}>+ Cômodo</button>
+        ${["Sala","Cozinha","Quarto","Banheiro","Área de serviço","Varanda","Quadro"].map(n=>html`<button key=${n} class="btn sm ghost" onClick=${()=>set({comodos:[...(pj.comodos||[]),{id:uid(),nome:n,itens:{}}]})}>+ ${n}</button>`)}</div>
+      <${PassoChk} pj=${pj} ids=${["planta"]} passo=${passo}/></div>`}
+
+    ${tab==="metragem"&&html`<div class="col">
+      <p class="small muted" style=${{margin:0}}>Meça na prancha com a escala. Deixando tudo zerado, o orçamento usa a média por ponto e avisa que é estimativa.</p>
+      <div class="grid g4">${METRAGENS.map(([k,l])=>html`<${F} key=${k} label=${l+" (m)"}><${Num} id=${"mt-"+k} step=${5} value=${(pj.metragem||{})[k]||0} onChange=${v=>set({metragem:{...pj.metragem,[k]:v}})}/><//>`)}</div>
+      <div class="small muted">Estimativa pela média: ${Object.entries(metragemEstimada(tot)).filter(([,v])=>v).map(([k,v])=>`${(METRAGENS.find(m=>m[0]===k)||[k,k])[1]} ${v} m`).join(" · ")||"—"}</div>
+      <${PassoChk} pj=${pj} ids=${["caminhos"]} passo=${passo}/></div>`}
+
+    ${tab==="quadro"&&html`<div class="col">
+      <div class="grid g2" style=${{alignItems:"start"}}>
+        <div class="card col"><h3>Resumo da contagem</h3>
+          ${total?html`<div class="tbl-wrap"><table><tbody>${Object.entries(tot).map(([k,q])=>{const ia=pj.iaOriginal&&pj.iaOriginal[k];const dif=pj.iaOriginal&&(ia||0)!==q;
+            return html`<tr key=${k}><td>${nomeP(k)}</td><td class="r num">${q}</td>${pj.iaOriginal?html`<td class="r small">${dif?html`<span class="pill warn">IA: ${ia||0}</span>`:html`<span class="muted">igual IA</span>`}</td>`:null}</tr>`})}</tbody></table></div>`:html`<p class="muted" style=${{margin:0}}>Nada contado ainda.</p>`}
+          <div class="small"><b class="num">${total}</b> itens · <b class="num">${(pj.circuitos||[]).length}</b> circuitos no quadro de cargas · disjuntores contados: <b class="num">${(tot.dj1||0)+(tot.dj2||0)+(tot.dj3||0)}</b></div>
+          ${(pj.circuitos||[]).length&&((tot.dj1||0)+(tot.dj2||0)+(tot.dj3||0))!==(pj.circuitos||[]).length?html`<div class="alert warn">O número de disjuntores (${(tot.dj1||0)+(tot.dj2||0)+(tot.dj3||0)}) não bate com o de circuitos (${pj.circuitos.length}). Confira o unifilar.</div>`:null}
+          ${(tot.chuv||tot.ar||tot.tue)&&!(pj.circuitos||[]).some(c=>num(c.disjuntor)>=25)?html`<div class="alert warn">Há chuveiro/ar/TUE mas nenhum circuito de 25A ou mais no quadro de cargas.</div>`:null}
+        </div>
+        <div class="card col"><h3>Passos</h3>
+          ${PASSOS.map((p,i)=>html`<label class="chk" key=${p.id}><input type="checkbox" checked=${!!pj.passos[p.id]} onChange=${e=>passo(p.id,e.target.checked)}/> ${i+1}. ${p.t}</label>`)}
+          ${S.admin?html`<button class="btn pri" disabled=${nPass<7||!total} onClick=${()=>setConferir(true)}>${pj.status==="conferido"?"Conferido ✓ (conferir de novo)":"Marcar como conferido"}</button>
+            ${nPass<7&&html`<span class="small muted">Marque os 7 passos para liberar.</span>`}`:html`<span class="small muted">Só o patrão marca o projeto como conferido.</span>`}
+          ${pj.status==="conferido"&&S.admin&&html`<button class="btn" onClick=${gerarOrc}>Gerar orçamento deste projeto</button>`}
+        </div>
+      </div></div>`}
+    ${conferir&&html`<${ConferirModal} pj=${pj} tot=${tot} nomeP=${nomeP} onClose=${()=>setConferir(false)} onOk=${async regra=>{
+      if(regra&&regra.trim()){const r=(S.config.regras?S.config.regras+"\n":"")+"• "+regra.trim();await S.api.setMeta("config",{...S.config,regras:r},null)}
+      await salvar({status:"conferido",conferidoEm:new Date().toISOString(),conferidoPor:S.me.id},"Projeto conferido. Já pode gerar o orçamento.");setConferir(false)}}/>`}
+  <//>`;
+}
+function PassoChk({pj,ids,passo}){return html`<div class="row" style=${{borderTop:"1px solid var(--line)",paddingTop:10}}>${ids.map(k=>{const p=PASSOS.find(x=>x.id===k);return html`<label class="chk" key=${k}><input type="checkbox" checked=${!!pj.passos[k]} onChange=${e=>passo(k,e.target.checked)}/> Conferi: ${p.t}</label>`})}<span class="small muted" style=${{flexBasis:"100%"}}>${ids.map(k=>PASSOS.find(x=>x.id===k).d).join(" ")}</span></div>`}
+function Comodo({c,pontos,onChange,onDel}){
+  const [add,setAdd]=useState("");
+  const it=Object.entries(c.itens||{});
+  const P=k=>pontos.find(p=>p.id===k);
+  const grupos=[...new Set(pontos.map(p=>p.grupo))];
+  return html`<div class="comodo"><div class="comodo-h"><input class="i" style=${{flex:1,minWidth:140,fontWeight:600}} value=${c.nome} onChange=${e=>onChange({...c,nome:e.target.value})} aria-label="Nome do cômodo"/>
+    <span class="small muted num">${it.reduce((a,[,q])=>a+num(q),0)} itens</span><button class="btn sm ghost danger" onClick=${onDel}>Remover</button></div>
+    <div class="comodo-b">
+      ${it.map(([k,q])=>html`<div class="it" key=${k}><span class="nm">${(P(k)||{nome:k+" (não cadastrado)"}).nome}</span><${Num} value=${q} onChange=${v=>{const n={...c.itens};if(v>0)n[k]=v;else delete n[k];onChange({...c,itens:n})}}/></div>`)}
+      <div class="it"><select class="i" style=${{flex:1,minWidth:180}} value=${add} onChange=${e=>{const k=e.target.value;if(!k)return;onChange({...c,itens:{...c.itens,[k]:(num(c.itens[k])||0)+1}});setAdd("")}} aria-label="Adicionar ponto">
+        <option value="">+ adicionar ponto…</option>${grupos.map(g=>html`<optgroup key=${g} label=${g}>${pontos.filter(p=>p.grupo===g).map(p=>html`<option key=${p.id} value=${p.id}>${p.nome}</option>`)}</optgroup>`)}</select></div>
+    </div></div>`;
+}
+function ConferirModal({pj,tot,nomeP,onClose,onOk}){
+  const [regra,setRegra]=useState("");
+  const difs=pj.iaOriginal?[...new Set([...Object.keys(pj.iaOriginal),...Object.keys(tot)])].filter(k=>(pj.iaOriginal[k]||0)!==(tot[k]||0)):[];
+  return html`<${Modal} title="Conferência do patrão" onClose=${onClose}>
+    ${pj.iaOriginal?(difs.length?html`<div class="col"><p style=${{margin:0}}>Você corrigiu a leitura da IA em <b>${difs.length}</b> item(ns):</p>
+      <div class="tbl-wrap"><table><thead><tr><th>Item</th><th class="r">IA leu</th><th class="r">Você deixou</th></tr></thead><tbody>${difs.map(k=>html`<tr key=${k}><td>${nomeP(k)}</td><td class="r num">${pj.iaOriginal[k]||0}</td><td class="r num">${tot[k]||0}</td></tr>`)}</tbody></table></div>
+      <${F} label="Por que a IA errou? Escreva como regra; ela passa a seguir nas próximas leituras e a equipe aprende no guia."><textarea class="i" id="regra" value=${regra} onChange=${e=>setRegra(e.target.value)} placeholder="Ex.: Nesse projetista, triângulo com traço embaixo é tomada 20A, não TUG."></textarea><//></div>`
+      :html`<div class="alert ok">A contagem final é igual à leitura da IA.</div>`):html`<p style=${{margin:0}}>Projeto contado à mão. Se quiser, registre uma regra que você usou para ensinar a equipe.</p><${F} label="Regra da casa (opcional)"><textarea class="i" id="regra" value=${regra} onChange=${e=>setRegra(e.target.value)}></textarea><//>`}
+    <div class="row" style=${{justifyContent:"flex-end"}}><button class="btn" onClick=${onClose}>Voltar</button><button class="btn pri" onClick=${()=>onOk(regra)}>Confirmar conferência</button></div>
+  <//>`;
+}
+
+/* ============================== PRECIFICAÇÃO / ORÇAMENTOS ============================== */
+PAGES.orcamentos=function Orcamentos({go,arg}){
+  const S=useS();
+  const [aberto,setAberto]=useState(arg||null);
+  const [del,setDel]=useState(null);
+  useEffect(()=>{if(arg)setAberto(arg)},[arg]);
+  const lista=[...S.data.orcamentos].sort((a,b)=>(b.criadoEm||"").localeCompare(a.criadoEm||""));
+  return html`<div class="phead"><div><h1>Precificação</h1><p>Preço por ponto, com o custo real da hora da equipe por trás. O sistema avisa quando o preço não paga a obra.</p></div>
+    <div class="row"><button class="btn" onClick=${()=>go("projetos")}>A partir de um projeto</button><button class="btn pri" onClick=${()=>setAberto("novo")}>Orçamento avulso</button></div></div>
+  ${lista.length?html`<div class="tbl-wrap"><table><thead><tr><th>Nº</th><th>Cliente</th><th>Etapa</th><th class="r">Total</th><th class="r">Margem</th><th></th></tr></thead><tbody>
+    ${lista.map(o=>{const c=calcOrc(o,S.custoHora);const st=c.margem<0?"bad":c.margem<num(S.config.margemMin)?"warn":"ok";
+      return html`<tr key=${o.id}><td class="mono">${o.numero}</td><td><b>${o.cliente||"Sem nome"}</b><div class="small muted">${dataBR((o.criadoEm||"").slice(0,10))}</div></td><td>${(PIPE.find(p=>p.id===o.etapa)||PIPE[2]).t}</td><td class="r num">${brl(c.total)}</td><td class="r"><span class=${"pill "+st}>${n2(c.margem)}%</span></td>
+      <td class="r"><div class="row" style=${{justifyContent:"flex-end",flexWrap:"nowrap"}}><button class="btn sm" onClick=${()=>setAberto(o.id)}>Abrir</button><button class="btn sm ghost danger" onClick=${()=>setDel(o)}>Excluir</button></div></td></tr>`})}
+  </tbody></table></div>`:html`<${Empty} title="Nenhum orçamento ainda" text="O caminho mais rápido é ler o projeto: a contagem de pontos vira o orçamento sozinha. Para serviço pequeno, crie um avulso e adicione os pontos."><div class="row"><button class="btn" onClick=${()=>go("projetos")}>Ler projeto</button><button class="btn pri" onClick=${()=>setAberto("novo")}>Orçamento avulso</button></div><//>`}
+  ${aberto&&html`<${EditorOrc} id=${aberto} onClose=${()=>setAberto(null)} go=${go}/>`}
+  ${del&&html`<${Confirm} text=${`Excluir o orçamento ${del.numero}?`} onNo=${()=>setDel(null)} onYes=${()=>{S.api.del("orcamentos",del.id,"Orçamento excluído.");setDel(null)}}/>`}`;
+};
+
+function EditorOrc({id,onClose,go}){
+  const S=useS();
+  const salvo=id!=="novo"&&S.data.orcamentos.find(o=>o.id===id);
+  const [o,setO]=useState(()=>salvo?JSON.parse(JSON.stringify(salvo)):{id:uid(),numero:proxNumero(S.data.orcamentos,"ORC-"),cliente:"",telefone:"",endereco:"",tipo:"residencial",linhas:[],deslocamento:S.config.deslocamentoPadrao,desconto:0,impostoPct:S.config.impostoPct,clienteMaterial:false,etapa:"orcamento",probabilidade:50,criadoEm:new Date().toISOString(),condicoes:"50% de entrada e 50% na entrega.",prazo:""});
+  const [dirty,setDirty]=useState(id==="novo");
+  const [add,setAdd]=useState("");
+  const [msg,setMsg]=useState(false);
+  const set=p=>{setO(x=>({...x,...p}));setDirty(true)};
+  const c=calcOrc(o,S.custoHora);
+  const saude=saudeOrc(o,c,S.config,S.custoHora);
+  const upL=(lid,p)=>set({linhas:o.linhas.map(l=>l.id===lid?{...l,...p}:l)});
+  const addPonto=k=>{
+    const ind=o.tipo==="industrial";
+    if(k.startsWith("m:")){const m=S.mats.find(x=>x.id===k.slice(2));if(!m)return;set({linhas:[...o.linhas,{id:uid(),matId:m.id,desc:m.nome,unid:m.unid,qtd:1,mo:0,custoMat:num(m.custo),mat:Math.round(num(m.custo)*(1+num(S.config.markupMatPct)/100)*100)/100,horas:0}]});return}
+    if(k==="livre"){set({linhas:[...o.linhas,{id:uid(),desc:"Serviço",unid:"un",qtd:1,mo:0,custoMat:0,mat:0,horas:1}]});return}
+    const p=S.pontos.find(x=>x.id===k);if(!p)return;const ck=custoKit(p,S.mats);
+    set({linhas:[...o.linhas,{id:uid(),tipoId:p.id,desc:p.nome,unid:p.unid,qtd:1,mo:Math.round(num(p.mo)*(ind?num(S.config.fatorIndustrial):1)*100)/100,custoMat:ck,mat:Math.round(ck*(1+num(S.config.markupMatPct)/100)*100)/100,horas:num(p.horas)}]});
+  };
+  const salvar=async(extra={},m="Orçamento salvo.")=>{const x={...o,...extra};setO(x);const ok=await S.api.set("orcamentos",x.id,x,m);if(ok)setDirty(false);return ok};
+  const cli=S.data.clientes.find(x=>x.nome===o.cliente);
+  const fechar=async()=>{
+    const pj=S.data.projetos.find(p=>p.id===o.projetoId);
+    const tarefas=pj?gerarTarefas(pj,S.pontos):[{id:uid(),etapa:"infra",comodo:"Geral",desc:"Executar serviço conforme orçamento "+o.numero,horas:c.horas,resp:"",feito:false},{id:uid(),etapa:"testes",comodo:"Geral",desc:"Testar e entregar ao cliente",horas:.5,resp:"",feito:false}];
+    const materiais=[];
+    if(!o.clienteMaterial){
+      const acc={};
+      for(const l of o.linhas){
+        if(l.matId){acc[l.matId]=(acc[l.matId]||0)+num(l.qtd);continue}
+        const p=S.pontos.find(x=>x.id===l.tipoId);if(!p)continue;
+        for(const [mid,q] of (p.kit||[]))acc[mid]=(acc[mid]||0)+num(q)*num(l.qtd);
+      }
+      for(const [mid,q] of Object.entries(acc))materiais.push({matId:mid,qtd:Math.ceil(q),baixado:false});
+    }
+    const os={id:uid(),numero:proxNumero(S.data.os,"OS-"),orcamentoId:o.id,projetoId:o.projetoId||"",cliente:o.cliente,endereco:o.endereco,telefone:o.telefone,etapa:materiais.length?"material":"infra",tarefas,materiais,inicio:hoje(),prazo:o.prazo||"",criadoEm:new Date().toISOString(),valor:c.total};
+    const nid=await S.api.add("os",os,null);
+    if(!nid)return;
+    await salvar({etapa:"aprovado",aprovadoEm:new Date().toISOString(),osId:nid},null);
+    const ent=Math.round(c.total*.5*100)/100;
+    await S.api.add("financeiro",{tipo:"entrada",desc:`Entrada ${o.numero} · ${o.cliente}`,valor:ent,venc:hoje(),status:"pendente",categoria:"Obra",ref:o.id,criadoEm:new Date().toISOString()},null);
+    await S.api.add("financeiro",{tipo:"entrada",desc:`Saldo na entrega ${o.numero} · ${o.cliente}`,valor:Math.round((c.total-ent)*100)/100,venc:o.prazo||"",status:"pendente",categoria:"Obra",ref:o.id,criadoEm:new Date().toISOString()},null);
+    S.toast(`Fechado! ${os.numero} criada com ${tarefas.length} tarefas e 2 parcelas lançadas no financeiro.`);
+    onClose();go("os",nid);
+  };
+  const actions=html`<button class="btn" disabled=${!dirty} onClick=${()=>salvar()}>${dirty?"Salvar":"Salvo"}</button>`;
+  return html`<${Modal} title=${"Orçamento "+o.numero} onClose=${onClose} actions=${actions}>
+    <div class="grid g4">
+      <${F} label="Cliente"><${Inp} id="o-cli" value=${o.cliente} list="lst-cli2" onChange=${v=>{const k=S.data.clientes.find(x=>x.nome===v);set(k?{cliente:v,telefone:o.telefone||k.telefone||"",endereco:o.endereco||k.endereco||""}:{cliente:v})}}/><//>
+      <${F} label="Telefone / WhatsApp"><${Inp} id="o-tel" value=${o.telefone} onChange=${v=>set({telefone:v})}/><//>
+      <${F} label="Endereço da obra" style=${{gridColumn:"span 2"}}><${Inp} id="o-end" value=${o.endereco} onChange=${v=>set({endereco:v})}/><//>
+      <${F} label="Tipo de obra"><${Sel} id="o-tipo" value=${o.tipo} onChange=${v=>set({tipo:v})} opts=${[["residencial","Residencial / predial"],["industrial","Industrial"]]}/><//>
+      <${F} label="Etapa no funil"><${Sel} id="o-et" value=${o.etapa} onChange=${v=>set({etapa:v})} opts=${PIPE.map(p=>[p.id,p.t])}/><//>
+      <${F} label="Prazo de entrega"><${Inp} id="o-prazo" type="date" value=${o.prazo} onChange=${v=>set({prazo:v})}/><//>
+      <${F} label="Chance de fechar (%)"><${Inp} id="o-prob" type="number" value=${o.probabilidade} onChange=${v=>set({probabilidade:v})}/><//>
+    </div>
+    <datalist id="lst-cli2">${S.data.clientes.map(c=>html`<option value=${c.nome}/>`)}</datalist>
+    ${!cli&&o.cliente&&html`<div class="small"><button class="btn sm" onClick=${()=>S.api.add("clientes",{nome:o.cliente,telefone:o.telefone,endereco:o.endereco,criadoEm:new Date().toISOString()},"Cliente cadastrado.")}>Cadastrar "${o.cliente}" como cliente</button></div>`}
+
+    <div class="tbl-wrap"><table><thead><tr><th>Item</th><th class="r">Qtd</th><th class="r">Mão de obra (un)</th><th class="r">Material (un)</th><th class="r">Horas (un)</th><th class="r">Total</th><th></th></tr></thead><tbody>
+      ${o.linhas.map(l=>html`<tr key=${l.id}><td style=${{minWidth:200}}><input class="i" value=${l.desc} onChange=${e=>upL(l.id,{desc:e.target.value})} aria-label="Descrição"/></td>
+        <td class="r" style=${{width:130}}><${Num} value=${l.qtd} onChange=${v=>upL(l.id,{qtd:v})}/></td>
+        <td class="r" style=${{width:110}}><${Inp} type="number" value=${l.mo} onChange=${v=>upL(l.id,{mo:v})} aria-label="Mão de obra"/></td>
+        <td class="r" style=${{width:110}}><${Inp} type="number" value=${l.mat} onChange=${v=>upL(l.id,{mat:v})} aria-label="Material"/></td>
+        <td class="r" style=${{width:90}}><${Inp} type="number" value=${l.horas} onChange=${v=>upL(l.id,{horas:v})} aria-label="Horas"/></td>
+        <td class="r num">${brl(num(l.qtd)*(num(l.mo)+(o.clienteMaterial?0:num(l.mat))))}</td>
+        <td><button class="btn sm ghost danger" aria-label="Remover" onClick=${()=>set({linhas:o.linhas.filter(x=>x.id!==l.id)})}>✕</button></td></tr>`)}
+      ${!o.linhas.length&&html`<tr><td colspan="7" class="muted">Sem itens. Adicione pontos abaixo ou gere a partir de um projeto lido.</td></tr>`}
+    </tbody></table></div>
+    <div class="row"><select class="i" style=${{maxWidth:360}} value=${add} onChange=${e=>{addPonto(e.target.value);setAdd("")}} aria-label="Adicionar item">
+      <option value="">+ adicionar ponto, material ou serviço…</option>
+      ${[...new Set(S.pontos.map(p=>p.grupo))].map(g=>html`<optgroup key=${g} label=${"Pontos · "+g}>${S.pontos.filter(p=>p.grupo===g).map(p=>html`<option key=${p.id} value=${p.id}>${p.nome} · ${brl(p.mo)}</option>`)}</optgroup>`)}
+      <optgroup label="Material avulso">${S.mats.map(m=>html`<option key=${m.id} value=${"m:"+m.id}>${m.nome}</option>`)}</optgroup>
+      <option value="livre">Serviço livre (digitar)</option></select>
+      <label class="chk"><input type="checkbox" checked=${!!o.clienteMaterial} onChange=${e=>set({clienteMaterial:e.target.checked})}/> Cliente compra o material (cobrar só mão de obra)</label></div>
+
+    <div class="grid g2" style=${{alignItems:"start"}}>
+      <div class="col">
+        <div class="grid g3">
+          <${F} label="Deslocamento (R$)"><${Inp} id="o-desl" type="number" value=${o.deslocamento} onChange=${v=>set({deslocamento:v})}/><//>
+          <${F} label="Desconto (R$)"><${Inp} id="o-desc" type="number" value=${o.desconto} onChange=${v=>set({desconto:v})}/><//>
+          <${F} label="Imposto (%)"><${Inp} id="o-imp" type="number" value=${o.impostoPct} onChange=${v=>set({impostoPct:v})}/><//>
+        </div>
+        <${F} label="Condições de pagamento"><${Inp} id="o-cond" value=${o.condicoes} onChange=${v=>set({condicoes:v})}/><//>
+        <div class="col">${saude.map(([t,m],i)=>html`<div key=${i} class=${"alert "+t}>${m}</div>`)}</div>
+      </div>
+      <div class="total-box">
+        <div class="ln"><span>Mão de obra</span><span class="num">${brl(c.mo)}</span></div>
+        <div class="ln"><span>Material</span><span class="num">${brl(c.mat)}</span></div>
+        <div class="ln"><span>Deslocamento − desconto</span><span class="num">${brl(c.desloc-c.desc)}</span></div>
+        <div class="ln" style=${{borderTop:"1px solid #ffffff2a",paddingTop:8,marginTop:4}}><span>Preço ao cliente</span></div>
+        <div class="big">${brl(c.total)}</div>
+        <div class="ln" style=${{opacity:.8}}><span>Imposto</span><span class="num">− ${brl(c.imposto)}</span></div>
+        <div class="ln" style=${{opacity:.8}}><span>Custo da equipe (${n2(c.horas)} h × ${brl(S.custoHora)})</span><span class="num">− ${brl(c.custoMO)}</span></div>
+        <div class="ln" style=${{opacity:.8}}><span>Custo do material + deslocamento</span><span class="num">− ${brl(c.custoMat+c.desloc)}</span></div>
+        <div class="ln" style=${{fontWeight:600,fontSize:15}}><span>Lucro estimado</span><span class="num">${brl(c.lucro)} · ${n2(c.margem)}%</span></div>
+      </div>
+    </div>
+
+    <div class="row" style=${{justifyContent:"flex-end",borderTop:"1px solid var(--line)",paddingTop:14}}>
+      <button class="btn" onClick=${()=>gerarPdfProposta(o,c,S)}>Baixar proposta (PDF)</button>
+      <button class="btn" onClick=${()=>setMsg(true)}>Texto para WhatsApp</button>
+      ${o.etapa!=="aprovado"?html`<button class="btn pri" disabled=${!o.linhas.length} onClick=${fechar}>Cliente aprovou → gerar OS</button>`:html`<button class="btn pri" onClick=${()=>{onClose();go("os",o.osId)}}>Abrir OS</button>`}
+    </div>
+    ${msg&&html`<${MsgWhats} o=${o} c=${c} onClose=${()=>setMsg(false)}/>`}
+  <//>`;
+}
+function textoProposta(o,c,S){
+  return `Olá${o.cliente?", "+o.cliente.split(" ")[0]:""}! Segue a proposta ${o.numero} da ${S.config.empresa}.
+
+${o.linhas.map(l=>`• ${n2(l.qtd)} ${l.unid||""} ${l.desc}`).join("\n")}
+
+Mão de obra: ${brl(c.mo)}
+Material: ${o.clienteMaterial?"por conta do cliente":brl(c.mat)}
+${c.desloc?`Deslocamento: ${brl(c.desloc)}\n`:""}${c.desc?`Desconto: −${brl(c.desc)}\n`:""}*Total: ${brl(c.total)}*
+
+Pagamento: ${o.condicoes||"a combinar"}
+${o.prazo?`Entrega prevista: ${dataBR(o.prazo)}\n`:""}Validade: 10 dias.
+Serviço executado conforme NBR 5410. Qualquer dúvida, é só responder.`;
+}
+function MsgWhats({o,c,onClose}){
+  const S=useS();const t=textoProposta(o,c,S);const ref=useRef(null);
+  const tel=String(o.telefone||"").replace(/\D/g,"");const fone=tel?(tel.length<=11?"55"+tel:tel):"";
+  const copiar=async()=>{try{await navigator.clipboard.writeText(t);S.toast("Texto copiado. Cole no WhatsApp do cliente.")}catch{ref.current.select();S.toast("Selecionei o texto: use Ctrl+C / copiar.")}};
+  return html`<${Modal} title="Mensagem para o cliente" onClose=${onClose}>
+    <textarea ref=${ref} class="i" style=${{minHeight:300,fontFamily:"var(--f-mono)",fontSize:12.5}} readonly value=${t}></textarea>
+    <div class="row" style=${{justifyContent:"flex-end"}}><button class="btn" onClick=${copiar}>Copiar texto</button>
+      ${fone&&html`<a class="btn pri" href=${`https://api.whatsapp.com/send?phone=${fone}&text=${encodeURIComponent(t)}`} target="_blank" rel="noopener">Abrir WhatsApp de ${o.telefone}</a>`}</div><//>`;
+}
+async function gerarPdfProposta(o,c,S){
+  try{
+    const {jsPDF}=window.jspdf;const d=new jsPDF({unit:"mm",format:"a4"});
+    const W=210,M=16;let y=18;
+    d.setFillColor(29,47,69);d.rect(0,0,W,30,"F");d.setTextColor(255);d.setFont("helvetica","bold");d.setFontSize(18);d.text(S.config.empresa||"Elétrica",M,16);
+    d.setFontSize(9);d.setFont("helvetica","normal");d.text([S.config.cidade,S.config.telefone].filter(Boolean).join(" · ")||"Instalações elétricas",M,23);
+    d.setFontSize(11);d.text("PROPOSTA "+o.numero,W-M,16,{align:"right"});d.setFontSize(9);d.text(new Date().toLocaleDateString("pt-BR"),W-M,23,{align:"right"});
+    y=42;d.setTextColor(20);d.setFontSize(10);d.setFont("helvetica","bold");d.text("Cliente",M,y);d.setFont("helvetica","normal");d.text(o.cliente||"—",M+22,y);
+    if(o.endereco){y+=6;d.setFont("helvetica","bold");d.text("Obra",M,y);d.setFont("helvetica","normal");d.text(d.splitTextToSize(o.endereco,150),M+22,y)}
+    y+=12;d.setFillColor(232,236,240);d.rect(M,y-5,W-2*M,8,"F");d.setFont("helvetica","bold");d.setFontSize(9);
+    d.text("ITEM",M+2,y);d.text("QTD",125,y,{align:"right"});d.text("UNIT.",155,y,{align:"right"});d.text("TOTAL",W-M-2,y,{align:"right"});
+    d.setFont("helvetica","normal");y+=8;
+    for(const l of o.linhas){
+      const u=num(l.mo)+(o.clienteMaterial?0:num(l.mat));const ls=d.splitTextToSize(l.desc||"",95);
+      if(y+ls.length*5>270){d.addPage();y=20}
+      d.text(ls,M+2,y);d.text(n2(l.qtd)+" "+(l.unid||""),125,y,{align:"right"});d.text(brl(u),155,y,{align:"right"});d.text(brl(u*num(l.qtd)),W-M-2,y,{align:"right"});
+      y+=ls.length*5+2;d.setDrawColor(220);d.line(M,y-3,W-M,y-3);
+    }
+    if(y>230){d.addPage();y=20}
+    y+=4;const lin=(a,b,bold)=>{d.setFont("helvetica",bold?"bold":"normal");d.text(a,140,y,{align:"right"});d.text(b,W-M-2,y,{align:"right"});y+=6};
+    lin("Mão de obra",brl(c.mo));lin("Material",o.clienteMaterial?"por conta do cliente":brl(c.mat));if(c.desloc)lin("Deslocamento",brl(c.desloc));if(c.desc)lin("Desconto","− "+brl(c.desc));
+    d.setFontSize(12);lin("TOTAL",brl(c.total),true);d.setFontSize(9);
+    y+=6;d.setFont("helvetica","normal");
+    const notas=[`Pagamento: ${o.condicoes||"a combinar"}`,o.prazo?`Entrega prevista: ${dataBR(o.prazo)}`:"","Validade da proposta: 10 dias.","Serviço executado conforme NBR 5410. Luminárias e acabamentos decorativos não inclusos, salvo quando listados."].filter(Boolean);
+    d.text(d.splitTextToSize(notas.join("\n"),W-2*M),M,y);
+    const blob=d.output("blob");
+    const dl=await window.claude?.use?.("downloads");
+    if(!dl){S.toast("Download indisponível aqui. Use o texto para WhatsApp.");return}
+    await dl.save({filename:`Proposta_${o.numero}_${(o.cliente||"cliente").replace(/[^\w]+/g,"_")}.pdf`,data:blob});
+    S.toast("Proposta gerada.");
+  }catch(e){if(e&&e.code==="declined")return;console.error(e);S.toast("Não foi possível gerar o PDF: "+(e&&e.message||"erro"))}
+}
+
+/* ============================== FUNIL ============================== */
+PAGES.pipeline=function Pipeline({go}){
+  const S=useS();
+  const mover=(o,d)=>{const i=PIPE.findIndex(p=>p.id===(o.etapa||"orcamento"));const j=Math.min(PIPE.length-1,Math.max(0,i+d));if(PIPE[j].id==="aprovado"){go("orcamentos",o.id);S.toast("Para fechar, use o botão 'Cliente aprovou' no orçamento: ele já gera a OS.");return}S.api.update("orcamentos",o.id,{etapa:PIPE[j].id})};
+  const tot=PIPE.slice(0,4).reduce((a,p)=>a+S.data.orcamentos.filter(o=>(o.etapa||"orcamento")===p.id).reduce((x,o)=>x+calcOrc(o,S.custoHora).total*num(o.probabilidade)/100,0),0);
+  return html`<div class="phead"><div><h1>Funil de vendas</h1><p>Onde cada orçamento está. Previsão ponderada pela chance de fechar: <b class="num">${brl(tot)}</b>.</p></div><button class="btn pri" onClick=${()=>go("orcamentos","novo")}>Novo orçamento</button></div>
+  <div class="kanban">${PIPE.map(p=>{const it=S.data.orcamentos.filter(o=>(o.etapa||"orcamento")===p.id);
+    return html`<div class="kcol" key=${p.id}><h3>${p.t}<span class="pill">${it.length}</span></h3><div class="small muted num">${brl(it.reduce((a,o)=>a+calcOrc(o,S.custoHora).total,0))}</div>
+      ${it.map(o=>html`<div class="kcard" key=${o.id} style=${{flexDirection:"column",cursor:"default"}}><button class="btn ghost" style=${{padding:0,justifyContent:"flex-start",textAlign:"left",whiteSpace:"normal"}} onClick=${()=>go("orcamentos",o.id)}><b>${o.cliente||"Sem nome"}</b></button><div class="small muted"><span class="mono">${o.numero}</span> · ${brl(calcOrc(o,S.custoHora).total)} · ${n2(o.probabilidade)}%</div>
+        <div class="row" style=${{justifyContent:"space-between"}}><button class="btn sm" disabled=${p.id==="contato"} onClick=${()=>mover(o,-1)} aria-label="Voltar etapa">←</button><button class="btn sm" disabled=${p.id==="perdido"||p.id==="aprovado"} onClick=${()=>mover(o,1)} aria-label="Avançar etapa">→</button></div></div>`)}
+    </div>`})}</div>`;
+};
+
+/* ============================== ORDENS DE SERVIÇO ============================== */
+PAGES.os=function OSPage({go,arg}){
+  const S=useS();const [aberta,setAberta]=useState(arg||null);
+  useEffect(()=>{if(arg)setAberta(arg)},[arg]);
+  const [ver,setVer]=useState("ativas");
+  const lista=S.data.os.filter(o=>ver==="todas"||o.etapa!=="concluida");
+  return html`<div class="phead"><div><h1>Ordens de serviço</h1><p>Cada obra fechada vira uma OS com tarefas por cômodo e etapa. A cor de cada etapa segue a cor dos fios.</p></div>
+    <${Tabs} value=${ver} onChange=${setVer} tabs=${[["ativas","Em andamento"],["todas","Todas"]]}/></div>
+  ${S.data.os.length?html`<div class="kanban">${ETAPAS_OS.filter(e=>ver==="todas"||e.id!=="concluida").map(e=>{const it=lista.filter(o=>o.etapa===e.id);
+    return html`<div class="kcol" key=${e.id}><h3><span class="wire" style=${{background:e.c,height:16}}></span>${e.t}<span class="pill">${it.length}</span></h3>${e.sub?html`<div class="small muted">${e.sub}</div>`:null}
+    ${it.map(o=>{const t=o.tarefas||[];const f=t.filter(x=>x.feito).length;const falta=(o.materiais||[]).some(m=>!m.baixado);
+      return html`<button class="kcard" key=${o.id} onClick=${()=>setAberta(o.id)}><span class="wire" style=${{background:e.c}}></span><div style=${{flex:1,minWidth:0}}><b>${o.cliente}</b><div class="small muted"><span class="mono">${o.numero}</span>${o.prazo?" · entrega "+dataBR(o.prazo):""}</div><div class="bar" style=${{margin:"6px 0 4px"}}><i style=${{width:(t.length?f/t.length*100:0)+"%"}}></i></div><div class="small muted">${f}/${t.length} tarefas${falta?" · material a separar":""}</div></div></button>`})}
+    </div>`})}</div>`:html`<${Empty} title="Nenhuma OS ainda" text="A OS nasce quando você marca no orçamento que o cliente aprovou. Ela já vem com as tarefas por cômodo e a lista de material."><button class="btn" onClick=${()=>go("orcamentos")}>Ir para Precificação</button><//>`}
+  ${aberta&&html`<${DetalheOS} id=${aberta} onClose=${()=>setAberta(null)}/>`}`;
+};
+
+function DetalheOS({id,onClose}){
+  const S=useS();
+  const o=S.data.os.find(x=>x.id===id);
+  const [nova,setNova]=useState({etapa:"infra",desc:"",resp:""});
+  const [prancha,setPrancha]=useState(null);
+  const [del,setDel]=useState(false);
+  if(!o)return null;
+  const pj=S.data.projetos.find(p=>p.id===o.projetoId);
+  const equipe=S.data.team.filter(t=>t.active!==false).map(t=>[t.id,S.nome(t.id)+" · "+(PAPEIS[t.role]||t.role)]);
+  if(!equipe.find(e=>e[0]===S.me.id))equipe.unshift([S.me.id,S.nome(S.me.id)]);
+  const upT=(tid,p)=>S.api.update("os",o.id,{tarefas:o.tarefas.map(t=>t.id===tid?{...t,...p}:t)});
+  const etapa=v=>S.api.update("os",o.id,{etapa:v},"Etapa atualizada.");
+  const mat=m=>S.mats.find(x=>x.id===m.matId);
+  const separar=async()=>{
+    const faltas=[];
+    for(const m of (o.materiais||[]).filter(m=>!m.baixado)){const k=mat(m);if(!k){faltas.push(m.matId);continue}if(num(k.estoque)<num(m.qtd))faltas.push(k.nome)}
+    if(faltas.length){S.toast("Falta em estoque: "+faltas.slice(0,4).join(", ")+(faltas.length>4?"…":"")+". Dê entrada no almoxarifado ou baixe só o que tem.");return}
+    for(const m of (o.materiais||[]).filter(m=>!m.baixado)){const k=mat(m);await S.api.update("materiais",k.id,{estoque:num(k.estoque)-num(m.qtd)});await S.api.add("movimentos",{matId:k.id,tipo:"saida",qtd:num(m.qtd),ref:o.numero,data:hoje(),por:S.me.id},null)}
+    await S.api.update("os",o.id,{materiais:o.materiais.map(m=>({...m,baixado:true})),etapa:o.etapa==="material"?"infra":o.etapa},"Material separado e baixado do estoque.");
+  };
+  const baixarUm=async m=>{const k=mat(m);if(!k)return;await S.api.update("materiais",k.id,{estoque:num(k.estoque)-num(m.qtd)});await S.api.add("movimentos",{matId:k.id,tipo:"saida",qtd:num(m.qtd),ref:o.numero,data:hoje(),por:S.me.id},null);await S.api.update("os",o.id,{materiais:o.materiais.map(x=>x.matId===m.matId?{...x,baixado:true}:x)},"Baixado.")};
+  const porEtapa=ETAPAS_OS.filter(e=>e.id!=="material"&&e.id!=="concluida").map(e=>({e,t:(o.tarefas||[]).filter(t=>t.etapa===e.id)})).filter(x=>x.t.length);
+  const feitas=(o.tarefas||[]).filter(t=>t.feito).length;
+  const distribuir=r=>{if(!r)return;S.api.update("os",o.id,{tarefas:o.tarefas.map(t=>t.resp?t:{...t,resp:r})},"Tarefas sem responsável atribuídas.")};
+  return html`<${Modal} title=${o.numero+" · "+o.cliente} onClose=${onClose} actions=${html`${pj&&pj.assetId?html`<button class="btn" onClick=${()=>setPrancha(pj)}>Ver prancha</button>`:null}`}>
+    <div class="grid g4">
+      <div class="kpi"><span>Endereço</span><div>${o.endereco||"—"}</div></div>
+      <div class="kpi"><span>Telefone</span><div class="mono" style=${{userSelect:"all"}}>${o.telefone||"—"}</div></div>
+      <div class="kpi"><span>Entrega</span><div>${dataBR(o.prazo)}</div></div>
+      <div class="kpi"><span>Andamento</span><div class="num">${feitas}/${(o.tarefas||[]).length} tarefas</div></div>
+    </div>
+    <div class="row">${ETAPAS_OS.map(e=>html`<button key=${e.id} class=${"btn sm"+(o.etapa===e.id?" pri":"")} disabled=${!S.admin&&!["eletricista"].includes(S.papel)} onClick=${()=>etapa(e.id)}><span class="wire" style=${{background:e.c,height:12,width:3}}></span>${e.t}</button>`)}</div>
+
+    <div class="grid g2" style=${{alignItems:"start"}}>
+      <div class="card col"><div class="row" style=${{justifyContent:"space-between"}}><h3>Tarefas</h3>
+        ${S.admin&&html`<select class="i" style=${{maxWidth:240}} value="" onChange=${e=>distribuir(e.target.value)} aria-label="Atribuir sem responsável"><option value="">Atribuir as sem responsável a…</option>${equipe.map(([i,n])=>html`<option key=${i} value=${i}>${n}</option>`)}</select>`}</div>
+        ${porEtapa.map(({e,t})=>html`<div key=${e.id}><div class="row" style=${{marginTop:6}}><span class="wire" style=${{background:e.c,height:14}}></span><b>${e.t}</b><span class="small muted">${t.filter(x=>x.feito).length}/${t.length}</span></div>
+          ${t.map(k=>html`<div key=${k.id} class=${"task"+(k.feito?" done":"")}><input type="checkbox" checked=${!!k.feito} aria-label="Concluir" onChange=${()=>upT(k.id,{feito:!k.feito,feitoPor:S.me.id,feitoEm:new Date().toISOString()})}/>
+            <div style=${{flex:1,minWidth:0}}><div class="t">${k.desc}</div><div class="row small muted" style=${{marginTop:4}}>${k.horas?html`<span>~${n2(k.horas)} h</span>`:null}
+            ${S.admin?html`<select class="i" style=${{maxWidth:220,padding:"3px 6px"}} value=${k.resp||""} onChange=${ev=>upT(k.id,{resp:ev.target.value})} aria-label="Responsável"><option value="">Sem responsável</option>${equipe.map(([i,n])=>html`<option key=${i} value=${i}>${n}</option>`)}</select>`:html`<span>${k.resp?S.nome(k.resp):"sem responsável"}</span>`}
+            ${k.feito&&k.feitoPor?html`<span>feito por ${S.nome(k.feitoPor)}</span>`:null}</div></div>
+            ${S.admin&&html`<button class="btn sm ghost danger" aria-label="Remover tarefa" onClick=${()=>S.api.update("os",o.id,{tarefas:o.tarefas.filter(x=>x.id!==k.id)})}>✕</button>`}</div>`)}</div>`)}
+        ${S.admin&&html`<div class="grid" style=${{gridTemplateColumns:"minmax(0,140px) minmax(0,1fr) auto",gap:8,borderTop:"1px solid var(--line)",paddingTop:10}}>
+          <${Sel} value=${nova.etapa} onChange=${v=>setNova({...nova,etapa:v})} opts=${ETAPAS_OS.filter(e=>!["material","concluida"].includes(e.id)).map(e=>[e.id,e.t])}/>
+          <${Inp} value=${nova.desc} onChange=${v=>setNova({...nova,desc:v})} placeholder="Nova tarefa"/>
+          <button class="btn" disabled=${!nova.desc} onClick=${()=>{S.api.update("os",o.id,{tarefas:[...(o.tarefas||[]),{id:uid(),etapa:nova.etapa,comodo:"",desc:nova.desc,horas:0,resp:"",feito:false}]});setNova({...nova,desc:""})}}>Adicionar</button></div>`}
+      </div>
+      <div class="col">
+        <div class="card col"><div class="row" style=${{justifyContent:"space-between"}}><h3>Material da obra</h3>${(o.materiais||[]).some(m=>!m.baixado)&&html`<button class="btn sm pri" onClick=${separar}>Separar tudo e dar baixa</button>`}</div>
+          ${(o.materiais||[]).length?html`<div class="tbl-wrap"><table><thead><tr><th>Material</th><th class="r">Precisa</th><th class="r">Estoque</th><th></th></tr></thead><tbody>
+            ${o.materiais.map(m=>{const k=mat(m);const fal=k&&!m.baixado&&num(k.estoque)<num(m.qtd);return html`<tr key=${m.matId}><td>${k?k.nome:m.matId}</td><td class="r num">${n2(m.qtd)} ${k?k.unid:""}</td><td class="r num">${k?n2(k.estoque):"—"}</td>
+              <td class="r">${m.baixado?html`<span class="pill ok">Separado</span>`:fal?html`<span class="pill bad">Comprar ${n2(num(m.qtd)-num(k.estoque))}</span>`:html`<button class="btn sm" onClick=${()=>baixarUm(m)}>Baixar</button>`}</td></tr>`})}
+          </tbody></table></div>`:html`<p class="muted small" style=${{margin:0}}>Sem material listado (cliente compra ou serviço avulso).</p>`}
+        </div>
+        ${pj&&html`<div class="card col"><h3>Do projeto: ${pj.nome}</h3><div class="small muted">${(pj.circuitos||[]).length} circuitos · tensão ${(pj.carimbo||{}).tensao||"—"}</div>
+          ${(pj.circuitos||[]).length?html`<div class="tbl-wrap"><table><thead><tr><th>Circ.</th><th>Descrição</th><th class="r">Disj.</th><th class="r">Cabo</th></tr></thead><tbody>${pj.circuitos.map(c=>html`<tr key=${c.id}><td class="mono">${c.num}</td><td>${c.desc}</td><td class="r num">${c.disjuntor}A</td><td class="r num">${c.bitola}mm²</td></tr>`)}</tbody></table></div>`:null}</div>`}
+        ${S.admin&&html`<button class="btn ghost danger" onClick=${()=>setDel(true)}>Excluir OS</button>`}
+      </div>
+    </div>
+    ${prancha&&html`<${VerPrancha} pj=${prancha} onClose=${()=>setPrancha(null)}/>`}
+    ${del&&html`<${Confirm} text=${`Excluir ${o.numero}? As tarefas somem para a equipe.`} onNo=${()=>setDel(false)} onYes=${()=>{S.api.del("os",o.id,"OS excluída.");onClose()}}/>`}
+  <//>`;
+}
+function VerPrancha({pj,onClose}){
+  const [pgs,setPgs]=useState([]);const [err,setErr]=useState("");const [z,setZ]=useState(1);
+  useEffect(()=>{(async()=>{try{const r=await fetch("/_blob/"+pj.assetId);if(!r.ok)throw 0;const b=await r.blob();setPgs(await arquivoParaPaginas(new File([b],pj.arquivo||"p.pdf",{type:b.type||"application/pdf"})))}catch{setErr("Não foi possível abrir a prancha.")}})()},[]);
+  return html`<${Modal} title=${"Prancha · "+pj.nome} onClose=${onClose} actions=${html`<button class="btn sm" onClick=${()=>setZ(x=>Math.max(.25,x-.25))}>Zoom −</button><button class="btn sm" onClick=${()=>setZ(x=>Math.min(3,x+.25))}>Zoom +</button>`}>
+    ${err?html`<div class="alert bad">${err}</div>`:!pgs.length?html`<div class="alert info"><span class="spin"></span> Abrindo…</div>`:pgs.map(p=>html`<div class="viewer" key=${p.n}><img src=${p.url} style=${{width:z*100+"%"}} alt=${"Página "+p.n}/></div>`)}<//>`;
+}
+
+/* ============================== ALMOXARIFADO ============================== */
+PAGES.estoque=function Estoque(){
+  const S=useS();const [busca,setBusca]=useState("");const [mov,setMov]=useState(null);const [novo,setNovo]=useState(null);const [tab,setTab]=useState("itens");
+  const lista=S.data.materiais.filter(m=>(m.nome||"").toLowerCase().includes(busca.toLowerCase())).sort((a,b)=>(a.nome||"").localeCompare(b.nome||""));
+  const comprar=S.data.materiais.filter(m=>num(m.minimo)>0&&num(m.estoque)<num(m.minimo));
+  const reservado={};for(const o of S.data.os.filter(o=>o.etapa!=="concluida"))for(const m of (o.materiais||[]))if(!m.baixado)reservado[m.matId]=(reservado[m.matId]||0)+num(m.qtd);
+  const pode=S.admin||S.papel==="escritorio"||S.papel==="eletricista";
+  return html`<div class="phead"><div><h1>Almoxarifado</h1><p>Quanto tem, quanto as obras abertas vão usar e o que precisa comprar.</p></div>${S.admin&&html`<button class="btn pri" onClick=${()=>setNovo({nome:"",unid:"un",custo:0,estoque:0,minimo:0})}>Novo material</button>`}</div>
+  <${Tabs} value=${tab} onChange=${setTab} tabs=${[["itens","Itens"],["comprar",`Comprar (${comprar.length+Object.keys(reservado).filter(k=>{const m=S.mats.find(x=>x.id===k);return m&&num(m.estoque)<reservado[k]}).length})`],["mov","Movimentações"]]}/>
+  ${tab==="itens"&&html`<input class="i" style=${{maxWidth:320}} placeholder="Buscar material" value=${busca} onChange=${e=>setBusca(e.target.value)} aria-label="Buscar"/>
+    ${lista.length?html`<div class="tbl-wrap"><table><thead><tr><th>Material</th><th class="r">Estoque</th><th class="r">Reservado p/ obras</th><th class="r">Mínimo</th><th class="r">Custo</th><th></th></tr></thead><tbody>
+      ${lista.map(m=>{const r=reservado[m.id]||0;const st=num(m.estoque)<r?"bad":num(m.minimo)>0&&num(m.estoque)<num(m.minimo)?"warn":"";
+        return html`<tr key=${m.id}><td>${m.nome}</td><td class="r num">${st?html`<span class=${"pill "+st}>${n2(m.estoque)} ${m.unid}</span>`:`${n2(m.estoque)} ${m.unid}`}</td><td class="r num">${r?n2(r):"—"}</td><td class="r num">${n2(m.minimo)}</td><td class="r num">${brl(m.custo)}</td>
+        <td class="r"><div class="row" style=${{justifyContent:"flex-end",flexWrap:"nowrap"}}>${pode&&html`<button class="btn sm" onClick=${()=>setMov({m,tipo:"entrada",qtd:0})}>Entrada</button><button class="btn sm" onClick=${()=>setMov({m,tipo:"saida",qtd:0})}>Saída</button>`}${S.admin&&html`<button class="btn sm ghost" onClick=${()=>setNovo({...m})}>Editar</button>`}</div></td></tr>`})}
+    </tbody></table></div>`:html`<${Empty} title="Nenhum material cadastrado" text=${S.admin?"Cadastre os materiais em Preços e custos (com o botão de modelo) ou aqui, um a um.":"O patrão ainda não cadastrou os materiais."}/>`}`}
+  ${tab==="comprar"&&html`<div class="tbl-wrap"><table><thead><tr><th>Material</th><th class="r">Estoque</th><th class="r">Obras precisam</th><th class="r">Mínimo</th><th class="r">Comprar</th><th class="r">Custo est.</th></tr></thead><tbody>
+    ${S.mats.map(m=>{const r=reservado[m.id]||0;const q=Math.max(0,r+num(m.minimo)-num(m.estoque));return q>0?html`<tr key=${m.id}><td>${m.nome}</td><td class="r num">${n2(m.estoque)}</td><td class="r num">${n2(r)}</td><td class="r num">${n2(m.minimo)}</td><td class="r num"><b>${n2(Math.ceil(q))} ${m.unid}</b></td><td class="r num">${brl(Math.ceil(q)*num(m.custo))}</td></tr>`:null})}
+  </tbody></table></div>`}
+  ${tab==="mov"&&html`<div class="tbl-wrap"><table><thead><tr><th>Data</th><th>Material</th><th>Tipo</th><th class="r">Qtd</th><th>Ref.</th></tr></thead><tbody>
+    ${[...S.data.movimentos].sort((a,b)=>(b.data||"").localeCompare(a.data||"")).slice(0,200).map(v=>html`<tr key=${v.id}><td>${dataBR(v.data)}</td><td>${(S.mats.find(m=>m.id===v.matId)||{nome:v.matId}).nome}</td><td>${v.tipo==="entrada"?html`<span class="pill ok">Entrada</span>`:html`<span class="pill">Saída</span>`}</td><td class="r num">${n2(v.qtd)}</td><td class="small muted">${v.ref||""}</td></tr>`)}
+    ${!S.data.movimentos.length&&html`<tr><td colspan="5" class="muted">Nenhuma movimentação.</td></tr>`}</tbody></table></div>`}
+  ${mov&&html`<${Modal} title=${(mov.tipo==="entrada"?"Entrada · ":"Saída · ")+mov.m.nome} onClose=${()=>setMov(null)}>
+    <div class="grid g3"><${F} label=${"Quantidade ("+mov.m.unid+")"}><${Num} id="mv-q" value=${mov.qtd} onChange=${v=>setMov({...mov,qtd:v})}/><//>
+    <${F} label="Referência (nota, OS, fornecedor)"><${Inp} id="mv-r" value=${mov.ref} onChange=${v=>setMov({...mov,ref:v})}/><//>
+    ${mov.tipo==="entrada"&&html`<${F} label="Custo unitário pago (R$)"><${Inp} id="mv-c" type="number" value=${mov.custo??mov.m.custo} onChange=${v=>setMov({...mov,custo:v})}/><//>`}</div>
+    <div class="row" style=${{justifyContent:"flex-end"}}><button class="btn pri" disabled=${!mov.qtd} onClick=${async()=>{const d=mov.tipo==="entrada"?mov.qtd:-mov.qtd;const p={estoque:num(mov.m.estoque)+d};if(mov.tipo==="entrada"&&mov.custo!=null)p.custo=num(mov.custo);await S.api.update("materiais",mov.m.id,p);await S.api.add("movimentos",{matId:mov.m.id,tipo:mov.tipo,qtd:mov.qtd,ref:mov.ref||"",data:hoje(),por:S.me.id},"Movimentação registrada.");setMov(null)}}>Registrar</button></div><//>`}
+  ${novo&&html`<${Modal} title=${novo.id?"Editar material":"Novo material"} onClose=${()=>setNovo(null)}>
+    <div class="grid g3"><${F} label="Nome"><${Inp} id="nm-n" value=${novo.nome} onChange=${v=>setNovo({...novo,nome:v})}/><//><${F} label="Unidade"><${Sel} id="nm-u" value=${novo.unid} onChange=${v=>setNovo({...novo,unid:v})} opts=${["un","m","kg","rolo","cx","pç"]}/><//>
+    <${F} label="Custo (R$)"><${Inp} id="nm-c" type="number" value=${novo.custo} onChange=${v=>setNovo({...novo,custo:v})}/><//><${F} label="Estoque atual"><${Inp} id="nm-e" type="number" value=${novo.estoque} onChange=${v=>setNovo({...novo,estoque:v})}/><//><${F} label="Estoque mínimo"><${Inp} id="nm-m" type="number" value=${novo.minimo} onChange=${v=>setNovo({...novo,minimo:v})}/><//>
+    <${F} label="Fornecedor"><${Sel} id="nm-f" value=${novo.fornecedorId||""} onChange=${v=>setNovo({...novo,fornecedorId:v})} opts=${[["","—"],...S.data.fornecedores.map(f=>[f.id,f.nome])]}/><//></div>
+    <div class="row" style=${{justifyContent:"space-between"}}>${novo.id?html`<button class="btn ghost danger" onClick=${()=>{S.api.del("materiais",novo.id,"Material excluído.");setNovo(null)}}>Excluir</button>`:html`<span></span>`}<button class="btn pri" disabled=${!novo.nome} onClick=${()=>{novo.id?S.api.set("materiais",novo.id,novo,"Material salvo."):S.api.add("materiais",novo,"Material cadastrado.");setNovo(null)}}>Salvar</button></div><//>`}`;
+};
+
+/* ============================== FINANCEIRO ============================== */
+PAGES.financeiro=function Fin(){
+  const S=useS();const [ed,setEd]=useState(null);const [filtro,setFiltro]=useState("aberto");const [mes,setMes]=useState(hoje().slice(0,7));
+  const L=[...S.data.financeiro].sort((a,b)=>(a.venc||"9").localeCompare(b.venc||"9"));
+  const vis=L.filter(f=>filtro==="aberto"?f.status!=="pago":filtro==="mes"?((f.pagoEm||f.venc||"").slice(0,7)===mes):true);
+  const doMes=L.filter(f=>f.status==="pago"&&(f.pagoEm||"").slice(0,7)===mes);
+  const ent=doMes.filter(f=>f.tipo==="entrada").reduce((a,f)=>a+num(f.valor),0),sai=doMes.filter(f=>f.tipo==="saida").reduce((a,f)=>a+num(f.valor),0);
+  const pagar=f=>S.api.update("financeiro",f.id,{status:f.status==="pago"?"pendente":"pago",pagoEm:f.status==="pago"?"":hoje()},f.status==="pago"?"Reaberto.":"Baixado como pago.");
+  return html`<div class="phead"><div><h1>Financeiro</h1><p>Contas a receber e a pagar. Ao fechar uma obra, entrada e saldo entram aqui sozinhos.</p></div><button class="btn pri" onClick=${()=>setEd({tipo:"saida",desc:"",valor:0,venc:hoje(),status:"pendente",categoria:"Material"})}>Novo lançamento</button></div>
+  <div class="grid g4"><div class="card kpi"><span>Recebido em ${mes.split("-").reverse().join("/")}</span><b>${brl(ent)}</b></div><div class="card kpi"><span>Pago no mês</span><b>${brl(sai)}</b></div><div class="card kpi"><span>Resultado do mês</span><b style=${{color:ent-sai<0?"var(--bad)":"var(--ok)"}}>${brl(ent-sai)}</b></div>
+    <div class="card kpi"><span>Mês</span><input class="i" type="month" value=${mes} onChange=${e=>setMes(e.target.value)} aria-label="Mês"/></div></div>
+  <${Tabs} value=${filtro} onChange=${setFiltro} tabs=${[["aberto","Em aberto"],["mes","Do mês"],["todos","Todos"]]}/>
+  ${vis.length?html`<div class="tbl-wrap"><table><thead><tr><th>Vencimento</th><th>Descrição</th><th>Categoria</th><th class="r">Valor</th><th>Situação</th><th></th></tr></thead><tbody>
+    ${vis.map(f=>{const venc=f.status!=="pago"&&f.venc&&f.venc<hoje();return html`<tr key=${f.id}><td>${dataBR(f.venc)}</td><td>${f.desc}</td><td class="small muted">${f.categoria||""}</td><td class="r num" style=${{color:f.tipo==="entrada"?"var(--ok)":"var(--fg)"}}>${f.tipo==="entrada"?"+":"−"} ${brl(f.valor)}</td>
+      <td>${f.status==="pago"?html`<span class="pill ok">Pago ${dataBR(f.pagoEm)}</span>`:venc?html`<span class="pill bad">Vencido</span>`:html`<span class="pill warn">Pendente</span>`}</td>
+      <td class="r"><div class="row" style=${{justifyContent:"flex-end",flexWrap:"nowrap"}}><button class="btn sm" onClick=${()=>pagar(f)}>${f.status==="pago"?"Reabrir":"Baixar"}</button><button class="btn sm ghost" onClick=${()=>setEd({...f})}>Editar</button></div></td></tr>`})}
+  </tbody></table></div>`:html`<${Empty} title="Nada por aqui" text="Lance contas a pagar (material, combustível, folha) e a receber. As parcelas das obras fechadas entram automaticamente."/>`}
+  ${ed&&html`<${Modal} title=${ed.id?"Editar lançamento":"Novo lançamento"} onClose=${()=>setEd(null)}>
+    <div class="grid g3"><${F} label="Tipo"><${Sel} id="fn-t" value=${ed.tipo} onChange=${v=>setEd({...ed,tipo:v})} opts=${[["entrada","Entrada (a receber)"],["saida","Saída (a pagar)"]]}/><//>
+      <${F} label="Descrição"><${Inp} id="fn-d" value=${ed.desc} onChange=${v=>setEd({...ed,desc:v})}/><//><${F} label="Valor (R$)"><${Inp} id="fn-v" type="number" value=${ed.valor} onChange=${v=>setEd({...ed,valor:v})}/><//>
+      <${F} label="Vencimento"><${Inp} id="fn-ve" type="date" value=${ed.venc} onChange=${v=>setEd({...ed,venc:v})}/><//><${F} label="Categoria"><${Sel} id="fn-c" value=${ed.categoria} onChange=${v=>setEd({...ed,categoria:v})} opts=${["Obra","Material","Folha","Combustível","Ferramentas","Impostos","Aluguel","Outros"]}/><//>
+      <${F} label="Forma"><${Sel} id="fn-f" value=${ed.forma||"Pix"} onChange=${v=>setEd({...ed,forma:v})} opts=${["Pix","Dinheiro","Boleto","Cartão de crédito","Transferência"]}/><//></div>
+    <div class="row" style=${{justifyContent:"space-between"}}>${ed.id?html`<button class="btn ghost danger" onClick=${()=>{S.api.del("financeiro",ed.id,"Lançamento excluído.");setEd(null)}}>Excluir</button>`:html`<span></span>`}<button class="btn pri" disabled=${!ed.desc||!ed.valor} onClick=${()=>{ed.id?S.api.set("financeiro",ed.id,ed,"Salvo."):S.api.add("financeiro",{...ed,criadoEm:new Date().toISOString()},"Lançado.");setEd(null)}}>Salvar</button></div><//>`}`;
+};
+
+/* ============================== CADASTROS ============================== */
+PAGES.cadastros=function Cad(){
+  const S=useS();const [tab,setTab]=useState("clientes");const [ed,setEd]=useState(null);
+  const L=S.data[tab];
+  return html`<div class="phead"><div><h1>Clientes e fornecedores</h1></div><button class="btn pri" onClick=${()=>setEd({nome:"",telefone:"",email:"",endereco:"",doc:""})}>Novo ${tab==="clientes"?"cliente":"fornecedor"}</button></div>
+  <${Tabs} value=${tab} onChange=${setTab} tabs=${[["clientes",`Clientes (${S.data.clientes.length})`],["fornecedores",`Fornecedores (${S.data.fornecedores.length})`]]}/>
+  ${L.length?html`<div class="tbl-wrap"><table><thead><tr><th>Nome</th><th>Telefone</th><th>Endereço</th>${tab==="clientes"?html`<th class="r">Obras</th>`:html`<th>Fornece</th>`}<th></th></tr></thead><tbody>
+    ${[...L].sort((a,b)=>(a.nome||"").localeCompare(b.nome||"")).map(c=>html`<tr key=${c.id}><td><b>${c.nome}</b>${c.doc?html`<div class="small muted">${c.doc}</div>`:null}</td><td class="mono" style=${{userSelect:"all"}}>${c.telefone||"—"}</td><td class="small">${c.endereco||"—"}</td>
+      ${tab==="clientes"?html`<td class="r num">${S.data.orcamentos.filter(o=>o.cliente===c.nome&&o.etapa==="aprovado").length}</td>`:html`<td class="small">${c.fornece||""}</td>`}
+      <td class="r"><button class="btn sm" onClick=${()=>setEd({...c})}>Editar</button></td></tr>`)}</tbody></table></div>`:html`<${Empty} title=${tab==="clientes"?"Nenhum cliente":"Nenhum fornecedor"} text=${tab==="clientes"?"Clientes também podem ser cadastrados direto do orçamento.":"Cadastre as lojas de material elétrico para ligar aos materiais e comparar preço."}/>`}
+  ${ed&&html`<${Modal} title=${ed.id?"Editar":"Novo cadastro"} onClose=${()=>setEd(null)}>
+    <div class="grid g3"><${F} label="Nome"><${Inp} id="cd-n" value=${ed.nome} onChange=${v=>setEd({...ed,nome:v})}/><//><${F} label="Telefone / WhatsApp"><${Inp} id="cd-t" value=${ed.telefone} onChange=${v=>setEd({...ed,telefone:v})}/><//><${F} label="CPF / CNPJ"><${Inp} id="cd-d" value=${ed.doc} onChange=${v=>setEd({...ed,doc:v})}/><//>
+    <${F} label="Endereço" style=${{gridColumn:"1/-1"}}><${Inp} id="cd-e" value=${ed.endereco} onChange=${v=>setEd({...ed,endereco:v})}/><//>${tab==="fornecedores"&&html`<${F} label="O que fornece"><${Inp} id="cd-f" value=${ed.fornece} onChange=${v=>setEd({...ed,fornece:v})}/><//>`}</div>
+    <div class="row" style=${{justifyContent:"space-between"}}>${ed.id?html`<button class="btn ghost danger" onClick=${()=>{S.api.del(tab,ed.id,"Excluído.");setEd(null)}}>Excluir</button>`:html`<span></span>`}<button class="btn pri" disabled=${!ed.nome} onClick=${()=>{ed.id?S.api.set(tab,ed.id,ed,"Salvo."):S.api.add(tab,{...ed,criadoEm:new Date().toISOString()},"Cadastrado.");setEd(null)}}>Salvar</button></div><//>`}`;
+};
+
+/* ============================== PREÇOS E CUSTOS ============================== */
+PAGES.precos=function Precos(){
+  const S=useS();const [tab,setTab]=useState(S.pontos.length?"pontos":"param");
+  const [cfg,setCfg]=useState(S.config);const [cfgDirty,setCfgDirty]=useState(false);
+  useEffect(()=>{if(!cfgDirty)setCfg(S.config)},[S.configSalva,S.config.regras]);
+  const [pts,setPts]=useState(S.pontos);const [ptsDirty,setPtsDirty]=useState(false);
+  useEffect(()=>{if(!ptsDirty)setPts(S.pontos)},[S.precos]);
+  const [kit,setKit]=useState(null);const [carregando,setCarregando]=useState(false);
+  const setC=p=>{setCfg(x=>({...x,...p}));setCfgDirty(true)};
+  const ch=(num(cfg.folhaMensal)*(1+num(cfg.encargosPct)/100)+num(cfg.custosFixos))/Math.max(1,num(cfg.horasProdutivas));
+  const upP=(id,p)=>{setPts(a=>a.map(x=>x.id===id?{...x,...p}:x));setPtsDirty(true)};
+  const carregarModelo=async()=>{
+    setCarregando(true);
+    try{
+      const exist=new Set(S.mats.map(m=>m.id));
+      for(const [id,nome,unid,custo] of MODELO.materiais)if(!exist.has(id))await S.api.set("materiais",id,{id,nome,unid,custo,estoque:0,minimo:0},null);
+      const pontos=MODELO.pontos.map(([id,nome,grupo,unid,mo,horas,kit])=>({id,nome,grupo,unid,mo,horas,kit}));
+      const atuais=new Set(S.pontos.map(p=>p.id));
+      const novos=[...S.pontos,...pontos.filter(p=>!atuais.has(p.id))];
+      await S.api.setMeta("precos",{pontos:novos},null);setPts(novos);setPtsDirty(false);
+      if(!S.configSalva)await S.api.setMeta("config",cfg,null);
+      S.toast("Tabela modelo carregada. Ajuste os valores para a sua realidade.");
+    }finally{setCarregando(false)}
+  };
+  return html`<div class="phead"><div><h1>Preços e custos</h1><p>A base de toda a precificação: quanto custa a sua hora, quanto você cobra por ponto e o material que cada ponto leva.</p></div>
+    <div class="row">${(!S.pontos.length||!S.mats.length)&&html`<button class="btn" disabled=${carregando} onClick=${carregarModelo}>${carregando?"Carregando…":"Carregar tabela modelo"}</button>`}</div></div>
+  <${Tabs} value=${tab} onChange=${setTab} tabs=${[["param","Custo da hora e parâmetros"],["pontos",`Preço por ponto (${pts.length})`]]}/>
+  ${tab==="param"&&html`<div class="grid g2" style=${{alignItems:"start"}}>
+    <div class="card col"><h3>Quanto custa 1 hora da sua equipe</h3><p class="small muted" style=${{margin:0}}>É aqui que a maioria erra o preço: cobra o ponto sem saber quanto custa a hora trabalhada.</p>
+      <div class="grid g2"><${F} label="Folha mensal da equipe (R$)"><${Inp} id="pc-fo" type="number" value=${cfg.folhaMensal} onChange=${v=>setC({folhaMensal:v})}/><//>
+      <${F} label="Encargos e benefícios (%)"><${Inp} id="pc-en" type="number" value=${cfg.encargosPct} onChange=${v=>setC({encargosPct:v})}/><//>
+      <${F} label="Custos fixos mensais (R$) · carro, aluguel, contador, ferramentas"><${Inp} id="pc-cf" type="number" value=${cfg.custosFixos} onChange=${v=>setC({custosFixos:v})}/><//>
+      <${F} label="Horas produtivas por mês (equipe toda)"><${Inp} id="pc-hp" type="number" value=${cfg.horasProdutivas} onChange=${v=>setC({horasProdutivas:v})}/><//></div>
+      <div class="small muted">Horas produtivas = pessoas em obra × ~150 h/mês (já descontando deslocamento, chuva e retrabalho). Ex.: 3 pessoas ≈ 450 h.</div>
+      <div class="total-box"><div class="ln"><span>Custo da hora</span></div><div class="big">${brl(ch)}</div><div class="small" style=${{opacity:.8}}>Qualquer ponto que renda menos que isso por hora dá prejuízo.</div></div>
+    </div>
+    <div class="col"><div class="card col"><h3>Parâmetros do orçamento</h3>
+      <div class="grid g2"><${F} label="Nome da empresa"><${Inp} id="pc-emp" value=${cfg.empresa} onChange=${v=>setC({empresa:v})}/><//><${F} label="Cidade"><${Inp} id="pc-cid" value=${cfg.cidade} onChange=${v=>setC({cidade:v})}/><//>
+      <${F} label="Telefone (aparece na proposta)"><${Inp} id="pc-tel" value=${cfg.telefone} onChange=${v=>setC({telefone:v})}/><//><${F} label="Imposto padrão (%)"><${Inp} id="pc-imp" type="number" value=${cfg.impostoPct} onChange=${v=>setC({impostoPct:v})}/><//>
+      <${F} label="Markup sobre material (%)"><${Inp} id="pc-mk" type="number" value=${cfg.markupMatPct} onChange=${v=>setC({markupMatPct:v})}/><//><${F} label="Fator industrial (× mão de obra)"><${Inp} id="pc-fi" type="number" value=${cfg.fatorIndustrial} onChange=${v=>setC({fatorIndustrial:v})}/><//>
+      <${F} label="Deslocamento padrão (R$)"><${Inp} id="pc-dp" type="number" value=${cfg.deslocamentoPadrao} onChange=${v=>setC({deslocamentoPadrao:v})}/><//><${F} label="Margem mínima aceitável (%)"><${Inp} id="pc-mm" type="number" value=${cfg.margemMin} onChange=${v=>setC({margemMin:v})}/><//></div></div>
+      <div class="card col"><h3>Regras da casa para ler projeto</h3><p class="small muted" style=${{margin:0}}>O jeito do patrão ler. A IA obedece estas regras e a equipe vê no guia. Uma por linha.</p>
+        <textarea class="i" id="pc-rg" style=${{minHeight:130}} value=${cfg.regras} onChange=${e=>setC({regras:e.target.value})} placeholder=${"• Todo banheiro tem chuveiro mesmo que o projeto não mostre\n• Ponto de ar-condicionado: contar tomada 20A + dreno"}></textarea></div>
+      <div class="row" style=${{justifyContent:"flex-end"}}><button class="btn pri" disabled=${!cfgDirty} onClick=${async()=>{if(await S.api.setMeta("config",cfg,"Parâmetros salvos."))setCfgDirty(false)}}>Salvar parâmetros</button></div>
+    </div></div>`}
+  ${tab==="pontos"&&html`${pts.length?html`<div class="alert info">Valores do modelo são só referência para começar. Ajuste pelo que você cobra hoje e confira a coluna R$/hora: ela tem que ficar acima do custo da hora (${brl(S.custoHora)}).</div>
+    <div class="tbl-wrap"><table><thead><tr><th>Tipo de ponto</th><th>Grupo</th><th class="r">Preço M.O.</th><th class="r">Horas</th><th class="r">R$/hora</th><th class="r">Material (kit)</th><th></th></tr></thead><tbody>
+    ${pts.map(p=>{const rh=num(p.horas)?num(p.mo)/num(p.horas):0;const ck=custoKit(p,S.mats);return html`<tr key=${p.id}><td style=${{minWidth:200}}><input class="i" value=${p.nome} onChange=${e=>upP(p.id,{nome:e.target.value})} aria-label="Nome"/></td>
+      <td style=${{width:130}}><${Sel} value=${p.grupo} onChange=${v=>upP(p.id,{grupo:v})} opts=${["Residencial","Quadro","Industrial"]}/></td>
+      <td style=${{width:110}}><${Inp} type="number" value=${p.mo} onChange=${v=>upP(p.id,{mo:v})} aria-label="Preço mão de obra"/></td>
+      <td style=${{width:90}}><${Inp} type="number" value=${p.horas} onChange=${v=>upP(p.id,{horas:v})} aria-label="Horas"/></td>
+      <td class="r num">${rh?html`<span class=${"pill "+(rh<S.custoHora?"bad":rh<S.custoHora*1.3?"warn":"ok")}>${brl(rh)}</span>`:"—"}</td>
+      <td class="r"><button class="btn sm" onClick=${()=>setKit(p)}>${(p.kit||[]).length} itens · ${brl(ck)}</button></td>
+      <td><button class="btn sm ghost danger" aria-label="Remover" onClick=${()=>{setPts(a=>a.filter(x=>x.id!==p.id));setPtsDirty(true)}}>✕</button></td></tr>`})}</tbody></table></div>
+    <div class="row" style=${{justifyContent:"space-between"}}><button class="btn" onClick=${()=>{setPts(a=>[...a,{id:"p"+uid().slice(-6),nome:"Novo tipo de ponto",grupo:"Residencial",unid:"pt",mo:0,horas:1,kit:[]}]);setPtsDirty(true)}}>+ Tipo de ponto</button>
+      <button class="btn pri" disabled=${!ptsDirty} onClick=${async()=>{if(await S.api.setMeta("precos",{pontos:pts},"Tabela de preços salva."))setPtsDirty(false)}}>Salvar tabela</button></div>`
+    :html`<${Empty} title="Tabela de preços vazia" text="Carregue a tabela modelo (28 tipos de ponto com kit de material) e ajuste os valores, ou crie os tipos um a um."><div class="row"><button class="btn pri" disabled=${carregando} onClick=${carregarModelo}>Carregar tabela modelo</button><button class="btn" onClick=${()=>{setPts([{id:"p"+uid().slice(-6),nome:"Novo tipo de ponto",grupo:"Residencial",unid:"pt",mo:0,horas:1,kit:[]}]);setPtsDirty(true)}}>Criar do zero</button></div><//>`}`}
+  ${kit&&html`<${KitModal} p=${pts.find(x=>x.id===kit.id)||kit} onClose=${()=>setKit(null)} onSave=${k=>{upP(kit.id,{kit:k});setKit(null)}}/>`}`;
+};
+function KitModal({p,onClose,onSave}){
+  const S=useS();const [k,setK]=useState(p.kit||[]);const [add,setAdd]=useState("");
+  return html`<${Modal} title=${"Material por ponto · "+p.nome} onClose=${onClose}>
+    <p class="small muted" style=${{margin:0}}>O que vai em cada unidade deste ponto. Cabo e eletroduto ficam de fora: entram pela metragem do projeto.</p>
+    ${k.map(([mid,q],i)=>{const m=S.mats.find(x=>x.id===mid);return html`<div class="it" key=${mid}><span class="nm">${m?m.nome:mid+" (não cadastrado)"}</span><span class="small muted num">${m?brl(num(m.custo)*num(q)):""}</span><${Num} value=${q} onChange=${v=>setK(a=>v>0?a.map((x,j)=>j===i?[x[0],v]:x):a.filter((_,j)=>j!==i))}/></div>`})}
+    <select class="i" value=${add} onChange=${e=>{const v=e.target.value;if(v&&!k.find(x=>x[0]===v))setK([...k,[v,1]]);setAdd("")}} aria-label="Adicionar material"><option value="">+ adicionar material…</option>${S.mats.map(m=>html`<option key=${m.id} value=${m.id}>${m.nome}</option>`)}</select>
+    <div class="row" style=${{justifyContent:"flex-end"}}><button class="btn pri" onClick=${()=>onSave(k)}>Aplicar</button></div><//>`;
+}
+
+/* ============================== EQUIPE ============================== */
+PAGES.equipe=function Equipe(){
+  const S=useS();const [papelNovo,setPapelNovo]=useState({});
+  const local=S.be.status!=="ready";
+  const liberar=async id=>{await S.api.set("team",id,{id,role:papelNovo[id]||"eletricista",active:true,addedAt:new Date().toISOString()},null);await S.api.del("access_requests",id,"Acesso liberado.")};
+  return html`<div class="phead"><div><h1>Equipe e acessos</h1><p>Quem entra no sistema e o que cada um vê. Eletricista e ajudante veem só tarefas, OS, almoxarifado e o guia; preço e financeiro ficam com o patrão e o escritório.</p></div></div>
+  ${local&&html`<div class="alert warn">No modo local não há equipe. Abra pelo link do claude.ai e compartilhe com a equipe (permissão de edição) para cada um pedir acesso.</div>`}
+  <div class="card col"><h3>Como colocar alguém na equipe</h3><ol style=${{margin:0,paddingLeft:18}} class="small"><li>Compartilhe o link deste sistema com a pessoa, com permissão de edição.</li><li>Ela abre, faz login e toca em "Pedir acesso".</li><li>O pedido aparece aqui: escolha a função e libere.</li></ol></div>
+  ${S.data.access_requests.length?html`<div class="card col"><h3>Pedidos de acesso</h3>${S.data.access_requests.map(r=>html`<div class="row" key=${r.id} style=${{justifyContent:"space-between"}}><div><b>${S.nome(r.id)}</b><div class="small muted">pediu em ${dataBR((r.requestedAt||"").slice(0,10))}</div></div>
+    <div class="row"><select class="i" style=${{width:"auto"}} value=${papelNovo[r.id]||"eletricista"} onChange=${e=>setPapelNovo({...papelNovo,[r.id]:e.target.value})} aria-label="Função">${Object.entries(PAPEIS).filter(([k])=>k!=="patrao").map(([k,v])=>html`<option key=${k} value=${k}>${v}</option>`)}</select>
+    <button class="btn pri" onClick=${()=>liberar(r.id)}>Liberar</button><button class="btn ghost danger" onClick=${()=>S.api.del("access_requests",r.id,"Pedido recusado.")}>Recusar</button></div></div>`)}</div>`:null}
+  ${S.data.team.length?html`<div class="tbl-wrap"><table><thead><tr><th>Pessoa</th><th>Função</th><th class="r">Tarefas abertas</th><th>Acesso</th><th></th></tr></thead><tbody>
+    ${S.data.team.map(t=>{const ab=S.data.os.filter(o=>o.etapa!=="concluida").flatMap(o=>o.tarefas||[]).filter(k=>k.resp===t.id&&!k.feito).length;
+      return html`<tr key=${t.id}><td><b>${S.nome(t.id)}</b></td><td><select class="i" style=${{width:"auto"}} value=${t.role} onChange=${e=>S.api.update("team",t.id,{role:e.target.value},"Função atualizada.")} aria-label="Função">${Object.entries(PAPEIS).filter(([k])=>k!=="patrao").map(([k,v])=>html`<option key=${k} value=${k}>${v}</option>`)}</select></td>
+      <td class="r num">${ab}</td><td>${t.active!==false?html`<span class="pill ok">Ativo</span>`:html`<span class="pill">Pausado</span>`}</td>
+      <td class="r"><div class="row" style=${{justifyContent:"flex-end",flexWrap:"nowrap"}}><button class="btn sm" onClick=${()=>S.api.update("team",t.id,{active:t.active===false},t.active===false?"Acesso reativado.":"Acesso pausado.")}>${t.active===false?"Reativar":"Pausar"}</button><button class="btn sm ghost danger" onClick=${()=>S.api.del("team",t.id,"Removido da equipe.")}>Remover</button></div></td></tr>`})}
+  </tbody></table></div>`:!local&&html`<${Empty} title="Ninguém na equipe ainda" text="Quando alguém pedir acesso pelo link compartilhado, o pedido aparece aqui."/>`}`;
+};
+
+/* ============================== BOOT ============================== */
+ReactDOM.createRoot(document.getElementById("root")).render(html`<${Provider}><${App}/><//>`);
+</script>
