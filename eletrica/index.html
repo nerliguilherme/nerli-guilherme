@@ -198,6 +198,40 @@ td.r,th.r{text-align:right}
   h1{font-size:25px}
 }
 @media (max-width: 560px){.flow{grid-template-columns:1fr}}
+/* início: faixa da marca + trilha (fio) dos 4 passos */
+.hero{position:relative;overflow:hidden;border-radius:18px;background:#0a87c7;background-image:radial-gradient(120% 140% at 100% 0%,#18a6e8 0%,#0a87c7 45%,#06639a 100%);color:#fff;padding:28px 28px 26px}
+.hero-mark{position:absolute;right:-30px;top:-20px;height:250px;opacity:.16;pointer-events:none;filter:brightness(0) invert(1)}
+.hero-in{position:relative;display:flex;flex-direction:column;gap:12px;max-width:720px}
+.hero-date{font-size:13px;font-weight:600;color:#cfeafa}
+.hero h1{font-size:32px;color:#fff}
+.hero p{margin:0;color:#e3f3fc;max-width:520px}
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px;margin:4px 0 6px}
+.hero-stats div{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;min-width:140px}
+.hero-stats b{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;color:#fff}
+.hero-stats span{font-size:12.5px;color:#d4ecfa}
+.hero .btn.hero-ghost{background:transparent;border-color:rgba(255,255,255,.6);color:#fff}
+.hero .btn.hero-ghost:hover{background:rgba(255,255,255,.12)}
+.trilha{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;position:relative}
+.trilha::before{content:"";position:absolute;left:12.5%;right:12.5%;top:27px;height:4px;border-radius:2px;background:var(--accent)}
+.tpasso{display:flex;flex-direction:column;align-items:center;gap:12px;min-width:0;position:relative}
+.tno{position:relative;width:58px;height:58px;border-radius:50%;background:var(--panel);border:4px solid var(--accent);display:grid;place-items:center;color:var(--brand);box-shadow:var(--shadow)}
+.tno .tic svg{width:24px;height:24px;display:block}
+.tno .tn{position:absolute;right:-6px;bottom:-4px;width:22px;height:22px;border-radius:50%;background:var(--brand);color:#fff;font-size:12px;font-weight:800;display:grid;place-items:center;border:2px solid var(--bg)}
+.tcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:6px;width:100%;box-shadow:var(--shadow);text-align:center;flex:1}
+.tcard h3{font-size:16px}
+.tcard .tbig{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.15}
+.tcard p{margin:0 0 6px;color:var(--muted);font-size:13px;flex:1}
+.aic{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;flex:none;background:var(--brand-soft);color:var(--brand)}
+.aic svg{width:20px;height:20px}
+.aic.warn{background:var(--warn-soft);color:var(--warn)} .aic.bad{background:var(--bad-soft);color:var(--bad)} .aic.ok{background:var(--ok-soft);color:var(--ok)}
+@media (max-width: 900px){
+  .trilha{grid-template-columns:1fr;gap:12px}
+  .trilha::before{left:27px;right:auto;top:20px;bottom:20px;width:4px;height:auto}
+  .tpasso{flex-direction:row;align-items:stretch}
+  .tno{flex:none}
+  .tcard{text-align:left}
+}
+@media (max-width: 560px){.hero{padding:22px 18px}.hero h1{font-size:26px}.hero-stats div{min-width:0;flex:1 1 40%}}
 </style>
 
 <div id="root"><div class="gate"><div class="card"><h2>Carregando sistema…</h2><p class="muted">Conectando ao banco de dados da empresa.</p></div></div></div>
@@ -740,7 +774,8 @@ function PedirAcesso(){
 /* ============================== INÍCIO ============================== */
 PAGES.painel=function Painel({go}){
   const S=useS();const {orcamentos,os,financeiro,materiais,projetos}=S.data;
-  const h=new Date().getHours();const saud=h<12?"Bom dia":h<18?"Boa tarde":"Boa noite";
+  const agora=new Date();const h=agora.getHours();const saud=h<12?"Bom dia":h<18?"Boa tarde":"Boa noite";
+  const dataTxt=(s=>s.charAt(0).toUpperCase()+s.slice(1))(agora.toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long"}));
   const primeiro=(S.nome(S.me.id)||"").split(" ")[0];
   const abertos=orcamentos.filter(o=>["contato","visita","orcamento","negociacao"].includes(o.etapa||"orcamento"));
   const valAberto=abertos.reduce((a,o)=>a+calcOrc(o,S.custoHora).total,0);
@@ -751,25 +786,49 @@ PAGES.painel=function Painel({go}){
   const baixo=materiais.filter(m=>num(m.minimo)>0&&num(m.estoque)<num(m.minimo));
   const semConf=projetos.filter(p=>p.status!=="conferido");
   const atencao=[
-    semConf.length&&{t:"warn",m:`${semConf.length} projeto(s) esperando a conferência do patrão`,a:["Conferir","projetos"]},
-    vencidos.length&&{t:"bad",m:`${vencidos.length} conta(s) vencida(s): ${brl(vencidos.reduce((a,f)=>a+num(f.valor),0))}`,a:["Ver contas","financeiro"]},
-    baixo.length&&{t:"warn",m:`${baixo.length} material(is) acabando: ${baixo.slice(0,3).map(m=>m.nome).join(", ")}${baixo.length>3?"…":""}`,a:["Ver estoque","estoque"]}
+    semConf.length&&{t:"warn",ic:"plan",m:`${semConf.length} projeto(s) esperando a conferência do patrão`,a:["Conferir","projetos"]},
+    vencidos.length&&{t:"bad",ic:"cash",m:`${vencidos.length} conta(s) vencida(s): ${brl(vencidos.reduce((a,f)=>a+num(f.valor),0))}`,a:["Ver contas","financeiro"]},
+    baixo.length&&{t:"warn",ic:"box",m:`${baixo.length} material(is) acabando: ${baixo.slice(0,3).map(m=>m.nome).join(", ")}${baixo.length>3?"…":""}`,a:["Ver estoque","estoque"]}
   ].filter(Boolean);
   const passos=[
-    {n:1,t:"Ler o projeto",big:projetos.length,sub:semConf.length?`${semConf.length} para conferir`:"projetos lidos",b:["Enviar prancha",()=>go("projetos","novo")]},
-    {n:2,t:"Fazer o orçamento",big:brl(valAberto),sub:`${abertos.length} orçamento(s) em aberto`,b:["Novo orçamento",()=>go("orcamentos","novo")]},
-    {n:3,t:"Executar a obra",big:osAtivas.length,sub:`obra(s) andando · ${tarefasAb} tarefa(s) a fazer`,b:["Ver obras",()=>go("os")]},
-    {n:4,t:"Receber",big:brl(receber),sub:vencidos.length?`${vencidos.length} conta(s) vencida(s)`:"a receber",b:["Ver dinheiro",()=>go("financeiro")]}
+    {n:1,ic:"plan",t:"Ler o projeto",big:String(projetos.length),sub:semConf.length?`${semConf.length} para conferir`:"projetos lidos",b:["Enviar prancha",()=>go("projetos","novo")],pri:true},
+    {n:2,ic:"tag",t:"Fazer o orçamento",big:String(abertos.length),sub:`em aberto · ${brl(valAberto)}`,b:["Novo orçamento",()=>go("orcamentos","novo")],pri:true},
+    {n:3,ic:"tool",t:"Executar a obra",big:String(osAtivas.length),sub:`obra(s) andando · ${tarefasAb} tarefa(s)`,b:["Ver obras",()=>go("os")]},
+    {n:4,ic:"cash",t:"Receber",big:brl(receber),sub:vencidos.length?`${vencidos.length} vencida(s)`:"a receber",b:["Ver dinheiro",()=>go("financeiro")]}
   ];
   return html`
-  <div class="phead"><div><h1>${saud}${primeiro?", "+primeiro:""}</h1><p>Todo serviço segue estes 4 passos. Toque no botão do passo que você quer fazer.</p></div></div>
+  <section class="hero">
+    <img class="hero-mark" src=${SHIELD_URL} alt=""/>
+    <div class="hero-in">
+      <span class="hero-date">${dataTxt}</span>
+      <h1>${saud}${primeiro?", "+primeiro:""}</h1>
+      <p>Tudo da ${S.config.empresa||"Lumen"} num lugar só: do projeto ao dinheiro na conta.</p>
+      <div class="hero-stats">
+        <div><b>${brl(valAberto)}</b><span>em negociação</span></div>
+        <div><b>${osAtivas.length}</b><span>obra(s) andando</span></div>
+        <div><b>${brl(receber)}</b><span>a receber</span></div>
+      </div>
+      <div class="row"><button class="btn pri big" onClick=${()=>go("projetos","novo")}>Ler um projeto</button><button class="btn big hero-ghost" onClick=${()=>go("orcamentos","novo")}>Novo orçamento</button></div>
+    </div>
+  </section>
   ${!S.pontos.length&&html`<div class="alert info"><div style=${{flex:1}}><b>Antes de tudo:</b> cadastre seus preços. Sem eles o sistema não calcula orçamento.</div><button class="btn pri sm" onClick=${()=>go("precos")}>Cadastrar preços</button></div>`}
-  <div class="flow">${passos.map(p=>html`<div class="fstep" key=${p.n}><div class="top"><span class="n">${p.n}</span><h3>${p.t}</h3></div><div class="big">${p.big}</div><p>${p.sub}</p><button class=${"btn"+(p.n===1||p.n===2?" pri":"")} onClick=${p.b[1]}>${p.b[0]}</button></div>`)}</div>
-  ${atencao.length?html`<div class="col"><h2>Precisa de atenção</h2>${atencao.map((a,i)=>html`<div key=${i} class=${"alert "+a.t} style=${{alignItems:"center"}}><div style=${{flex:1}}>${a.m}</div><button class="btn sm" onClick=${()=>go(a.a[1])}>${a.a[0]}</button></div>`)}</div>`:null}
-  <div class="col"><div class="row" style=${{justifyContent:"space-between"}}><h2>Obras em andamento</h2>${osAtivas.length?html`<button class="btn sm ghost" onClick=${()=>go("os")}>Ver todas</button>`:null}</div>
-    ${osAtivas.length?html`<div class="card col">${osAtivas.slice(0,6).map(o=>{const t=o.tarefas||[];const f=t.filter(x=>x.feito).length;const E=etapaOS(o.etapa);
-      return html`<button key=${o.id} class="row" style=${{flexWrap:"nowrap",background:"none",border:0,padding:0,textAlign:"left",cursor:"pointer",width:"100%"}} onClick=${()=>go("os",o.id)}><span class="wire" style=${{background:E.c}}></span><div style=${{flex:1,minWidth:0}}><div class="row" style=${{justifyContent:"space-between"}}><b>${o.cliente}</b><span class="small muted">${E.t}</span></div><div class="bar" style=${{margin:"6px 0 3px"}}><i style=${{width:(t.length?f/t.length*100:0)+"%"}}></i></div><div class="small muted">${f} de ${t.length} tarefas feitas</div></div></button>`})}</div>`
-    :html`<div class="card muted">Nenhuma obra andando. A obra aparece aqui quando o cliente aprova um orçamento.</div>`}
+  <div class="col" style=${{gap:14}}>
+    <div><h2>O caminho de cada obra</h2><p class="muted" style=${{margin:"4px 0 0"}}>Todo serviço passa por estes 4 passos, nesta ordem.</p></div>
+    <div class="trilha">${passos.map(p=>html`<div class="tpasso" key=${p.n}>
+      <div class="tno"><span class="tic"><${Ic} n=${p.ic}/></span><span class="tn">${p.n}</span></div>
+      <div class="tcard"><h3>${p.t}</h3><div class="tbig">${p.big}</div><p>${p.sub}</p><button class=${"btn"+(p.pri?" pri":"")} onClick=${p.b[1]}>${p.b[0]}</button></div>
+    </div>`)}</div>
+  </div>
+  <div class="grid g2" style=${{alignItems:"start"}}>
+    <div class="col"><h2>Precisa de atenção</h2>
+      ${atencao.length?atencao.map((a,i)=>html`<div key=${i} class="card row" style=${{flexWrap:"nowrap",gap:12}}><span class=${"aic "+a.t}><${Ic} n=${a.ic}/></span><div style=${{flex:1,minWidth:0}}>${a.m}</div><button class="btn sm" onClick=${()=>go(a.a[1])}>${a.a[0]}</button></div>`)
+        :html`<div class="card row" style=${{gap:12}}><span class="aic ok"><${Ic} n="check"/></span><div>Tudo em dia. Nada pendente agora.</div></div>`}
+    </div>
+    <div class="col"><div class="row" style=${{justifyContent:"space-between"}}><h2>Obras em andamento</h2>${osAtivas.length?html`<button class="btn sm ghost" onClick=${()=>go("os")}>Ver todas</button>`:null}</div>
+      ${osAtivas.length?html`<div class="card col">${osAtivas.slice(0,6).map(o=>{const t=o.tarefas||[];const f=t.filter(x=>x.feito).length;const E=etapaOS(o.etapa);const pc=t.length?Math.round(f/t.length*100):0;
+        return html`<button key=${o.id} class="row" style=${{flexWrap:"nowrap",background:"none",border:0,padding:0,textAlign:"left",cursor:"pointer",width:"100%"}} onClick=${()=>go("os",o.id)}><span class="wire" style=${{background:E.c}}></span><div style=${{flex:1,minWidth:0}}><div class="row" style=${{justifyContent:"space-between"}}><b>${o.cliente}</b><span class="small muted">${E.t} · ${pc}%</span></div><div class="bar" style=${{margin:"6px 0 3px"}}><i style=${{width:pc+"%"}}></i></div><div class="small muted">${f} de ${t.length} tarefas feitas</div></div></button>`})}</div>`
+      :html`<div class="card row" style=${{gap:12}}><span class="aic"><${Ic} n="tool"/></span><div class="muted">Nenhuma obra andando. Ela aparece aqui quando o cliente aprova um orçamento.</div></div>`}
+    </div>
   </div>`;
 };
 
