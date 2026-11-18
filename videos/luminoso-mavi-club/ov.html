@@ -1,0 +1,38 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="fonts/fonts.css">
+<style>html,body{margin:0;background:transparent}#s{position:relative;width:1080px;height:1920px;overflow:hidden;font-family:Inter,sans-serif;color:#fff;-webkit-font-smoothing:antialiased;letter-spacing:-.025em}
+.abs{position:absolute;left:0;top:0}.w{display:inline-block;white-space:pre}.k{color:#93C5FD}
+.cap{position:absolute;left:0;width:1080px;top:1300px;text-align:center;font-size:84px;font-weight:800;line-height:1.05;text-shadow:0 4px 30px rgba(0,0,0,.55)}
+#grad{position:absolute;left:0;top:1050px;width:1080px;height:870px;background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.55) 45%,rgba(0,0,0,.65))}
+.seal{position:absolute;left:0;width:1080px;top:1180px;display:flex;justify-content:center}
+.seal div{display:flex;align-items:center;gap:16px;padding:16px 30px 16px 18px;border-radius:999px;background:rgba(255,255,255,.95);color:#18181B;font-size:40px;font-weight:700;box-shadow:0 18px 40px -16px rgba(0,0,0,.6)}
+.seal i{display:inline-flex;width:52px;height:52px;border-radius:26px;background:#16A34A;align-items:center;justify-content:center}
+.seal span{color:#52525B;font-weight:600}
+#end{position:absolute;inset:0;background:#FAFAFA}
+</style></head><body><div id="s"><div id="grad"></div><div id="caps"></div>
+<div class="seal" id="seal"><div><i><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></i>Feito pela Ngraph <span>· MAVI club</span></div></div>
+<div id="end"></div>
+<img id="logo" src="img/ngraph.svg" class="abs" style="width:640px;left:220px;top:600px">
+<div id="at" class="abs" style="width:1080px;top:850px;text-align:center;font-size:64px;font-weight:600;color:#18181B">@ngraph.pe</div>
+<div id="btn" class="abs" style="left:200px;top:970px;width:680px;height:132px;border-radius:66px;background:#18181B;color:#fff;display:flex;align-items:center;justify-content:center;gap:22px;font-size:46px;font-weight:600;transform-origin:50% 50%">
+ <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"><path d="M4.5 19.5l1.1-3.6A8 8 0 1 1 8.4 18.5z"/><path d="M9.2 8.6c.3-.5.7-.5 1-.1l.7 1.4c.1.3 0 .6-.2.8l-.4.4c.5 1.1 1.4 2 2.5 2.5l.4-.4c.2-.2.5-.3.8-.2l1.4.7c.4.3.4.7-.1 1-.9.7-2.2.7-3.6-.2a8.4 8.4 0 0 1-2.7-2.7c-.9-1.4-.9-2.6-.2-3.6z" fill="#fff" stroke="none"/></svg>Chama no WhatsApp</div>
+<div id="tag" class="abs" style="width:1080px;top:1150px;text-align:center;font-size:42px;font-weight:500;color:#52525B">Luminosos · Fachadas · Letreiros</div>
+</div><script>
+const $=id=>document.getElementById(id),cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+function bez(x1,y1,x2,y2){return x=>{x=cl(x);if(x<=0||x>=1)return x;let a=0,b=1,u=x;for(let i=0;i<28;i++){u=(a+b)/2;const X=3*(1-u)*(1-u)*u*x1+3*(1-u)*u*u*x2+u*u*u;if(X<x)a=u;else b=u;}return 3*(1-u)*(1-u)*u*y1+3*(1-u)*u*u*y2+u*u*u;};}
+const EZ=bez(.65,0,.35,1),seg=(t,a,b)=>EZ((t-a)/(b-a));
+const ON=2.57, END=14.35;
+const L=[['Apagada,','é só uma placa.',.25,ON-.25],['Acesa,','<k>chama</k> <k>o</k> <k>cliente.</k>',ON+.05,6.2],['Luminoso redondo','com <k>LED</k>',9.0,END-.2]];
+let h='';L.forEach((l,i)=>{h+=`<div class="cap" id="cp${i}">`+[l[0],l[1]].map((ln,r)=>'<div>'+ln.split(' ').map((w,j)=>`<span class="w" data-i="${r*4+j}">${w.replace('<k>','<span class="k">').replace('</k>','</span>')} </span>`).join('')+'</div>').join('')+'</div>';});
+$('caps').innerHTML=h;
+function fe(e,o,dy=20){e.style.opacity=o.toFixed(3);e.style.transform=`translateY(${((1-o)*dy).toFixed(1)}px)`;}
+window.seek=t=>{
+ L.forEach((l,i)=>{const c=$('cp'+i),o=1-seg(t,l[3],l[3]+.25);c.querySelectorAll('.w').forEach(w=>fe(w,seg(t,l[2]+w.dataset.i*.08,l[2]+w.dataset.i*.08+.35)*o,22));});
+ $('grad').style.opacity=(1-seg(t,END,END+.3)).toFixed(3);
+ fe($('seal'),seg(t,6.3,6.7)*(1-seg(t,END-.3,END)),16);
+ const e=seg(t,END,END+.45); $('end').style.opacity=e.toFixed(3);
+ fe($('logo'),seg(t,END+.25,END+.65)); fe($('at'),seg(t,END+.45,END+.85)); fe($('tag'),seg(t,END+.85,END+1.25),14);
+ const bo=seg(t,END+.65,END+1.05),ph=t>END+1.3?((t-END-1.3)/1.0)%1:0,pu=t>END+1.3?(1-Math.cos(2*Math.PI*ph))/2:0;
+ $('btn').style.opacity=bo;$('btn').style.transform=`translateY(${(1-bo)*20}px) scale(${((.96+.04*bo)*(1+.03*pu)).toFixed(4)})`;
+};
+window.ready=Promise.all([document.fonts.ready,...[...document.images].map(i=>i.decode().catch(()=>0))]).then(()=>{seek(0);return true});
+</script></body></html>
