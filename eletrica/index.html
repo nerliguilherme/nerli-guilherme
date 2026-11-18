@@ -1,17 +1,18 @@
 <title>Lumen Gestão</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap">
 <style>
 /* Layout: menu lateral claro com 5 destinos principais (desktop) / barra de abas embaixo (celular).
    Amarelo Lumen = ação principal. Cores dos fios da NBR 5410 marcam as etapas da obra. */
 :root{
   --bg:#f4f6f8; --panel:#ffffff; --sunk:#eef1f4; --line:#e1e6eb; --fg:#17202a; --muted:#5d6975;
   --ink:#1b2733; --ink-fg:#eef2f6;
-  --accent:#f5b400; --accent-fg:#1d1600; --accent-text:#8a6200; --accent-soft:#fff3c7;
+  --accent:#f7b52c; --accent-fg:#1d1600; --accent-text:#0573a8; --accent-soft:#fff3d1;
+  --brand:#0a97d9; --brand-soft:#e1f2fb;
   --ok:#1d7a45; --ok-soft:#dff2e6; --warn:#946000; --warn-soft:#fbefd2; --bad:#b3261e; --bad-soft:#fbe1de;
   --fio-fase:#c8392b; --fio-neutro:#3a8bd0; --fio-terra:#3f9b45; --fio-retorno:#3a3f45; --fio-cinza:#98a3ae;
-  --f-disp:"Archivo","Inter",Arial,sans-serif;
+  --f-disp:"Montserrat","Inter",Arial,sans-serif;
   --f-body:"Inter",-apple-system,"Segoe UI",Roboto,sans-serif;
   --f-mono:"Inter",-apple-system,"Segoe UI",Roboto,sans-serif;
   --r:10px; --shadow:0 1px 2px rgba(20,30,40,.06),0 2px 8px rgba(20,30,40,.04);
@@ -19,13 +20,15 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#11161c; --panel:#192029; --sunk:#141a21; --line:#29323c; --fg:#e8edf2; --muted:#9aa6b2;
   --ink:#0c1116; --ink-fg:#e2e8ee;
-  --accent:#f5b400; --accent-fg:#1d1600; --accent-text:#f5c542; --accent-soft:#3a2f0a;
+  --accent:#f7b52c; --accent-fg:#1d1600; --accent-text:#5cc0ee; --accent-soft:#3a2f0a;
+  --brand:#2aa9e6; --brand-soft:#0f2c3b;
   --ok:#5fc78c; --ok-soft:#15301f; --warn:#e8b54d; --warn-soft:#33270f; --bad:#f28a82; --bad-soft:#3a1715;
   --fio-retorno:#cfd6dd; --shadow:none; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#11161c; --panel:#192029; --sunk:#141a21; --line:#29323c; --fg:#e8edf2; --muted:#9aa6b2;
   --ink:#0c1116; --ink-fg:#e2e8ee;
-  --accent:#f5b400; --accent-fg:#1d1600; --accent-text:#f5c542; --accent-soft:#3a2f0a;
+  --accent:#f7b52c; --accent-fg:#1d1600; --accent-text:#5cc0ee; --accent-soft:#3a2f0a;
+  --brand:#2aa9e6; --brand-soft:#0f2c3b;
   --ok:#5fc78c; --ok-soft:#15301f; --warn:#e8b54d; --warn-soft:#33270f; --bad:#f28a82; --bad-soft:#3a1715;
   --fio-retorno:#cfd6dd; --shadow:none; color-scheme:dark}
 html,body,#root{height:100%}
@@ -40,7 +43,11 @@ h1{font-size:28px;font-weight:800} h2{font-size:20px} h3{font-size:16.5px}
 /* menu lateral */
 .rail{width:236px;flex:none;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:20px 12px;gap:2px;overflow-y:auto}
 .brand{display:flex;align-items:center;gap:10px;padding:0 8px 18px}
-.brand .logo{width:34px;height:34px;border-radius:9px;background:var(--accent);display:grid;place-items:center;color:var(--accent-fg);flex:none}
+.brand .shield{width:34px;height:44px;flex:none}
+.brand .wm{font-family:var(--f-disp);font-size:23px;font-weight:800;line-height:1;letter-spacing:.01em}
+.brand .wm span{font-size:inherit} .brand .wm .a{color:var(--accent)} .brand .wm .b{color:var(--brand)}
+.brand .sub{font-size:10.5px;line-height:1.25;color:var(--brand);font-weight:600;letter-spacing:.02em;text-transform:uppercase;display:block;margin-top:3px}
+.brand img.logoimg{max-width:190px;max-height:52px;object-fit:contain}
 .brand b{font-family:var(--f-disp);font-size:21px;font-weight:800;display:block;line-height:1}
 .brand span{font-size:12px;color:var(--muted)}
 .navgrp{font-size:11.5px;font-weight:600;color:var(--muted);padding:16px 12px 4px}
@@ -49,7 +56,7 @@ h1{font-size:28px;font-weight:800} h2{font-size:20px} h3{font-size:16.5px}
 .nav.sec{font-size:14px;min-height:38px;padding:7px 12px}
 .nav.sec svg{width:18px;height:18px}
 .nav:hover{background:var(--sunk)}
-.nav[aria-current="page"]{background:var(--accent-soft);font-weight:600}
+.nav[aria-current="page"]{background:var(--brand-soft);font-weight:600}
 .nav[aria-current="page"] svg{color:var(--accent-text)}
 .nav .badge{margin-left:auto}
 .rail .me{margin-top:auto;padding:14px 12px 0;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
@@ -168,7 +175,7 @@ td.r,th.r{text-align:right}
 .mais{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
 .mais button{display:flex;gap:14px;align-items:center;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;cursor:pointer;box-shadow:var(--shadow)}
 .mais button:hover{border-color:var(--muted)}
-.mais .ic{width:42px;height:42px;border-radius:10px;background:var(--accent-soft);color:var(--accent-text);display:grid;place-items:center;flex:none}
+.mais .ic{width:42px;height:42px;border-radius:10px;background:var(--brand-soft);color:var(--accent-text);display:grid;place-items:center;flex:none}
 .mais .ic svg{width:22px;height:22px}
 .mais b{display:block;font-size:15.5px}
 .mais span{font-size:13px;color:var(--muted)}
@@ -253,7 +260,9 @@ const MODELO={
 };
 const METRAGENS=[["el34","Eletroduto 3/4\""],["el1","Eletroduto 1\""],["c15","Cabo 1,5mm²"],["c25","Cabo 2,5mm²"],["c4","Cabo 4mm²"],["c6","Cabo 6mm²"],["c10","Cabo 10mm²"],["c16","Cabo 16mm²"]];
 const CONFIG_PADRAO={empresa:"Lumen",cidade:"",telefone:"",impostoPct:6,markupMatPct:20,fatorIndustrial:1.3,deslocamentoPadrao:80,margemMin:25,
-  folhaMensal:9000,encargosPct:40,custosFixos:3500,horasProdutivas:440,regras:""};
+  folhaMensal:9000,encargosPct:40,custosFixos:3500,horasProdutivas:440,regras:"",cnpj:"",email:"",validadeDias:10,
+  garantia:"90 dias sobre a mão de obra, contados da entrega do serviço (Código de Defesa do Consumidor).",
+  naoIncluso:"Luminárias, lâmpadas e acabamentos decorativos, salvo quando listados\nObras civis: abertura e fechamento de paredes, reboco e pintura\nTaxas e pedidos junto à concessionária de energia"};
 const PASSOS=[
  {id:"carimbo",t:"Carimbo e notas",d:"Canto inferior direito da prancha. Anote cliente, endereço, escala (ex.: 1:50), revisão, tensão (127/220V) e área. Escala errada estraga toda a metragem."},
  {id:"legenda",t:"Legenda de símbolos",d:"Cada projetista desenha um pouco diferente. Antes de contar, confira na legenda da própria prancha o que é tomada baixa, média, alta, TUE e cada tipo de interruptor."},
@@ -633,6 +642,13 @@ const ICP={
  bolt:"M13 2 4 14h7l-1 8 9-12h-7z"
 };
 const Ic=({n})=>html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d=${ICP[n]}/></svg>`;
+const SHIELD_SVG=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 130"><path d="M36 25 L9 36 V80 C9 99 28 112 50 124 C72 112 91 99 91 80 V36 L64 25" fill="none" stroke="#0a97d9" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/><path d="M61 2 L27 63 H49 L40 104 L76 46 H54 Z" fill="#f7b52c"/></svg>`;
+const SHIELD_URL="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(SHIELD_SVG);
+function Marca({style}){
+  const S=useS();const e=S.config.empresa||"Lumen";const lu=/^lumen$/i.test(e.trim());
+  if(S.config.logoAssetId)return html`<div class="brand" style=${style}><img class="logoimg" src=${"/_blob/"+S.config.logoAssetId} alt=${e}/></div>`;
+  return html`<div class="brand" style=${style}><img class="shield" src=${SHIELD_URL} alt=""/><div><div class="wm">${lu?html`<span class="a">LU</span><span class="b">MEN</span>`:html`<span class="b">${e}</span>`}</div><span class="sub">Infraestrutura & instalações elétricas</span></div></div>`;
+}
 const TODOS=["patrao","escritorio","eletricista","ajudante"],ESC=["patrao","escritorio"];
 const MENU=[
  {id:"painel",t:"Início",ic:"home",r:ESC,d:"Visão geral e o caminho de cada obra"},
@@ -673,7 +689,7 @@ function App(){
   const secBadge=sec.concat(prin.slice(4)).some(m=>m.b&&bdg[m.b]);
   return html`<div class="app">
     <nav class="rail" aria-label="Menu">
-      <div class="brand"><span class="logo"><${Ic} n="bolt"/></span><div><b>${S.config.empresa||"Lumen"}</b><span>Instalações elétricas</span></div></div>
+      <${Marca}/>
       ${prin.map(m=>html`<button key=${m.id} class="nav" aria-current=${atual===m.id?"page":undefined} onClick=${()=>go(m.id)}><${Ic} n=${m.ic}/>${m.t}<${Bd} m=${m}/></button>`)}
       ${sec.length?html`<div class="navgrp">Mais</div>${sec.map(m=>html`<button key=${m.id} class="nav sec" aria-current=${atual===m.id?"page":undefined} onClick=${()=>go(m.id)}><${Ic} n=${m.ic}/>${m.t}<${Bd} m=${m}/></button>`)}`:null}
       <div class="me"><b>${S.nome(S.me.id)}</b>${PAPEIS[S.papel]}${S.be.status==="local"?html`<div style=${{marginTop:6}}><span class="pill warn">Modo local</span></div>`:null}</div>
@@ -706,7 +722,7 @@ function PedirAcesso(){
   const pedir=async()=>{try{await S.be.db.doc(`access_requests/${S.me.id}`).set({id:S.me.id,requestedAt:new Date().toISOString()});setEnv(true)}catch(e){S.toast("Não foi possível enviar o pedido. Peça ao patrão para compartilhar o link com permissão de edição.")}};
   const inativo=S.membro&&S.membro.active===false;
   return html`<div class="gate"><div class="card">
-    <div class="brand" style=${{padding:0}}><span class="logo"><${Ic} n="bolt"/></span><div><b>${S.config.empresa||"Lumen"}</b><span>Instalações elétricas</span></div></div>
+    <${Marca} style=${{padding:0}}/>
     <h2>${inativo?"Acesso pausado":"Peça acesso"}</h2>
     <p class="muted" style=${{margin:0}}>${inativo?"Seu acesso foi pausado. Fale com o patrão para reativar.":"O patrão precisa liberar seu acesso e dizer sua função."}</p>
     ${!inativo&&(env||pedido?html`<div class="alert ok">Pedido enviado. Quando for liberado, esta tela abre sozinha.</div>`:html`<button class="btn pri big" onClick=${pedir}>Pedir acesso</button>`)}
@@ -1174,7 +1190,7 @@ Material: ${o.clienteMaterial?"por conta do cliente":brl(c.mat)}
 ${c.desloc?`Deslocamento: ${brl(c.desloc)}\n`:""}${c.desc?`Desconto: −${brl(c.desc)}\n`:""}*Total: ${brl(c.total)}*
 
 Pagamento: ${o.condicoes||"a combinar"}
-${o.prazo?`Entrega prevista: ${dataBR(o.prazo)}\n`:""}Validade: 10 dias.
+${o.prazo?`Entrega prevista: ${dataBR(o.prazo)}\n`:""}Validade: ${num(S.config.validadeDias)||10} dias.
 Serviço executado conforme NBR 5410. Qualquer dúvida, é só responder.`;
 }
 function MsgWhats({o,c,onClose}){
@@ -1186,35 +1202,128 @@ function MsgWhats({o,c,onClose}){
     <div class="row" style=${{justifyContent:"flex-end"}}><button class="btn" onClick=${copiar}>Copiar texto</button>
       ${fone&&html`<a class="btn pri" href=${`https://api.whatsapp.com/send?phone=${fone}&text=${encodeURIComponent(t)}`} target="_blank" rel="noopener">Abrir WhatsApp de ${o.telefone}</a>`}</div><//>`;
 }
+async function logoParaPdf(S){
+  try{
+    const proprio=!!S.config.logoAssetId;
+    const src=proprio?URL.createObjectURL(await (await fetch("/_blob/"+S.config.logoAssetId)).blob()):SHIELD_URL;
+    const img=await new Promise((ok,er)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=er;i.src=src});
+    const h=360,w=Math.round(h*(img.naturalWidth||100)/(img.naturalHeight||130));
+    const cv=document.createElement("canvas");cv.width=w;cv.height=h;cv.getContext("2d").drawImage(img,0,0,w,h);
+    return{data:cv.toDataURL("image/png"),r:w/h,proprio};
+  }catch(e){console.warn("logo",e);return null}
+}
 async function gerarPdfProposta(o,c,S){
   try{
     const {jsPDF}=window.jspdf;const d=new jsPDF({unit:"mm",format:"a4"});
-    const W=210,M=16;let y=18;
-    d.setFillColor(29,47,69);d.rect(0,0,W,30,"F");d.setTextColor(255);d.setFont("helvetica","bold");d.setFontSize(18);d.text(S.config.empresa||"Elétrica",M,16);
-    d.setFontSize(9);d.setFont("helvetica","normal");d.text([S.config.cidade,S.config.telefone].filter(Boolean).join(" · ")||"Instalações elétricas",M,23);
-    d.setFontSize(11);d.text("PROPOSTA "+o.numero,W-M,16,{align:"right"});d.setFontSize(9);d.text(new Date().toLocaleDateString("pt-BR"),W-M,23,{align:"right"});
-    y=42;d.setTextColor(20);d.setFontSize(10);d.setFont("helvetica","bold");d.text("Cliente",M,y);d.setFont("helvetica","normal");d.text(o.cliente||"—",M+22,y);
-    if(o.endereco){y+=6;d.setFont("helvetica","bold");d.text("Obra",M,y);d.setFont("helvetica","normal");d.text(d.splitTextToSize(o.endereco,150),M+22,y)}
-    y+=12;d.setFillColor(232,236,240);d.rect(M,y-5,W-2*M,8,"F");d.setFont("helvetica","bold");d.setFontSize(9);
-    d.text("ITEM",M+2,y);d.text("QTD",125,y,{align:"right"});d.text("UNIT.",155,y,{align:"right"});d.text("TOTAL",W-M-2,y,{align:"right"});
-    d.setFont("helvetica","normal");y+=8;
-    for(const l of o.linhas){
-      const u=num(l.mo)+(o.clienteMaterial?0:num(l.mat));const ls=d.splitTextToSize(l.desc||"",95);
-      if(y+ls.length*5>270){d.addPage();y=20}
-      d.text(ls,M+2,y);d.text(n2(l.qtd)+" "+(l.unid||""),125,y,{align:"right"});d.text(brl(u),155,y,{align:"right"});d.text(brl(u*num(l.qtd)),W-M-2,y,{align:"right"});
-      y+=ls.length*5+2;d.setDrawColor(220);d.line(M,y-3,W-M,y-3);
+    const cfg=S.config,W=210,H=297,M=15,emp=cfg.empresa||"Lumen";
+    const INK=[27,39,51],AMA=[245,180,0],CINZA=[100,110,122],LINHA=[226,230,235],SUAVE=[244,246,248],BRANCO=[255,255,255];
+    const fill=k=>d.setFillColor(...k),txt=k=>d.setTextColor(...k),draw=k=>d.setDrawColor(...k);
+    const f=(w,s)=>{d.setFont("helvetica",w);d.setFontSize(s)};
+    const limpa=s=>String(s??"").replace(/[−–]/g,"-").replace(/[→←]/g,"-").replace(/[^\x00-\xFF—•€]/g,"");
+    const logo=(x,y,s)=>{fill(AMA);d.roundedRect(x,y,s,s,s*.18,s*.18,"F");fill(INK);const k=s/24;d.lines([[-9*k,12*k],[7*k,0],[-1*k,8*k],[9*k,-12*k],[-7*k,0]],x+13*k,y+2*k,[1,1],"F",true)};
+    const rotulo=(t,x,yy)=>{f("bold",6.8);txt(CINZA);d.setCharSpace(.35);d.text(t.toUpperCase(),x,yy);d.setCharSpace(0)};
+    let y=0;
+    const AZUL=[10,151,217];
+    const lg=await logoParaPdf(S);
+    const marcaTxt=(x,yy,sz)=>{const lu=/^lumen$/i.test(emp.trim());f("bold",sz);if(lu){txt(AMA);d.text("LU",x,yy);const w=d.getTextWidth("LU");txt(AZUL);d.text("MEN",x+w,yy)}else{txt(AZUL);d.text(limpa(emp),x,yy)}};
+    const cab=()=>{
+      let tx=M;
+      if(lg&&lg.proprio){const h=20,w=Math.min(70,h*lg.r);d.addImage(lg.data,"PNG",M,8,w,h);tx=null}
+      else{if(lg)d.addImage(lg.data,"PNG",M,8,20/1.3,20);tx=M+20;marcaTxt(tx,19,22);f("bold",6.6);txt(AZUL);d.text("INFRAESTRUTURA & INSTALAÇÕES ELÉTRICAS",tx,24.2)}
+      f("normal",7.8);txt(CINZA);const ct=[cfg.cnpj?"CNPJ "+cfg.cnpj:"",cfg.telefone,cfg.email,cfg.cidade].filter(Boolean).join("   ·   ");if(ct)d.text(limpa(ct),tx??M,31);
+      txt(AZUL);f("bold",7.5);d.text("PROPOSTA COMERCIAL",W-M,14,{align:"right"});
+      txt(INK);f("bold",17);d.text(limpa(o.numero),W-M,22,{align:"right"});
+      f("normal",8.3);txt(CINZA);d.text("Emitida em "+new Date().toLocaleDateString("pt-BR"),W-M,27.5,{align:"right"});
+      fill(AZUL);d.rect(0,36,W,1.4,"F");fill(AMA);d.rect(0,36,W*.32,1.4,"F");
+    };
+    const cabMini=()=>{if(lg&&lg.proprio){const h=8;d.addImage(lg.data,"PNG",M,3.5,Math.min(40,h*lg.r),h)}else{if(lg)d.addImage(lg.data,"PNG",M,3,8/1.3,8);marcaTxt(M+8,9.5,11)}
+      f("normal",8.3);txt(CINZA);d.text("Proposta "+limpa(o.numero)+(o.cliente?"  ·  "+limpa(o.cliente):""),W-M,9,{align:"right"});fill(AZUL);d.rect(0,14,W,.8,"F");fill(AMA);d.rect(0,14,W*.32,.8,"F")};
+    const novaPag=()=>{d.addPage();cabMini();y=24};
+    const precisa=h=>{if(y+h>H-20){novaPag();return true}return false};
+    const secao=t=>{precisa(16);f("bold",11.5);txt(INK);d.text(t,M,y);fill(AMA);d.rect(M,y+2,14,1,"F");y+=8};
+
+    cab();y=48;
+    // cliente
+    f("bold",10.5);const endL=d.splitTextToSize(limpa(o.endereco||"—"),82);
+    const bh=Math.max(32,28+endL.length*4.6);
+    fill(SUAVE);d.roundedRect(M,y,W-2*M,bh,2.5,2.5,"F");
+    const xL=M+6,xR=M+96;
+    rotulo("Cliente",xL,y+8);f("bold",11);txt(INK);d.text(d.splitTextToSize(limpa(o.cliente||"—"),82)[0],xL,y+13.5);
+    rotulo("Telefone",xL,y+21);f("normal",10);txt(INK);d.text(limpa(o.telefone||"—"),xL,y+26);
+    rotulo("Local da obra",xR,y+8);f("normal",10);txt(INK);d.text(endL,xR,y+13.5);
+    const tipo=o.tipo==="industrial"?"Industrial":"Residencial / predial";
+    rotulo("Tipo de obra",xR,y+13.5+endL.length*4.6+2.5);f("normal",10);txt(INK);d.text(tipo,xR,y+13.5+endL.length*4.6+7.5);
+    y+=bh+11;
+
+    // escopo
+    const nPts=(o.linhas||[]).filter(l=>l.unid==="pt").reduce((a,l)=>a+num(l.qtd),0);
+    secao("Escopo do serviço");
+    f("normal",9.6);txt([45,55,66]);
+    const esc=`Execução da instalação elétrica ${o.tipo==="industrial"?"industrial":"residencial / predial"} ${o.clienteMaterial?"somente com mão de obra (material por conta do cliente)":"com fornecimento de mão de obra e material"}, seguindo a norma NBR 5410.${nPts?` Total de ${n2(nPts)} pontos elétricos.`:""}`;
+    const escL=d.splitTextToSize(esc,W-2*M);d.text(escL,M,y);y+=escL.length*4.6+7;
+
+    // itens agrupados
+    secao("Itens da proposta");
+    const grp=l=>{if(l.tipoId){const p=S.pontos.find(x=>x.id===l.tipoId);const g=p&&p.grupo;return g==="Quadro"?"Quadro e proteção":g==="Industrial"?"Instalação industrial":"Pontos elétricos"}if(l.matId||/lista do projeto/.test(l.desc||""))return"Materiais e infraestrutura";return"Outros serviços"};
+    const ORD=["Pontos elétricos","Quadro e proteção","Instalação industrial","Materiais e infraestrutura","Outros serviços"];
+    const X={q:124,u:128,un:163,t:W-M-3};
+    const th=()=>{fill(AZUL);d.rect(M,y,W-2*M,8,"F");f("bold",7.2);txt(BRANCO);d.setCharSpace(.3);d.text("DESCRIÇÃO",M+3,y+5.3);d.text("QTD",X.q,y+5.3,{align:"right"});d.text("UN.",X.u,y+5.3);d.text("VALOR UNIT.",X.un,y+5.3,{align:"right"});d.text("TOTAL",X.t,y+5.3,{align:"right"});d.setCharSpace(0);y+=8};
+    th();
+    for(const g of ORD){
+      const ls=(o.linhas||[]).filter(l=>grp(l)===g&&num(l.qtd)>0);if(!ls.length)continue;
+      if(precisa(18))th();
+      fill([236,239,243]);d.rect(M,y,W-2*M,7,"F");f("bold",8.6);txt(INK);d.text(g,M+3,y+4.8);y+=7;
+      let sub=0,z=0;
+      for(const l of ls){
+        const u=num(l.mo)+(o.clienteMaterial?0:num(l.mat));const tot=u*num(l.qtd);sub+=tot;
+        f("normal",8.8);const dl=d.splitTextToSize(limpa(l.desc),88);const rh=dl.length*4.1+3.4;
+        if(precisa(rh))th();
+        if(z++%2){fill([250,251,252]);d.rect(M,y,W-2*M,rh,"F")}
+        txt(INK);d.text(dl,M+3,y+4.6);
+        d.text(n2(l.qtd),X.q,y+4.6,{align:"right"});txt(CINZA);d.text(limpa(l.unid||""),X.u,y+4.6);txt(INK);
+        d.text(brl(u),X.un,y+4.6,{align:"right"});f("bold",8.8);d.text(brl(tot),X.t,y+4.6,{align:"right"});
+        y+=rh;draw(LINHA);d.setLineWidth(.2);d.line(M,y,W-M,y);
+      }
+      if(precisa(7))th();
+      f("normal",8.2);txt(CINZA);d.text("Subtotal "+g.toLowerCase(),X.un,y+4.8,{align:"right"});f("bold",8.8);txt(INK);d.text(brl(sub),X.t,y+4.8,{align:"right"});y+=10;
     }
-    if(y>230){d.addPage();y=20}
-    y+=4;const lin=(a,b,bold)=>{d.setFont("helvetica",bold?"bold":"normal");d.text(a,140,y,{align:"right"});d.text(b,W-M-2,y,{align:"right"});y+=6};
-    lin("Mão de obra",brl(c.mo));lin("Material",o.clienteMaterial?"por conta do cliente":brl(c.mat));if(c.desloc)lin("Deslocamento",brl(c.desloc));if(c.desc)lin("Desconto","− "+brl(c.desc));
-    d.setFontSize(12);lin("TOTAL",brl(c.total),true);d.setFontSize(9);
-    y+=6;d.setFont("helvetica","normal");
-    const notas=[`Pagamento: ${o.condicoes||"a combinar"}`,o.prazo?`Entrega prevista: ${dataBR(o.prazo)}`:"","Validade da proposta: 10 dias.","Serviço executado conforme NBR 5410. Luminárias e acabamentos decorativos não inclusos, salvo quando listados."].filter(Boolean);
-    d.text(d.splitTextToSize(notas.join("\n"),W-2*M),M,y);
+
+    // totais + condições
+    precisa(62);y+=2;const y0=y;
+    const bx=118,bw=W-M-bx;let ty=y0;
+    const lin=(a,b)=>{f("normal",9.4);txt(CINZA);d.text(a,bx+4,ty+5);txt(INK);d.text(b,bx+bw-4,ty+5,{align:"right"});ty+=7};
+    fill(SUAVE);d.roundedRect(bx,y0,bw,(c.desloc?7:0)+(c.desc?7:0)+14+18,2.5,2.5,"F");ty+=1;
+    lin("Mão de obra",brl(c.mo));lin("Material",o.clienteMaterial?"por conta do cliente":brl(c.mat));
+    if(c.desloc)lin("Deslocamento",brl(c.desloc));if(c.desc)lin("Desconto","- "+brl(c.desc));
+    ty+=2;fill(AMA);d.roundedRect(bx,ty,bw,14,2.5,2.5,"F");txt(INK);f("bold",9);d.setCharSpace(.4);d.text("TOTAL",bx+4,ty+8.8);d.setCharSpace(0);f("bold",15);d.text(brl(c.total),bx+bw-4,ty+9.4,{align:"right"});ty+=14;
+    let cy=y0+5;const cw=bx-M-8;
+    const cond=(t,v)=>{rotulo(t,M,cy);f("normal",9.6);txt(INK);const L=d.splitTextToSize(limpa(v),cw);d.text(L,M,cy+5);cy+=5+L.length*4.6+4};
+    cond("Forma de pagamento",o.condicoes||"A combinar");
+    if(o.prazo)cond("Previsão de entrega",dataBR(o.prazo));
+    const val=num(cfg.validadeDias)||10;const vd=new Date();vd.setDate(vd.getDate()+val);
+    cond("Validade da proposta",`${val} dias (até ${vd.toLocaleDateString("pt-BR")})`);
+    y=Math.max(ty,cy)+8;
+
+    const lista=(t,txtv)=>{const ls=String(txtv||"").split("\n").map(s=>s.replace(/^[•\-\s]+/,"").trim()).filter(Boolean);if(!ls.length)return;secao(t);f("normal",9.4);txt([45,55,66]);
+      for(const l of ls){const L=d.splitTextToSize(limpa(l),W-2*M-6);precisa(L.length*4.5+2);fill(AMA);d.circle(M+1.2,y-1.2,.9,"F");d.text(L,M+5,y);y+=L.length*4.5+1.8}y+=5};
+    lista("Garantia",cfg.garantia);
+    lista("Não está incluso",cfg.naoIncluso);
+
+    // assinaturas
+    precisa(36);y+=14;draw([150,158,168]);d.setLineWidth(.3);
+    const sw=78;d.line(M,y,M+sw,y);d.line(W-M-sw,y,W-M,y);
+    f("bold",9);txt(INK);d.text(limpa(emp),M,y+5);d.text(limpa(o.cliente||"Cliente"),W-M-sw,y+5);
+    f("normal",8.2);txt(CINZA);d.text("Responsável técnico / comercial",M,y+9.5);d.text("De acordo        Data: ____/____/______",W-M-sw,y+9.5);
+
+    // rodapé
+    const n=d.getNumberOfPages();
+    for(let i=1;i<=n;i++){d.setPage(i);draw(LINHA);d.setLineWidth(.3);d.line(M,H-13,W-M,H-13);f("normal",7.5);txt(CINZA);
+      d.text(limpa([emp,cfg.telefone,cfg.email].filter(Boolean).join("  ·  ")),M,H-8.5);d.text(`Página ${i} de ${n}`,W-M,H-8.5,{align:"right"})}
+
     const blob=d.output("blob");
     const dl=await window.claude?.use?.("downloads");
     if(!dl){S.toast("Download indisponível aqui. Use o texto para WhatsApp.");return}
-    await dl.save({filename:`Proposta_${o.numero}_${(o.cliente||"cliente").replace(/[^\w]+/g,"_")}.pdf`,data:blob});
+    await dl.save({filename:`Proposta_${o.numero}_${(o.cliente||"cliente").normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^\w]+/g,"_")}.pdf`,data:blob});
     S.toast("Proposta gerada.");
   }catch(e){if(e&&e.code==="declined")return;console.error(e);S.toast("Não foi possível gerar o PDF: "+(e&&e.message||"erro"))}
 }
@@ -1251,64 +1360,147 @@ PAGES.os=function OSPage({go,arg}){
 function DetalheOS({id,onClose}){
   const S=useS();
   const o=S.data.os.find(x=>x.id===id);
-  const [nova,setNova]=useState({etapa:"infra",desc:"",resp:""});
   const [prancha,setPrancha]=useState(null);
   const [del,setDel]=useState(false);
+  const [edDados,setEdDados]=useState(null);
+  const [edTarefa,setEdTarefa]=useState(null);
+  const [addEm,setAddEm]=useState(null);
+  const [novaT,setNovaT]=useState({desc:"",horas:0});
+  const [edMat,setEdMat]=useState(false);
+  const [novoM,setNovoM]=useState({matId:"",nome:"",qtd:1});
+  const [novoX,setNovoX]=useState({desc:"",qtd:1,valor:0,tarefa:true});
+  const [edX,setEdX]=useState(null);
+  const [nota,setNota]=useState("");
+  const [edNota,setEdNota]=useState(null);
   if(!o)return null;
+  const podeEditar=S.admin||S.papel==="escritorio";
+  const podeCampo=podeEditar||S.papel==="eletricista";
+  const save=(p,m)=>S.api.update("os",o.id,p,m);
   const pj=S.data.projetos.find(p=>p.id===o.projetoId);
   const equipe=S.data.team.filter(t=>t.active!==false).map(t=>[t.id,S.nome(t.id)+" · "+(PAPEIS[t.role]||t.role)]);
   if(!equipe.find(e=>e[0]===S.me.id))equipe.unshift([S.me.id,S.nome(S.me.id)]);
-  const upT=(tid,p)=>S.api.update("os",o.id,{tarefas:o.tarefas.map(t=>t.id===tid?{...t,...p}:t)});
-  const etapa=v=>S.api.update("os",o.id,{etapa:v},"Etapa atualizada.");
-  const mat=m=>S.mats.find(x=>x.id===m.matId);
+  const tarefas=o.tarefas||[],materiais=o.materiais||[],extras=o.extras||[],notas=o.notas||[];
+  const upT=(tid,p,m)=>save({tarefas:tarefas.map(t=>t.id===tid?{...t,...p}:t)},m);
+  const mat=m=>m.matId?S.mats.find(x=>x.id===m.matId):null;
+  const nomeMat=m=>{const k=mat(m);return k?k.nome:(m.nome||m.matId||"Material")};
+  const keyM=(m,i)=>(m.matId||"x")+"-"+i;
   const separar=async()=>{
-    const faltas=[];
-    for(const m of (o.materiais||[]).filter(m=>!m.baixado)){const k=mat(m);if(!k){faltas.push(m.matId);continue}if(num(k.estoque)<num(m.qtd))faltas.push(k.nome)}
-    if(faltas.length){S.toast("Falta em estoque: "+faltas.slice(0,4).join(", ")+(faltas.length>4?"…":"")+". Dê entrada no almoxarifado ou baixe só o que tem.");return}
-    for(const m of (o.materiais||[]).filter(m=>!m.baixado)){const k=mat(m);await S.api.update("materiais",k.id,{estoque:num(k.estoque)-num(m.qtd)});await S.api.add("movimentos",{matId:k.id,tipo:"saida",qtd:num(m.qtd),ref:o.numero,data:hoje(),por:S.me.id},null)}
-    await S.api.update("os",o.id,{materiais:o.materiais.map(m=>({...m,baixado:true})),etapa:o.etapa==="material"?"infra":o.etapa},"Material separado e baixado do estoque.");
+    const pend=materiais.filter(m=>!m.baixado&&mat(m));const faltas=pend.filter(m=>num(mat(m).estoque)<num(m.qtd)).map(nomeMat);
+    if(faltas.length){S.toast("Falta em estoque: "+faltas.slice(0,4).join(", ")+(faltas.length>4?"…":"")+". Dê entrada no estoque ou baixe item por item.");return}
+    for(const m of pend){const k=mat(m);await S.api.update("materiais",k.id,{estoque:num(k.estoque)-num(m.qtd)});await S.api.add("movimentos",{matId:k.id,tipo:"saida",qtd:num(m.qtd),ref:o.numero,data:hoje(),por:S.me.id},null)}
+    await save({materiais:materiais.map(m=>mat(m)?{...m,baixado:true}:m),etapa:o.etapa==="material"?"infra":o.etapa},"Material separado e baixado do estoque.");
   };
-  const baixarUm=async m=>{const k=mat(m);if(!k)return;await S.api.update("materiais",k.id,{estoque:num(k.estoque)-num(m.qtd)});await S.api.add("movimentos",{matId:k.id,tipo:"saida",qtd:num(m.qtd),ref:o.numero,data:hoje(),por:S.me.id},null);await S.api.update("os",o.id,{materiais:o.materiais.map(x=>x.matId===m.matId?{...x,baixado:true}:x)},"Baixado.")};
-  const porEtapa=ETAPAS_OS.filter(e=>e.id!=="material"&&e.id!=="concluida").map(e=>({e,t:(o.tarefas||[]).filter(t=>t.etapa===e.id)})).filter(x=>x.t.length);
-  const feitas=(o.tarefas||[]).filter(t=>t.feito).length;
-  const distribuir=r=>{if(!r)return;S.api.update("os",o.id,{tarefas:o.tarefas.map(t=>t.resp?t:{...t,resp:r})},"Tarefas sem responsável atribuídas.")};
+  const baixarUm=async i=>{const m=materiais[i];const k=mat(m);if(!k)return;await S.api.update("materiais",k.id,{estoque:num(k.estoque)-num(m.qtd)});await S.api.add("movimentos",{matId:k.id,tipo:"saida",qtd:num(m.qtd),ref:o.numero,data:hoje(),por:S.me.id},null);await save({materiais:materiais.map((x,j)=>j===i?{...x,baixado:true}:x)},"Baixado do estoque.")};
+  const feitas=tarefas.filter(t=>t.feito).length;
+  const distribuir=r=>{if(!r)return;save({tarefas:tarefas.map(t=>t.resp?t:{...t,resp:r})},"Tarefas sem responsável atribuídas.")};
+  const ETS=ETAPAS_OS.filter(e=>e.id!=="material"&&e.id!=="concluida");
+  const totX=extras.reduce((a,x)=>a+num(x.qtd)*num(x.valor),0);
+  const pendX=extras.filter(x=>!x.lancado&&num(x.qtd)*num(x.valor)>0);
+  const cobrar=async()=>{const v=pendX.reduce((a,x)=>a+num(x.qtd)*num(x.valor),0);
+    await S.api.add("financeiro",{tipo:"entrada",desc:`Serviço extra ${o.numero} · ${o.cliente}: ${pendX.map(x=>x.desc).join(", ")}`,valor:Math.round(v*100)/100,venc:hoje(),status:"pendente",categoria:"Obra",ref:o.id,criadoEm:new Date().toISOString()},null);
+    await save({extras:extras.map(x=>pendX.includes(x)?{...x,lancado:true}:x)},`Cobrança de ${brl(v)} lançada em Dinheiro.`)};
+  const EditBtn=({on,label="Editar"})=>html`<button class="btn sm" onClick=${on}>${label}</button>`;
+  const Hd=({t,children})=>html`<div class="row" style=${{justifyContent:"space-between"}}><h3>${t}</h3><div class="row">${children}</div></div>`;
+
   return html`<${Modal} title=${o.numero+" · "+o.cliente} onClose=${onClose} actions=${html`${pj&&pj.assetId?html`<button class="btn" onClick=${()=>setPrancha(pj)}>Ver prancha</button>`:null}`}>
-    <div class="grid g4">
-      <div class="kpi"><span>Endereço</span><div>${o.endereco||"—"}</div></div>
-      <div class="kpi"><span>Telefone</span><div class="mono" style=${{userSelect:"all"}}>${o.telefone||"—"}</div></div>
-      <div class="kpi"><span>Entrega</span><div>${dataBR(o.prazo)}</div></div>
-      <div class="kpi"><span>Andamento</span><div class="num">${feitas}/${(o.tarefas||[]).length} tarefas</div></div>
+    <div class="card col">
+      <${Hd} t="Dados da obra">${podeEditar&&!edDados&&html`<${EditBtn} on=${()=>setEdDados({cliente:o.cliente||"",endereco:o.endereco||"",telefone:o.telefone||"",inicio:o.inicio||"",prazo:o.prazo||"",obs:o.obs||""})}/>`}<//>
+      ${edDados?html`<div class="grid g3">
+          <${F} label="Cliente"><${Inp} id="os-cli" value=${edDados.cliente} onChange=${v=>setEdDados({...edDados,cliente:v})}/><//>
+          <${F} label="Telefone"><${Inp} id="os-tel" value=${edDados.telefone} onChange=${v=>setEdDados({...edDados,telefone:v})}/><//>
+          <${F} label="Endereço"><${Inp} id="os-end" value=${edDados.endereco} onChange=${v=>setEdDados({...edDados,endereco:v})}/><//>
+          <${F} label="Início"><${Inp} id="os-ini" type="date" value=${edDados.inicio} onChange=${v=>setEdDados({...edDados,inicio:v})}/><//>
+          <${F} label="Entrega"><${Inp} id="os-pra" type="date" value=${edDados.prazo} onChange=${v=>setEdDados({...edDados,prazo:v})}/><//>
+        </div>
+        <${F} label="Observações (chave, horário, contato no local…)"><textarea class="i" id="os-obs" value=${edDados.obs} onChange=${e=>setEdDados({...edDados,obs:e.target.value})}></textarea><//>
+        <div class="row" style=${{justifyContent:"flex-end"}}><button class="btn" onClick=${()=>setEdDados(null)}>Cancelar</button><button class="btn pri" onClick=${async()=>{await save(edDados,"Dados da obra salvos.");setEdDados(null)}}>Salvar</button></div>`
+      :html`<div class="grid g4">
+          <div class="kpi"><span>Endereço</span><div>${o.endereco||"—"}</div></div>
+          <div class="kpi"><span>Telefone</span><div style=${{userSelect:"all"}}>${o.telefone||"—"}</div></div>
+          <div class="kpi"><span>Início → entrega</span><div>${dataBR(o.inicio)} → ${dataBR(o.prazo)}</div></div>
+          <div class="kpi"><span>Andamento</span><div class="num">${feitas} de ${tarefas.length} tarefas</div></div></div>
+        ${o.obs?html`<div class="small" style=${{whiteSpace:"pre-wrap"}}><b>Observações:</b> ${o.obs}</div>`:null}`}
     </div>
-    <div class="row">${ETAPAS_OS.map(e=>html`<button key=${e.id} class=${"btn sm"+(o.etapa===e.id?" pri":"")} disabled=${!S.admin&&!["eletricista"].includes(S.papel)} onClick=${()=>etapa(e.id)}><span class="wire" style=${{background:e.c,height:12,width:3}}></span>${e.t}</button>`)}</div>
+
+    <div class="col"><b class="small muted">Etapa atual da obra</b>
+      <div class="row">${ETAPAS_OS.map(e=>html`<button key=${e.id} class=${"btn sm"+(o.etapa===e.id?" pri":"")} disabled=${!podeCampo} onClick=${()=>save({etapa:e.id},"Etapa atualizada.")}><span class="wire" style=${{background:e.c,height:12,width:3}}></span>${e.t}</button>`)}</div></div>
 
     <div class="grid g2" style=${{alignItems:"start"}}>
-      <div class="card col"><div class="row" style=${{justifyContent:"space-between"}}><h3>Tarefas</h3>
-        ${S.admin&&html`<select class="i" style=${{maxWidth:240}} value="" onChange=${e=>distribuir(e.target.value)} aria-label="Atribuir sem responsável"><option value="">Atribuir as sem responsável a…</option>${equipe.map(([i,n])=>html`<option key=${i} value=${i}>${n}</option>`)}</select>`}</div>
-        ${porEtapa.map(({e,t})=>html`<div key=${e.id}><div class="row" style=${{marginTop:6}}><span class="wire" style=${{background:e.c,height:14}}></span><b>${e.t}</b><span class="small muted">${t.filter(x=>x.feito).length}/${t.length}</span></div>
-          ${t.map(k=>html`<div key=${k.id} class=${"task"+(k.feito?" done":"")}><input type="checkbox" checked=${!!k.feito} aria-label="Concluir" onChange=${()=>upT(k.id,{feito:!k.feito,feitoPor:S.me.id,feitoEm:new Date().toISOString()})}/>
-            <div style=${{flex:1,minWidth:0}}><div class="t">${k.desc}</div><div class="row small muted" style=${{marginTop:4}}>${k.horas?html`<span>~${n2(k.horas)} h</span>`:null}
-            ${S.admin?html`<select class="i" style=${{maxWidth:220,padding:"3px 6px"}} value=${k.resp||""} onChange=${ev=>upT(k.id,{resp:ev.target.value})} aria-label="Responsável"><option value="">Sem responsável</option>${equipe.map(([i,n])=>html`<option key=${i} value=${i}>${n}</option>`)}</select>`:html`<span>${k.resp?S.nome(k.resp):"sem responsável"}</span>`}
-            ${k.feito&&k.feitoPor?html`<span>feito por ${S.nome(k.feitoPor)}</span>`:null}</div></div>
-            ${S.admin&&html`<button class="btn sm ghost danger" aria-label="Remover tarefa" onClick=${()=>S.api.update("os",o.id,{tarefas:o.tarefas.filter(x=>x.id!==k.id)})}>✕</button>`}</div>`)}</div>`)}
-        ${S.admin&&html`<div class="grid" style=${{gridTemplateColumns:"minmax(0,140px) minmax(0,1fr) auto",gap:8,borderTop:"1px solid var(--line)",paddingTop:10}}>
-          <${Sel} value=${nova.etapa} onChange=${v=>setNova({...nova,etapa:v})} opts=${ETAPAS_OS.filter(e=>!["material","concluida"].includes(e.id)).map(e=>[e.id,e.t])}/>
-          <${Inp} value=${nova.desc} onChange=${v=>setNova({...nova,desc:v})} placeholder="Nova tarefa"/>
-          <button class="btn" disabled=${!nova.desc} onClick=${()=>{S.api.update("os",o.id,{tarefas:[...(o.tarefas||[]),{id:uid(),etapa:nova.etapa,comodo:"",desc:nova.desc,horas:0,resp:"",feito:false}]});setNova({...nova,desc:""})}}>Adicionar</button></div>`}
+      <div class="card col">
+        <${Hd} t="Tarefas">${S.admin&&html`<select class="i" style=${{maxWidth:230}} value="" onChange=${e=>distribuir(e.target.value)} aria-label="Atribuir sem responsável"><option value="">Dar as sem responsável para…</option>${equipe.map(([i,n])=>html`<option key=${i} value=${i}>${n}</option>`)}</select>`}<//>
+        ${ETS.map(e=>{const t=tarefas.filter(k=>k.etapa===e.id);if(!t.length&&!podeCampo)return null;
+          return html`<div key=${e.id} class="col" style=${{gap:0}}>
+          <div class="row" style=${{marginTop:6,justifyContent:"space-between"}}><div class="row"><span class="wire" style=${{background:e.c,height:16}}></span><b>${e.t}</b><span class="small muted">${t.filter(x=>x.feito).length}/${t.length}</span></div>
+            ${podeCampo&&addEm!==e.id&&html`<button class="btn sm ghost" onClick=${()=>{setAddEm(e.id);setNovaT({desc:"",horas:0})}}>+ Tarefa</button>`}</div>
+          ${t.map(k=>edTarefa&&edTarefa.id===k.id?html`<div key=${k.id} class="col" style=${{padding:"10px 0",borderBottom:"1px solid var(--line)"}}>
+              <${F} label="Tarefa"><${Inp} value=${edTarefa.desc} onChange=${v=>setEdTarefa({...edTarefa,desc:v})}/><//>
+              <div class="row"><${F} label="Etapa"><${Sel} value=${edTarefa.etapa} onChange=${v=>setEdTarefa({...edTarefa,etapa:v})} opts=${ETS.map(x=>[x.id,x.t])}/><//><${F} label="Horas"><${Num} step=${.5} value=${edTarefa.horas} onChange=${v=>setEdTarefa({...edTarefa,horas:v})}/><//></div>
+              <div class="row" style=${{justifyContent:"space-between"}}>${podeEditar?html`<button class="btn ghost danger" onClick=${()=>{save({tarefas:tarefas.filter(x=>x.id!==k.id)},"Tarefa removida.");setEdTarefa(null)}}>Remover tarefa</button>`:html`<span></span>`}
+                <div class="row"><button class="btn" onClick=${()=>setEdTarefa(null)}>Cancelar</button><button class="btn pri" disabled=${!edTarefa.desc} onClick=${()=>{upT(k.id,{desc:edTarefa.desc,etapa:edTarefa.etapa,horas:edTarefa.horas},"Tarefa salva.");setEdTarefa(null)}}>Salvar</button></div></div></div>`
+            :html`<div key=${k.id} class=${"task"+(k.feito?" done":"")}><input type="checkbox" checked=${!!k.feito} aria-label="Concluir" onChange=${()=>upT(k.id,{feito:!k.feito,feitoPor:S.me.id,feitoEm:new Date().toISOString()})}/>
+              <div style=${{flex:1,minWidth:0}}><div class="t">${k.desc}</div><div class="row small muted" style=${{marginTop:4}}>${k.horas?html`<span>~${n2(k.horas)} h</span>`:null}
+              ${S.admin?html`<select class="i" style=${{maxWidth:210,minHeight:30,padding:"2px 6px"}} value=${k.resp||""} onChange=${ev=>upT(k.id,{resp:ev.target.value})} aria-label="Responsável"><option value="">Sem responsável</option>${equipe.map(([i,n])=>html`<option key=${i} value=${i}>${n}</option>`)}</select>`:html`<span>${k.resp?S.nome(k.resp):"sem responsável"}</span>`}
+              ${k.feito&&k.feitoPor?html`<span>feito por ${S.nome(k.feitoPor)}</span>`:null}</div></div>
+              ${podeCampo&&html`<button class="btn sm ghost" onClick=${()=>setEdTarefa({id:k.id,desc:k.desc,etapa:k.etapa,horas:num(k.horas)})}>Editar</button>`}</div>`)}
+          ${addEm===e.id&&html`<div class="row" style=${{padding:"8px 0"}}><input class="i" style=${{flex:1,minWidth:180}} value=${novaT.desc} onChange=${ev=>setNovaT({...novaT,desc:ev.target.value})} placeholder=${"Nova tarefa de "+e.t.toLowerCase()} aria-label="Nova tarefa"/>
+            <${Num} step=${.5} value=${novaT.horas} onChange=${v=>setNovaT({...novaT,horas:v})}/><span class="small muted">h</span>
+            <button class="btn" onClick=${()=>setAddEm(null)}>Cancelar</button><button class="btn pri" disabled=${!novaT.desc} onClick=${()=>{save({tarefas:[...tarefas,{id:uid(),etapa:e.id,comodo:"",desc:novaT.desc,horas:novaT.horas,resp:"",feito:false,criadoPor:S.me.id}]},"Tarefa adicionada.");setAddEm(null)}}>Adicionar</button></div>`}
+          </div>`})}
       </div>
+
       <div class="col">
-        <div class="card col"><div class="row" style=${{justifyContent:"space-between"}}><h3>Material da obra</h3>${(o.materiais||[]).some(m=>!m.baixado)&&html`<button class="btn sm pri" onClick=${separar}>Separar tudo e dar baixa</button>`}</div>
-          ${(o.materiais||[]).length?html`<div class="tbl-wrap"><table><thead><tr><th>Material</th><th class="r">Precisa</th><th class="r">Estoque</th><th></th></tr></thead><tbody>
-            ${o.materiais.map(m=>{const k=mat(m);const fal=k&&!m.baixado&&num(k.estoque)<num(m.qtd);return html`<tr key=${m.matId}><td>${k?k.nome:m.matId}</td><td class="r num">${n2(m.qtd)} ${k?k.unid:""}</td><td class="r num">${k?n2(k.estoque):"—"}</td>
-              <td class="r">${m.baixado?html`<span class="pill ok">Separado</span>`:fal?html`<span class="pill bad">Comprar ${n2(num(m.qtd)-num(k.estoque))}</span>`:html`<button class="btn sm" onClick=${()=>baixarUm(m)}>Baixar</button>`}</td></tr>`})}
-          </tbody></table></div>`:html`<p class="muted small" style=${{margin:0}}>Sem material listado (cliente compra ou serviço avulso).</p>`}
+        <div class="card col">
+          <${Hd} t="Material da obra">${materiais.some(m=>!m.baixado&&mat(m))&&!edMat&&html`<button class="btn sm pri" onClick=${separar}>Separar tudo</button>`}${podeCampo&&html`<${EditBtn} on=${()=>setEdMat(!edMat)} label=${edMat?"Concluir edição":"Editar"}/>`}<//>
+          ${materiais.length?html`<div class="tbl-wrap"><table><thead><tr><th>Material</th><th class="r">Precisa</th><th class="r">Estoque</th><th></th></tr></thead><tbody>
+            ${materiais.map((m,i)=>{const k=mat(m);const fal=k&&!m.baixado&&num(k.estoque)<num(m.qtd);return html`<tr key=${keyM(m,i)}><td>${nomeMat(m)}${!k?html`<div class="small muted">fora do estoque</div>`:null}</td>
+              <td class="r">${edMat&&!m.baixado?html`<${Num} value=${m.qtd} onChange=${v=>save({materiais:materiais.map((x,j)=>j===i?{...x,qtd:v}:x)})}/>`:html`<span class="num">${n2(m.qtd)} ${k?k.unid:""}</span>`}</td>
+              <td class="r num">${k?n2(k.estoque):"—"}</td>
+              <td class="r">${edMat?(!m.baixado&&html`<button class="btn sm ghost danger" aria-label="Remover material" onClick=${()=>save({materiais:materiais.filter((_,j)=>j!==i)},"Material removido.")}>✕</button>`)
+                :m.baixado?html`<span class="pill ok">Separado</span>`:!k?html`<span class="pill">comprar</span>`:fal?html`<span class="pill bad">Comprar ${n2(num(m.qtd)-num(k.estoque))}</span>`:html`<button class="btn sm" onClick=${()=>baixarUm(i)}>Baixar</button>`}</td></tr>`})}
+          </tbody></table></div>`:html`<p class="muted small" style=${{margin:0}}>Nenhum material listado.</p>`}
+          ${edMat&&html`<div class="row" style=${{borderTop:"1px solid var(--line)",paddingTop:10}}>
+            <select class="i" style=${{flex:1,minWidth:180}} value=${novoM.matId} onChange=${e=>setNovoM({...novoM,matId:e.target.value})} aria-label="Material"><option value="">Escolha o material…</option><option value="__outro">Outro (digitar o nome)</option>${S.mats.map(m=>html`<option key=${m.id} value=${m.id}>${m.nome}</option>`)}</select>
+            ${novoM.matId==="__outro"&&html`<input class="i" style=${{flex:1,minWidth:160}} value=${novoM.nome} onChange=${e=>setNovoM({...novoM,nome:e.target.value})} placeholder="Nome do material" aria-label="Nome do material"/>`}
+            <${Num} value=${novoM.qtd} onChange=${v=>setNovoM({...novoM,qtd:v})}/>
+            <button class="btn pri" disabled=${!novoM.matId||!novoM.qtd||(novoM.matId==="__outro"&&!novoM.nome)} onClick=${()=>{const it=novoM.matId==="__outro"?{matId:"",nome:novoM.nome,qtd:novoM.qtd,baixado:false}:{matId:novoM.matId,qtd:novoM.qtd,baixado:false};save({materiais:[...materiais,it]},"Material adicionado.");setNovoM({matId:"",nome:"",qtd:1})}}>Adicionar</button></div>`}
         </div>
+
+        ${podeEditar&&html`<div class="card col">
+          <${Hd} t="Serviços extras">${pendX.length?html`<button class="btn sm pri" onClick=${cobrar}>Cobrar ${brl(pendX.reduce((a,x)=>a+num(x.qtd)*num(x.valor),0))}</button>`:null}<//>
+          <p class="small muted" style=${{margin:0}}>O cliente pediu algo a mais na obra? Lance aqui para não trabalhar de graça.</p>
+          ${extras.map(x=>edX&&edX.id===x.id?html`<div key=${x.id} class="row"><input class="i" style=${{flex:1,minWidth:160}} value=${edX.desc} onChange=${e=>setEdX({...edX,desc:e.target.value})} aria-label="Descrição"/><${Num} value=${edX.qtd} onChange=${v=>setEdX({...edX,qtd:v})}/><input class="i" style=${{width:110}} type="number" value=${edX.valor} onChange=${e=>setEdX({...edX,valor:num(e.target.value)})} aria-label="Valor unitário"/>
+              <button class="btn" onClick=${()=>setEdX(null)}>Cancelar</button><button class="btn pri" onClick=${()=>{save({extras:extras.map(y=>y.id===x.id?{...y,...edX}:y)},"Extra salvo.");setEdX(null)}}>Salvar</button></div>`
+            :html`<div key=${x.id} class="row" style=${{justifyContent:"space-between",borderBottom:"1px solid var(--line)",paddingBottom:8}}><div style=${{flex:1,minWidth:0}}><b>${x.desc}</b><div class="small muted">${n2(x.qtd)} × ${brl(x.valor)} = ${brl(num(x.qtd)*num(x.valor))}</div></div>
+              ${x.lancado?html`<span class="pill ok">Cobrado</span>`:html`<button class="btn sm" onClick=${()=>setEdX({...x})}>Editar</button><button class="btn sm ghost danger" aria-label="Remover extra" onClick=${()=>save({extras:extras.filter(y=>y.id!==x.id)},"Extra removido.")}>✕</button>`}</div>`)}
+          ${extras.length?html`<div class="small" style=${{textAlign:"right"}}>Total de extras: <b>${brl(totX)}</b></div>`:null}
+          <div class="col" style=${{gap:8,borderTop:extras.length?"0":"1px solid var(--line)",paddingTop:extras.length?0:10}}>
+            <div class="row"><input class="i" style=${{flex:1,minWidth:160}} value=${novoX.desc} onChange=${e=>setNovoX({...novoX,desc:e.target.value})} placeholder="Ex.: 2 tomadas a mais na cozinha" aria-label="Novo serviço extra"/>
+              <${Num} value=${novoX.qtd} onChange=${v=>setNovoX({...novoX,qtd:v})}/><input class="i" style=${{width:110}} type="number" placeholder="R$ unit." value=${novoX.valor||""} onChange=${e=>setNovoX({...novoX,valor:num(e.target.value)})} aria-label="Valor unitário"/></div>
+            <div class="row" style=${{justifyContent:"space-between"}}><label class="chk"><input type="checkbox" checked=${novoX.tarefa} onChange=${e=>setNovoX({...novoX,tarefa:e.target.checked})}/> Criar tarefa para a equipe</label>
+              <button class="btn pri" disabled=${!novoX.desc} onClick=${()=>{const p={extras:[...extras,{id:uid(),desc:novoX.desc,qtd:novoX.qtd,valor:novoX.valor,lancado:false,em:new Date().toISOString()}]};
+                if(novoX.tarefa)p.tarefas=[...tarefas,{id:uid(),etapa:["material","concluida"].includes(o.etapa)?"infra":o.etapa,comodo:"",desc:"Extra: "+novoX.desc,horas:0,resp:"",feito:false}];
+                save(p,"Serviço extra adicionado.");setNovoX({desc:"",qtd:1,valor:0,tarefa:true})}}>Adicionar extra</button></div></div>
+        </div>`}
+
+        <div class="card col">
+          <${Hd} t="Anotações da obra"><//>
+          <p class="small muted" style=${{margin:0}}>Qualquer novidade: o que o cliente pediu, problema encontrado, o que falta.</p>
+          <div class="row"><textarea class="i" style=${{flex:1,minHeight:60}} value=${nota} onChange=${e=>setNota(e.target.value)} placeholder="Escreva a anotação" aria-label="Nova anotação"></textarea></div>
+          <div class="row" style=${{justifyContent:"flex-end"}}><button class="btn pri" disabled=${!nota.trim()} onClick=${()=>{save({notas:[{id:uid(),texto:nota.trim(),por:S.me.id,em:new Date().toISOString()},...notas]},"Anotação salva.");setNota("")}}>Salvar anotação</button></div>
+          ${notas.map(n=>edNota&&edNota.id===n.id?html`<div key=${n.id} class="col"><textarea class="i" value=${edNota.texto} onChange=${e=>setEdNota({...edNota,texto:e.target.value})} aria-label="Editar anotação"></textarea>
+              <div class="row" style=${{justifyContent:"flex-end"}}><button class="btn" onClick=${()=>setEdNota(null)}>Cancelar</button><button class="btn pri" onClick=${()=>{save({notas:notas.map(x=>x.id===n.id?{...x,texto:edNota.texto,editadoEm:new Date().toISOString()}:x)},"Anotação salva.");setEdNota(null)}}>Salvar</button></div></div>`
+            :html`<div key=${n.id} style=${{borderTop:"1px solid var(--line)",paddingTop:8}}><div style=${{whiteSpace:"pre-wrap"}}>${n.texto}</div>
+              <div class="row small muted" style=${{justifyContent:"space-between"}}><span>${S.nome(n.por)} · ${new Date(n.em).toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"})}${n.editadoEm?" · editada":""}</span>
+              ${(n.por===S.me.id||S.admin)&&html`<div class="row"><button class="btn sm ghost" onClick=${()=>setEdNota({id:n.id,texto:n.texto})}>Editar</button><button class="btn sm ghost danger" aria-label="Apagar anotação" onClick=${()=>save({notas:notas.filter(x=>x.id!==n.id)},"Anotação apagada.")}>✕</button></div>`}</div></div>`)}
+        </div>
+
         ${pj&&html`<div class="card col"><h3>Do projeto: ${pj.nome}</h3><div class="small muted">${(pj.circuitos||[]).length} circuitos · tensão ${(pj.carimbo||{}).tensao||"—"}</div>
-          ${(pj.circuitos||[]).length?html`<div class="tbl-wrap"><table><thead><tr><th>Circ.</th><th>Descrição</th><th class="r">Disj.</th><th class="r">Cabo</th></tr></thead><tbody>${pj.circuitos.map(c=>html`<tr key=${c.id}><td class="mono">${c.num}</td><td>${c.desc}</td><td class="r num">${c.disjuntor}A</td><td class="r num">${c.bitola}mm²</td></tr>`)}</tbody></table></div>`:null}</div>`}
-        ${S.admin&&html`<button class="btn ghost danger" onClick=${()=>setDel(true)}>Excluir OS</button>`}
+          ${(pj.circuitos||[]).length?html`<div class="tbl-wrap"><table><thead><tr><th>Circ.</th><th>Descrição</th><th class="r">Disj.</th><th class="r">Cabo</th></tr></thead><tbody>${pj.circuitos.map(c=>html`<tr key=${c.id}><td>${c.num}</td><td>${c.desc}</td><td class="r num">${c.disjuntor}A</td><td class="r num">${c.bitola}mm²</td></tr>`)}</tbody></table></div>`:null}</div>`}
+        ${S.admin&&html`<button class="btn ghost danger" onClick=${()=>setDel(true)}>Excluir obra</button>`}
       </div>
     </div>
     ${prancha&&html`<${VerPrancha} pj=${prancha} onClose=${()=>setPrancha(null)}/>`}
-    ${del&&html`<${Confirm} text=${`Excluir ${o.numero}? As tarefas somem para a equipe.`} onNo=${()=>setDel(false)} onYes=${()=>{S.api.del("os",o.id,"OS excluída.");onClose()}}/>`}
+    ${del&&html`<${Confirm} text=${`Excluir ${o.numero}? As tarefas somem para a equipe.`} onNo=${()=>setDel(false)} onYes=${()=>{S.api.del("os",o.id,"Obra excluída.");onClose()}}/>`}
   <//>`;
 }
 function VerPrancha({pj,onClose}){
@@ -1433,6 +1625,17 @@ PAGES.precos=function Precos(){
       <${F} label="Telefone (aparece na proposta)"><${Inp} id="pc-tel" value=${cfg.telefone} onChange=${v=>setC({telefone:v})}/><//><${F} label="Imposto padrão (%)"><${Inp} id="pc-imp" type="number" value=${cfg.impostoPct} onChange=${v=>setC({impostoPct:v})}/><//>
       <${F} label="Markup sobre material (%)"><${Inp} id="pc-mk" type="number" value=${cfg.markupMatPct} onChange=${v=>setC({markupMatPct:v})}/><//><${F} label="Fator industrial (× mão de obra)"><${Inp} id="pc-fi" type="number" value=${cfg.fatorIndustrial} onChange=${v=>setC({fatorIndustrial:v})}/><//>
       <${F} label="Deslocamento padrão (R$)"><${Inp} id="pc-dp" type="number" value=${cfg.deslocamentoPadrao} onChange=${v=>setC({deslocamentoPadrao:v})}/><//><${F} label="Margem mínima aceitável (%)"><${Inp} id="pc-mm" type="number" value=${cfg.margemMin} onChange=${v=>setC({margemMin:v})}/><//></div></div>
+      <div class="card col"><h3>Logo da empresa</h3>
+        <div class="row"><div style=${{background:"var(--sunk)",borderRadius:8,padding:10}}><${Marca} style=${{padding:0}}/></div>
+          <input id="pc-logo" type="file" accept="image/png,image/jpeg,image/svg+xml" hidden onChange=${async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const as=await window.claude?.use?.("assets");if(!as){S.toast("Envio de arquivo indisponível aqui. Abra pelo link do claude.ai.");return}try{const r=await as.upload(f);const novo={...cfg,logoAssetId:r.id};setCfg(novo);await S.api.setMeta("config",novo,"Logo atualizada.");setCfgDirty(false)}catch(err){S.toast("Não foi possível enviar a logo: "+(err&&err.message||"erro"))}}}/>
+          <button class="btn" onClick=${()=>document.getElementById("pc-logo").click()}>Enviar logo (PNG ou JPG)</button>
+          ${cfg.logoAssetId&&html`<button class="btn ghost danger" onClick=${async()=>{const novo={...cfg,logoAssetId:""};setCfg(novo);await S.api.setMeta("config",novo,"Logo removida: voltou o desenho padrão.");setCfgDirty(false)}}>Usar desenho padrão</button>`}</div>
+        <p class="small muted" style=${{margin:0}}>Aparece no menu e na proposta em PDF. Use a versão com fundo branco ou transparente.</p></div>
+      <div class="card col"><h3>Dados da proposta (PDF)</h3>
+        <div class="grid g2"><${F} label="CNPJ"><${Inp} id="pc-cnpj" value=${cfg.cnpj} onChange=${v=>setC({cnpj:v})}/><//><${F} label="E-mail"><${Inp} id="pc-mail" value=${cfg.email} onChange=${v=>setC({email:v})}/><//>
+        <${F} label="Validade da proposta (dias)"><${Inp} id="pc-val" type="number" value=${cfg.validadeDias} onChange=${v=>setC({validadeDias:v})}/><//></div>
+        <${F} label="Garantia (uma por linha)"><textarea class="i" id="pc-gar" value=${cfg.garantia} onChange=${e=>setC({garantia:e.target.value})}></textarea><//>
+        <${F} label="Não está incluso (uma por linha)"><textarea class="i" id="pc-ni" value=${cfg.naoIncluso} onChange=${e=>setC({naoIncluso:e.target.value})}></textarea><//></div>
       <div class="card col"><h3>Regras da casa para ler projeto</h3><p class="small muted" style=${{margin:0}}>O jeito do patrão ler. A IA obedece estas regras e a equipe vê no guia. Uma por linha.</p>
         <textarea class="i" id="pc-rg" style=${{minHeight:130}} value=${cfg.regras} onChange=${e=>setC({regras:e.target.value})} placeholder=${"• Todo banheiro tem chuveiro mesmo que o projeto não mostre\n• Ponto de ar-condicionado: contar tomada 20A + dreno"}></textarea></div>
       <div class="row" style=${{justifyContent:"flex-end"}}><button class="btn pri" disabled=${!cfgDirty} onClick=${async()=>{if(await S.api.setMeta("config",cfg,"Parâmetros salvos."))setCfgDirty(false)}}>Salvar parâmetros</button></div>
