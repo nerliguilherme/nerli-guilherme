@@ -120,7 +120,8 @@ td.r,th.r{text-align:right}
 .empty h3{color:var(--fg);font-size:19px}
 .toast{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--ink-fg);padding:12px 18px;border-radius:10px;box-shadow:0 8px 28px #0005;z-index:50;max-width:min(420px,calc(100vw - 32px));font-weight:500}
 .modal-bg{position:fixed;inset:0;background:rgba(10,16,22,.55);z-index:40;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:max(16px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 24px max(12px,env(safe-area-inset-left,0px))}
-.modal{background:var(--bg);border-radius:14px;width:min(1100px,100%);margin-top:12px;display:flex;flex-direction:column;overflow:hidden}
+.modal{background:var(--bg);border-radius:14px;width:min(1100px,100%);margin-top:12px;display:flex;flex-direction:column;overflow:clip}
+.modal-f{position:sticky;bottom:0;z-index:2;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:12px 18px calc(12px + env(safe-area-inset-bottom,0px));background:var(--panel);border-top:1px solid var(--line);box-shadow:0 -4px 14px rgba(20,30,40,.06)}
 .modal-h{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:2;flex-wrap:wrap}
 .modal-b{padding:18px;display:flex;flex-direction:column;gap:18px}
 .steps{display:flex;flex-direction:column;gap:0}
@@ -507,11 +508,18 @@ function Num({value,onChange,step=1,min=0,id}){
 function F({label,children,style}){return html`<label class="f" style=${style}>${label}${children}</label>`}
 function Inp({value,onChange,type="text",placeholder,id,...r}){return html`<input class="i" id=${id} type=${type} value=${value??""} placeholder=${placeholder} onChange=${e=>onChange(type==="number"?num(e.target.value):e.target.value)} ...${r}/>`}
 function Sel({value,onChange,opts,id}){return html`<select class="i" id=${id} value=${value??""} onChange=${e=>onChange(e.target.value)}>${opts.map(o=>Array.isArray(o)?html`<option value=${o[0]}>${o[1]}</option>`:html`<option value=${o}>${o}</option>`)}</select>`}
-function Modal({title,onClose,children,actions}){
-  useEffect(()=>{const k=e=>e.key==="Escape"&&onClose();addEventListener("keydown",k);return()=>removeEventListener("keydown",k)},[]);
+function Modal({title,onClose,children,actions,footer}){
+  const ref=useRef(onClose);ref.current=onClose;
+  useEffect(()=>{const k=e=>e.key==="Escape"&&ref.current();addEventListener("keydown",k);return()=>removeEventListener("keydown",k)},[]);
   return html`<div class="modal-bg" onMouseDown=${e=>e.target===e.currentTarget&&onClose()}><div class="modal" role="dialog" aria-label=${title}>
     <div class="modal-h"><h2 style=${{flex:1,minWidth:0}}>${title}</h2>${actions}<button class="btn ghost" onClick=${onClose} aria-label="Fechar">✕</button></div>
-    <div class="modal-b">${children}</div></div></div>`;
+    <div class="modal-b">${children}</div>${footer?html`<div class="modal-f">${footer}</div>`:null}</div></div>`;
+}
+function StatusSalvo({salvando,dirty,ok,hora,vazio}){
+  if(salvando)return html`<span class="row small muted" style=${{gap:8}}><span class="spin"></span>Salvando…</span>`;
+  if(dirty)return html`<span class="small muted">${ok?"Salvando em instantes…":vazio}</span>`;
+  if(hora)return html`<span class="small" style=${{color:"var(--ok)",fontWeight:600}}>✓ Tudo salvo às ${hora}</span>`;
+  return html`<span class="small muted">Ainda não salvo</span>`;
 }
 function Confirm({text,onYes,onNo,yes="Excluir"}){
   return html`<div class="modal-bg"><div class="modal" style=${{width:"min(420px,100%)",marginTop:"20vh"}}><div class="modal-b"><p style=${{margin:0}}>${text}</p><div class="row" style=${{justifyContent:"flex-end"}}><button class="btn" onClick=${onNo}>Cancelar</button><button class="btn pri" onClick=${onYes}>${yes}</button></div></div></div></div>`;
@@ -861,7 +869,9 @@ function EditorProjeto({id,onClose,go}){
   const [dirty,setDirty]=useState(id==="novo");
   const [conferir,setConferir]=useState(false);
   const fileRef=useRef(null);
-  const set=p=>{setPj(x=>({...x,...p}));setDirty(true)};
+  const rev=useRef(0);const pjRef=useRef(pj);pjRef.current=pj;
+  const [salvoEm,setSalvoEm]=useState(salvo&&salvo.atualizadoEm||null);const [salvando,setSalvando]=useState(false);
+  const set=p=>{setPj(x=>({...x,...p}));setDirty(true);rev.current++};
   const passo=(k,v)=>set({passos:{...pj.passos,[k]:v}});
 
   // abrir prancha salva
@@ -905,7 +915,7 @@ function EditorProjeto({id,onClose,go}){
         if(modo==="quadro")novo.circuitos=[...(pj.circuitos||[]),...(r.circuitos||[]).map(c=>({id:uid(),...c}))];
       }
       novo.lidoPorIA=true;novo.iaOriginal=totaisProjeto(novo);
-      setPj(novo);setDirty(true);setTab(modo==="quadro"?"cargas":modo==="lista"?"metragem":"planta");S.toast(rc?"Recorte lido e somado ao projeto. Confira.":"Leitura feita. Agora confira passo a passo.");
+      setPj(novo);setDirty(true);rev.current++;setTab(modo==="quadro"?"cargas":modo==="lista"?"metragem":"planta");S.toast(rc?"Recorte lido e somado ao projeto. Confira.":"Leitura feita. Agora confira passo a passo.");
     }catch(e){setErro((e&&e.message)||"A IA não conseguiu ler. Tente um recorte menor ou faça a contagem manual.")}finally{setProg("")}
   };
   const [recortes,setRecortes]=useState([]);
@@ -919,7 +929,10 @@ function EditorProjeto({id,onClose,go}){
   const pUp=async()=>{if(!drag)return;const r=rectDe(drag);setDrag(null);if(r.w<.02||r.h<.02)return;
     try{const blob=await recortar(ver.blob,r);setRecortes(a=>[...a,{id:uid(),n:ver.n,blob,url:URL.createObjectURL(blob),modo:"unidade",rotulo:"Apto tipo",rep:1}]);setCortando(false);S.toast("Recorte criado. Diga o que é e toque em Ler recorte.")}catch{setErro("Não foi possível recortar.")}};
 
-  const salvar=async(extra={},msg="Projeto salvo.")=>{const o={...pj,...extra};setPj(o);const ok=await S.api.set("projetos",o.id,o,msg);if(ok)setDirty(false);return ok};
+  const salvar=async(extra={},msg="Projeto salvo.")=>{const r0=rev.current;const em=new Date().toISOString();const o={...pjRef.current,...extra,atualizadoEm:em};setPj(x=>({...x,...extra,atualizadoEm:em}));setSalvando(true);const ok=await S.api.set("projetos",o.id,o,msg);setSalvando(false);if(ok){if(rev.current===r0)setDirty(false);setSalvoEm(em)}return ok};
+  const temConteudo=!!(pj.nome||pj.arquivo||pj.assetId||(pj.comodos||[]).length);
+  useEffect(()=>{if(!dirty||!temConteudo)return;const t=setTimeout(()=>salvar({},null),1500);return()=>clearTimeout(t)},[pj,dirty]);
+  const sair=async()=>{if(dirty&&temConteudo)await salvar({},"Projeto salvo.");onClose()};
   const tot=totaisProjeto(pj);
   const nomeP=k=>(S.pontos.find(p=>p.id===k)||{nome:k}).nome;
   const total=Object.values(tot).reduce((a,b)=>a+b,0);
@@ -933,10 +946,13 @@ function EditorProjeto({id,onClose,go}){
     if(nid){onClose();go("orcamentos",nid)}
   };
 
-  const actions=html`<span class=${"pill "+(pj.status==="conferido"?"ok":"warn")}>${pj.status==="conferido"?"Conferido":`${nPass}/7 passos`}</span>
-    <button class="btn" disabled=${!dirty} onClick=${()=>salvar()}>${dirty?"Salvar":"Salvo"}</button>`;
+  const actions=html`<span class=${"pill "+(pj.status==="conferido"?"ok":"warn")}>${pj.status==="conferido"?"Conferido":`${nPass}/7 passos`}</span>`;
+  const hora=salvoEm?new Date(salvoEm).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}):"";
+  const prox=pj.status==="conferido"&&S.admin?html`<button class="btn pri" onClick=${gerarOrc}>Gerar orçamento</button>`:total>0&&tab!=="quadro"?html`<button class="btn pri" onClick=${()=>setTab("quadro")}>Ir para conferir</button>`:null;
+  const footer=html`<${StatusSalvo} salvando=${salvando} dirty=${dirty} ok=${temConteudo} hora=${hora} vazio="Dê um nome ou envie a prancha para começar a salvar"/>
+    <div class="row">${prox}<button class=${"btn"+(prox?"":" pri")} onClick=${sair}>Salvar e fechar</button></div>`;
 
-  return html`<${Modal} title=${pj.nome||"Novo projeto"} onClose=${()=>{onClose()}} actions=${actions}>
+  return html`<${Modal} title=${pj.nome||"Novo projeto"} onClose=${sair} actions=${actions} footer=${footer}>
     ${(()=>{const temOrc=S.data.orcamentos.some(o=>o.projetoId===pj.id);const et=[["Enviar a prancha",paginas.length>0||!!pj.assetId],["Contar os pontos",total>0],["Patrão confere",pj.status==="conferido"],["Gerar orçamento",temOrc]];
       return html`<div class="flow" style=${{gap:8}}>${et.map(([t,ok],i)=>html`<div key=${i} class="row" style=${{flexWrap:"nowrap",gap:8,padding:"10px 12px",borderRadius:10,background:ok?"var(--ok-soft)":"var(--panel)",border:"1px solid var(--line)"}}><span class="n" style=${{width:26,height:26,borderRadius:"50%",display:"grid",placeItems:"center",fontWeight:800,fontSize:13,flex:"none",background:ok?"var(--ok)":"var(--accent)",color:ok?"#fff":"var(--accent-fg)"}}>${ok?"✓":i+1}</span><b style=${{fontSize:14}}>${t}</b></div>`)}</div>`})()}
     <div class="grid g3">
@@ -1082,7 +1098,9 @@ function EditorOrc({id,onClose,go}){
   const [dirty,setDirty]=useState(id==="novo");
   const [add,setAdd]=useState("");
   const [msg,setMsg]=useState(false);
-  const set=p=>{setO(x=>({...x,...p}));setDirty(true)};
+  const rev=useRef(0);const oRef=useRef(o);oRef.current=o;
+  const [salvoEm,setSalvoEm]=useState(salvo&&salvo.atualizadoEm||null);const [salvando,setSalvando]=useState(false);
+  const set=p=>{setO(x=>({...x,...p}));setDirty(true);rev.current++};
   const c=calcOrc(o,S.custoHora);
   const saude=saudeOrc(o,c,S.config,S.custoHora);
   const upL=(lid,p)=>set({linhas:o.linhas.map(l=>l.id===lid?{...l,...p}:l)});
@@ -1093,7 +1111,10 @@ function EditorOrc({id,onClose,go}){
     const p=S.pontos.find(x=>x.id===k);if(!p)return;const ck=custoKit(p,S.mats);
     set({linhas:[...o.linhas,{id:uid(),tipoId:p.id,desc:p.nome,unid:p.unid,qtd:1,mo:Math.round(num(p.mo)*(ind?num(S.config.fatorIndustrial):1)*100)/100,custoMat:ck,mat:Math.round(ck*(1+num(S.config.markupMatPct)/100)*100)/100,horas:num(p.horas)}]});
   };
-  const salvar=async(extra={},m="Orçamento salvo.")=>{const x={...o,...extra};setO(x);const ok=await S.api.set("orcamentos",x.id,x,m);if(ok)setDirty(false);return ok};
+  const salvar=async(extra={},m="Orçamento salvo.")=>{const r0=rev.current;const em=new Date().toISOString();const x={...oRef.current,...extra,atualizadoEm:em};setO(y=>({...y,...extra,atualizadoEm:em}));setSalvando(true);const ok=await S.api.set("orcamentos",x.id,x,m);setSalvando(false);if(ok){if(rev.current===r0)setDirty(false);setSalvoEm(em)}return ok};
+  const temConteudo=!!(o.cliente||(o.linhas||[]).length);
+  useEffect(()=>{if(!dirty||!temConteudo)return;const t=setTimeout(()=>salvar({},null),1500);return()=>clearTimeout(t)},[o,dirty]);
+  const sair=async()=>{if(dirty&&temConteudo)await salvar({},"Orçamento salvo.");onClose()};
   const cli=S.data.clientes.find(x=>x.nome===o.cliente);
   const fechar=async()=>{
     const pj=S.data.projetos.find(p=>p.id===o.projetoId);
@@ -1118,8 +1139,10 @@ function EditorOrc({id,onClose,go}){
     S.toast(`Fechado! ${os.numero} criada com ${tarefas.length} tarefas e 2 parcelas lançadas no financeiro.`);
     onClose();go("os",nid);
   };
-  const actions=html`<button class="btn" disabled=${!dirty} onClick=${()=>salvar()}>${dirty?"Salvar":"Salvo"}</button>`;
-  return html`<${Modal} title=${"Orçamento "+o.numero} onClose=${onClose} actions=${actions}>
+  const hora=salvoEm?new Date(salvoEm).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}):"";
+  const footer=html`<${StatusSalvo} salvando=${salvando} dirty=${dirty} ok=${temConteudo} hora=${hora} vazio="Escreva o cliente ou adicione um item para começar a salvar"/>
+    <div class="row"><span class="small muted">Total</span><b style=${{fontSize:18}}>${brl(c.total)}</b><button class="btn pri" onClick=${sair}>Salvar e fechar</button></div>`;
+  return html`<${Modal} title=${"Orçamento "+o.numero} onClose=${sair} footer=${footer}>
     <div class="grid g4">
       <${F} label="Cliente"><${Inp} id="o-cli" value=${o.cliente} list="lst-cli2" onChange=${v=>{const k=S.data.clientes.find(x=>x.nome===v);set(k?{cliente:v,telefone:o.telefone||k.telefone||"",endereco:o.endereco||k.endereco||""}:{cliente:v})}}/><//>
       <${F} label="Telefone / WhatsApp"><${Inp} id="o-tel" value=${o.telefone} onChange=${v=>set({telefone:v})}/><//>
