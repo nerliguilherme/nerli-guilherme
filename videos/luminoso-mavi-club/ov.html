@@ -25,14 +25,14 @@
 const $=id=>document.getElementById(id),cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
 function bez(x1,y1,x2,y2){return x=>{x=cl(x);if(x<=0||x>=1)return x;let a=0,b=1,u=x;for(let i=0;i<28;i++){u=(a+b)/2;const X=3*(1-u)*(1-u)*u*x1+3*(1-u)*u*u*x2+u*u*u;if(X<x)a=u;else b=u;}return 3*(1-u)*(1-u)*u*y1+3*(1-u)*u*u*y2+u*u*u;};}
 const EZ=bez(.65,0,.35,1),seg=(t,a,b)=>EZ((t-a)/(b-a));
-const ON=2.57, END=16.9;
-const L=[['Apagada,','é só uma placa.',.25,ON-.25],['Acesa,','<k>chama</k> <k>o</k> <k>cliente.</k>',ON+.05,6.05],['Luminoso redondo','com <k>LED</k>',9.4,13.55],['Instalado','na <k>loja</k> ✓',13.95,END-.25]];
+const ON=2.57, END=19.4;
+const L=[['Apagada,','é só uma placa.',.25,ON-.25],['Acesa,','<k>chama</k> <k>o</k> <k>cliente.</k>',ON+.05,6.05],['Luminoso redondo','com <k>LED</k>',9.4,13.55],['Instalado','na <k>loja</k> ✓',13.95,16.2],['Visto','de <k>longe</k> 👀',16.6,END-.25]];
 let h='';L.forEach((l,i)=>{h+=`<div class="cap" id="cp${i}">`+[l[0],l[1]].map((ln,r)=>'<div>'+ln.split(' ').map((w,j)=>`<span class="w" data-i="${r*4+j}">${w.replace('<k>','<span class="k">').replace('</k>','</span>')} </span>`).join('')+'</div>').join('')+'</div>';});
 $('caps').innerHTML=h;
 function fe(e,o,dy=20){e.style.opacity=o.toFixed(3);e.style.transform=`translateY(${((1-o)*dy).toFixed(1)}px)`;}
 window.seek=t=>{
  L.forEach((l,i)=>{const c=$('cp'+i),o=1-seg(t,l[3],l[3]+.25);c.querySelectorAll('.w').forEach(w=>fe(w,seg(t,l[2]+w.dataset.i*.08,l[2]+w.dataset.i*.08+.35)*o,22));});
- $('grad').style.opacity=(1-seg(t,13.7,14.1)).toFixed(3); $('grad2').style.opacity=(seg(t,13.8,14.2)*(1-seg(t,END,END+.3))).toFixed(3);
+ $('grad').style.opacity=((1-seg(t,13.7,14.1))+seg(t,16.3,16.7)*(1-seg(t,END,END+.3))).toFixed(3); $('grad2').style.opacity=(seg(t,13.8,14.2)*(1-seg(t,16.3,16.6))).toFixed(3);
  fe($('seal'),seg(t,6.35,6.75)*(1-seg(t,9.05,9.3)),16);
  const e=seg(t,END,END+.45); $('end').style.opacity=e.toFixed(3);
  fe($('logo'),seg(t,END+.25,END+.65)); fe($('bar'),seg(t,END+.4,END+.8),10); fe($('at'),seg(t,END+.45,END+.85)); fe($('tag'),seg(t,END+.85,END+1.25),14);
