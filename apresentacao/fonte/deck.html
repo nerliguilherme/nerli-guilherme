@@ -177,9 +177,11 @@ const slides=[
   ${[['google','Avaliação no Google','Mais avaliações, mais destaque.'],['insta','Instagram','Seguidor novo com um toque.'],['whats','WhatsApp','Abre a conversa na hora.'],['pix','Pix','Chave certa, sem erro.']].map(([k,t,d])=>`<div style="text-align:center">${NFC[k]}<div class="cap" style="margin-top:22px;font-size:26px">${t}<span style="font-size:19px">${d}</span></div></div>`).join('')}</div>
   <div style="position:absolute;left:96px;bottom:104px;font-size:22px;color:var(--mut);font-weight:600">Também com QR Code para celulares sem NFC · Personalizado com a sua marca · Balcão, mesa, caixa, recepção e vitrine</div>${foot()}`),
  // 21 NFC produtos reais
- S(`<div style="position:absolute;left:96px;top:110px"><div class="kick">Placas NFC · Modelos</div><h2 style="margin-top:20px">Acabamento texturizado, ícone em relevo.</h2></div>
-  <div class="grid" style="left:96px;right:96px;top:300px;grid-template-columns:repeat(6,1fr);gap:22px">
-  ${ph('nfc_google',266,400,'Google','Display de mesa')}${ph('nfc_pix',266,400,'Pix')}${ph('nfc_whats',266,400,'WhatsApp')}${ph('nfc_insta_b',266,400,'Instagram','Branca')}${ph('nfc_insta_p',266,400,'Instagram','Preta')}${ph('nfc_wifi',266,400,'Wi-Fi')}</div>${foot()}`),
+ S(`<div style="position:absolute;left:96px;top:100px"><div class="kick">Placas NFC · Modelos</div><h2 style="margin-top:20px">Pronta para o balcão, com a cara da sua loja.</h2></div>
+  <div style="position:absolute;left:96px;top:270px">${ph('nfc_balcao',880,660)}</div>
+  <div style="position:absolute;left:1026px;right:96px;top:270px"><div class="card" style="padding:22px"><img src="img/nfc_artes.jpg" style="width:100%;display:block;border-radius:10px"></div>
+  <div style="margin-top:34px;display:flex;flex-direction:column;gap:20px;font-size:24px;font-weight:600;color:var(--navy)">
+  ${['Instagram, WhatsApp, Google e Pix','Display de acrílico para balcão e mesa','Arte personalizada com a sua marca','É só aproximar o celular, sem aplicativo'].map(x=>`<div style="display:flex;align-items:center;gap:14px"><span style="width:12px;height:12px;border-radius:50%;background:var(--ora);flex:none"></span>${x}</div>`).join('')}</div></div>${foot()}`),
  // 22 clientes
  S(`<div style="position:absolute;left:96px;top:110px"><div class="kick">Nossos clientes</div><h2 style="margin-top:20px">Marcas que já confiaram no nosso trabalho.</h2></div>
   <div class="grid" style="left:96px;right:96px;top:320px;grid-template-columns:repeat(4,1fr);gap:26px">
