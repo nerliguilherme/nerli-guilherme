@@ -111,7 +111,10 @@ const slides=[
  // 8 luminosos
  S(`<div style="position:absolute;left:96px;top:110px"><div class="kick">Letreiros luminosos · LED</div><h2 style="margin-top:20px">Luz que valoriza a marca, de dia e de noite.</h2></div>
   <div class="grid" style="left:96px;right:96px;top:300px;grid-template-columns:repeat(5,1fr)">
-  ${ph('flash_letreiro',322,520,'Flash EV','Letreiro 3D luminoso')}${ph('fibernett',322,520,'Grupo Fibernett','Logo em relevo iluminado')}${ph('revitafio_noite',322,520,'Revitafio','Letras em acrílico iluminadas')}${ph('dom_lipe',322,520,'Dom Lipe','Totem luminoso')}${ph('uninassau_lum',322,520,'Uninassau','Placa luminosa')}</div>${foot()}`),
+  ${ph('rei_noite',322,520,'O Rei da Pizza','Letreiro luminoso LED')}${ph('fibernett',322,520,'Grupo Fibernett','Logo em relevo iluminado')}${ph('revitafio_noite',322,520,'Revitafio','Letras em acrílico iluminadas')}${ph('dom_lipe',322,520,'Dom Lipe','Totem luminoso')}${ph('uninassau_lum',322,520,'Uninassau','Placa luminosa')}</div>${foot()}`),
+ // flash
+ project('Letreiro 3D · Letras soltas','Uma marca nova, inteira na parede.','Logo luminoso, frase da marca em letras soltas e placas de vaga e recarga. Identidade completa num só projeto.','Flash EV Eletropostos',
+   W3('flash_fachada','flash_frase','flash_letreiro','Letreiro 3D','Frase em letras soltas','Logo luminoso')),
  // 9 MAVI
  project('Luminoso redondo · LED','Apagado ou aceso, ele chama o cliente.','Luminoso redondo de parede com iluminação em LED, instalado na entrada da loja para ser visto de longe no corredor.','MAVI club',
    W2('mavi_loja','mavi_corredor','Na entrada da loja','','Visto do corredor','')),
@@ -120,8 +123,14 @@ const slides=[
   <div class="grid" style="left:96px;right:96px;top:300px;grid-template-columns:repeat(5,1fr)">
   ${ph('espelho_backlight',322,520,'Espelho Meu','Letreiro backlight')}${ph('espelho_relevo',322,520,'Espelho Meu','Logo em relevo, luz indireta')}${ph('sariteia',322,520,'Sariteia','Acrílico vinho, luz indireta')}${ph('ana_silva',322,520,'Ana Silva','Placa redonda com backlight')}${ph('amor_saude',322,520,'Amor Saúde','Letras em acrílico')}</div>${foot()}`),
  // 11 institucional
- project('Letra caixa institucional','Padrão de marca nacional, executado com precisão local.','Letra caixa seguindo o manual de identidade de grandes marcas: cor exata, proporção certa e alinhamento perfeito.','MRV Engenharia · Uninassau',
-   W3('mrv','mrv2','uninassau_placa','MRV','MRV','Uninassau')),
+ project('Letra caixa institucional','Padrão de marca nacional, executado com precisão local.','Letra caixa seguindo o manual de identidade de grandes marcas: cor exata, proporção certa e alinhamento perfeito.','MRV Engenharia · Meryson Guedes',
+   W3('mrv','mrv2','meryson','MRV','MRV','Meryson Guedes Advocacia')),
+ // uninassau
+ project('Fachada · Luminoso · Interno','De unidade de ensino a ponto de referência.','Placa de fachada, luminoso redondo dupla face voltado para a rua e painel adesivo na recepção. Projeto completo, por dentro e por fora.','Uninassau Centro Universitário',
+   W3('uninassau_fachada','uninassau_redondo','uninassau_painel','Fachada','Luminoso dupla face','Painel da recepção')),
+ // corporativo
+ project('Letras em relevo · Totem','Identidade que recebe o cliente na porta.','Letras em relevo na recepção e totem de identificação com logo recortado. Acabamento limpo que transmite confiança antes da primeira palavra.','Pousada Maria de Lourdes · Vilaverde',
+   W2('pousada','vilaverde','Pousada Maria de Lourdes','Letras em relevo na recepção','Vilaverde Condomínio Clube','Totem de identificação')),
  // 12 ambientação interna
  project('Ambientação interna · Adesivo','Comunicação visual não é só fachada.','Adesivos de parede, letreiros internos e peças motivacionais em grande formato. Cada parede reforça a marca.','ADTSA · Uninassau · Ramyla Melo',
    W3('adtsa','uninassau_interno','ramyla','ADTSA','Uninassau','Ramyla Melo')),
@@ -134,8 +143,8 @@ const slides=[
   <svg width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="#F28E25" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>${ph('rei_placa',820,480,'Placa instalada','Mesma cor, mesma proporção')}</div>${foot()}`),
  // 15 obras
  S(`<div style="position:absolute;left:96px;top:110px"><div class="kick">Bastidores</div><h2 style="margin-top:20px">Equipe própria, do andaime ao acabamento.</h2></div>
-  <div class="grid" style="left:96px;right:96px;top:300px;grid-template-columns:repeat(4,1fr)">
-  ${ph('dm_inst',405,520,'DM Surfwear','Instalação')}${ph('dm_pronta',405,520,'DM Surfwear','Pronta')}${ph('frio_inst',405,520,'Frio Peças','Instalação')}${ph('friopecas',405,520,'Frio Peças','Pronta')}</div>${foot()}`),
+  <div class="grid" style="left:96px;right:96px;top:300px;grid-template-columns:repeat(6,1fr);gap:20px">
+  ${ph('dm_inst',268,520,'DM Surfwear','Instalação')}${ph('dm_pronta',268,520,'DM Surfwear','Pronta')}${ph('frio_inst',268,520,'Frio Peças','Instalação')}${ph('friopecas',268,520,'Frio Peças','Pronta')}${ph('mendes_inst',268,520,'Mendes Import Car','Instalação')}${ph('mendes_pronta',268,520,'Mendes Import Car','Pronta')}</div>${foot()}`),
  // 16 sinalização
  S(`<div style="position:absolute;left:96px;top:110px"><div class="kick">Sinalização · Placas em PS · Displays</div><h2 style="margin-top:20px">Informação clara também é comunicação visual.</h2></div>
   <div class="grid" style="left:96px;right:96px;top:300px;grid-template-columns:repeat(5,1fr)">
@@ -145,6 +154,11 @@ const slides=[
   <div class="grid" style="left:96px;right:96px;top:290px;grid-template-columns:repeat(6,1fr);gap:20px">
   ${ph('weyne',268,250,'Weyne Modas')}${ph('blaser',268,250,'Blaser')}${ph('pan_premium',268,250,'Pan Premium')}${ph('laboplan',268,250,'Laboplan')}${ph('ridente',268,250,'Ridente')}${ph('conecta',268,250,'Conecta Solar')}
   ${ph('espelho_apagado',268,250,'Espelho Meu')}${ph('espelho_neon',268,250,'Espelho Meu')}${ph('ana_silva_dia',268,250,'Ana Silva')}${ph('revitafio_dia',268,250,'Revitafio')}${ph('uninassau_placa',268,250,'Uninassau')}${ph('dpaleteiros_noite',268,250,"D'Paleteiros")}</div>${foot()}`),
+ // trofeu
+ S(`<div style="position:absolute;left:96px;top:150px;width:760px"><div class="kick">Personalizados em acrílico</div><h2 style="margin-top:20px;font-size:76px">Troféus que viram <span class="k">lembrança</span>.</h2>
+  <p class="lead" style="margin-top:30px">Troféus, placas de homenagem e peças comemorativas em acrílico espelhado e impresso, cortados a laser no formato da sua arte. Para eventos, equipes, empresas e datas especiais.</p>
+  <div style="margin-top:36px;display:flex;align-items:center;gap:14px;font-size:22px;font-weight:700;color:var(--navy)"><span style="width:6px;height:30px;border-radius:3px;background:var(--mag)"></span>Corte a laser · Acrílico espelhado · Arte personalizada</div></div>
+  <div style="position:absolute;right:96px;top:96px">${ph('trofeu',860,830)}</div>${foot()}`),
  // 18 impressos
  S(`<div style="position:absolute;left:96px;top:110px"><div class="kick">Gráfica · Impressos</div><h2 style="margin-top:20px">Impressos que trazem o cliente até a porta.</h2></div>
   <div class="grid" style="left:96px;right:96px;top:310px;grid-template-columns:repeat(3,1fr)">
