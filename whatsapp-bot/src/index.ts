@@ -2,9 +2,11 @@
 import { assinaturaValida, extrairEventos, normalizarNumero } from "./whatsapp";
 import { validarAtualizacao } from "./pedidos";
 export { Conversa } from "./conversa";
+export { Caixa } from "./caixa";
 
 export interface Env {
   CONVERSA: DurableObjectNamespace<import("./conversa").Conversa>;
+  CAIXA: DurableObjectNamespace<import("./caixa").Caixa>;
   ANTHROPIC_API_KEY: string;
   WHATSAPP_TOKEN: string;
   WHATSAPP_APP_SECRET: string;
@@ -63,10 +65,25 @@ export default {
       return new Response("ok");
     }
 
-    // 3) O sistema da gráfica avisa que um pedido mudou de etapa
-    if (req.method === "POST" && url.pathname === "/api/pedido") {
+    // Rotas /api/* exigem o token da integração
+    if (url.pathname.startsWith("/api/")) {
       const token = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ?? "";
       if (!env.API_PEDIDOS_TOKEN || !(await iguais(token, env.API_PEDIDOS_TOKEN))) return json({ ok: false, erro: "token inválido" }, 401);
+    }
+
+    // 4) O sistema busca as triagens concluídas pela Nina
+    if (req.method === "GET" && url.pathname === "/api/triagens") {
+      const pendentes = url.searchParams.get("todas") !== "1";
+      return json({ ok: true, triagens: await caixa(env).listar(pendentes) });
+    }
+    const marcar = url.pathname.match(/^\/api\/triagens\/([\w-]+)\/importada$/);
+    if (req.method === "POST" && marcar) {
+      const ok = await caixa(env).marcarImportada(marcar[1]);
+      return json({ ok }, ok ? 200 : 404);
+    }
+
+    // 3) O sistema da gráfica avisa que um pedido mudou de etapa
+    if (req.method === "POST" && url.pathname === "/api/pedido") {
       const v = validarAtualizacao(await req.json().catch(() => null));
       if (!v.ok) return json({ ok: false, erro: v.erro }, 400);
       const numero = normalizarNumero(v.dados.telefone);
@@ -96,3 +113,5 @@ async function iguais(a: string, b: string) {
   const [x, y] = await Promise.all([h(a), h(b)]);
   return x.every((v, i) => v === y[i]);
 }
+
+const caixa = (env: Env) => env.CAIXA.get(env.CAIXA.idFromName("caixa"));

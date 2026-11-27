@@ -14,9 +14,17 @@ fallthrough = true
 name = "CONVERSA"
 class_name = "Conversa"
 
+[[durable_objects.bindings]]
+name = "CAIXA"
+class_name = "Caixa"
+
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["Conversa"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["Caixa"]
 
 [vars]
 # ID do número no painel da Meta (WhatsApp > Configuração da API)

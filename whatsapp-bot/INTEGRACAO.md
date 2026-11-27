@@ -63,7 +63,35 @@ curl_setopt_array($ch, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true,
 curl_exec($ch);
 ```
 
-## 2. Nina → Sistema: resumo da triagem (opcional)
+## 2. Sistema ← Nina: caixa de entrada de triagens (recomendado)
+
+O sistema busca as triagens que a Nina concluiu e as mostra no "Assistente de pedidos".
+
+```
+GET  /api/triagens                 → triagens pendentes (mais novas primeiro)
+GET  /api/triagens?todas=1         → todas, inclusive as já importadas
+POST /api/triagens/<id>/importada  → tira da lista de pendentes
+Authorization: Bearer <API_PEDIDOS_TOKEN>
+```
+
+Resposta:
+
+```json
+{ "ok": true, "triagens": [ {
+  "id": "3f1c…",
+  "telefone": "558195551234",
+  "nome": "Joana",
+  "situacao": "triagem_completa",
+  "resumo": "Cliente: Joana\nServiço: Fachada ACM\nMedidas: 3x1m…",
+  "conversa": "[sexta-feira, 27/11/2026 14:02] Joana: oi, queria uma fachada\n[…] Nina: …",
+  "criado": "2026-11-27T17:05:00.000Z",
+  "importada": false
+} ] }
+```
+
+`situacao` pode ser `triagem_completa` (pedido de orçamento) ou `precisa_atendente` (cliente pediu uma pessoa, reclamação etc.).
+
+## 3. Nina → Sistema: aviso imediato (opcional)
 
 Se você preencher `SISTEMA_WEBHOOK_URL` no `wrangler.toml`, a Nina faz um POST para esse endereço sempre que termina uma triagem. Assim o seu sistema pode criar o orçamento sozinho:
 

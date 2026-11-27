@@ -163,6 +163,17 @@ export class Conversa extends DurableObject<Env> {
         const titulo = decisao.situacao === "triagem_completa" ? "📋 *Resumo do pedido*" : "🙋 *Atendimento humano solicitado*";
         if (decisao.resumo?.trim()) {
           await enviarTexto(this.env, contato, `${titulo}\n\n${decisao.resumo.trim()}`);
+          const transcricaoAtual = (await this.get<Linha[]>("transcricao", []))
+            .slice(-30)
+            .map((l) => `[${dataHoraRecife(l.t)}] ${l.quem === "cliente" ? nome || "Cliente" : l.quem === "assistente" ? "Nina" : "Equipe"}: ${l.texto}`)
+            .join("\n");
+          await this.env.CAIXA.get(this.env.CAIXA.idFromName("caixa")).adicionar({
+            telefone: contato,
+            nome,
+            situacao: decisao.situacao,
+            resumo: decisao.resumo.trim(),
+            conversa: transcricaoAtual,
+          });
           this.ctx.waitUntil(this.avisarSistema(decisao.situacao, decisao.resumo.trim(), contato));
         }
         await this.ctx.storage.put("pausadoAte", Date.now() + this.num("PAUSA_HORAS_TRIAGEM", 48) * HORA);

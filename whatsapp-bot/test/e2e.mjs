@@ -107,6 +107,20 @@ try {
   assert.equal(avisosSistema[0].auth, "Bearer tok-pedidos");
   console.log("✔ triagem completa: envia resumo na conversa, avisa o sistema e pausa");
 
+  // Caixa de entrada de triagens
+  const api = (caminho, init = {}, tok = "tok-pedidos") => fetch(`${base}${caminho}`, { ...init, headers: { authorization: `Bearer ${tok}` } });
+  assert.equal((await api("/api/triagens", {}, "errado")).status, 401);
+  let cx = await (await api("/api/triagens")).json();
+  assert.equal(cx.triagens.length, 1);
+  assert.ok(cx.triagens[0].resumo.includes("fachada ACM"));
+  assert.ok(cx.triagens[0].conversa.includes("queria uma fachada") && cx.triagens[0].conversa.includes("Nina:"));
+  assert.equal(cx.triagens[0].nome, "Maria");
+  assert.equal((await api(`/api/triagens/${cx.triagens[0].id}/importada`, { method: "POST" })).status, 200);
+  cx = await (await api("/api/triagens")).json();
+  assert.equal(cx.triagens.length, 0, "importada sai da lista de pendentes");
+  assert.equal((await (await api("/api/triagens?todas=1")).json()).triagens.length, 1);
+  console.log("✔ caixa de triagens: lista, marca como importada");
+
   // Atendente respondeu pelo celular (coexistência): bot fica quieto
   await postar(eco("5581222222222", "Oi, aqui é da equipe"));
   await postar(texto("5581222222222", "n1", "oi"));
