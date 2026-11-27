@@ -4,9 +4,12 @@ import http from "node:http";
 import crypto from "node:crypto";
 import { spawn } from "node:child_process";
 import assert from "node:assert/strict";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 
 const MOCK = 9911, BOT = 8799, SEGREDO = "segredo-teste";
-const chamadasClaude = [], enviados = [];
+const chamadasClaude = [], enviados = [], templates = [], avisosSistema = [];
 let respostasClaude = [];
 
 const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64");
@@ -25,8 +28,10 @@ const mock = http.createServer(async (req, res) => {
   if (req.url === "/v23.0/PNID/messages") {
     const b = JSON.parse(corpo);
     if (b.type === "text") enviados.push(b);
+    if (b.type === "template") templates.push(b);
     return json({ messages: [{ id: "wamid.out" }] });
   }
+  if (req.url === "/sistema") { avisosSistema.push({ corpo: JSON.parse(corpo), auth: req.headers.authorization }); return json({ ok: true }); }
   if (req.url === "/v23.0/MIDIA1") return json({ url: `http://127.0.0.1:${MOCK}/arquivo`, mime_type: "image/png" });
   if (req.url === "/arquivo") { res.writeHead(200, { "content-type": "image/png" }); return res.end(PNG); }
   res.writeHead(404); res.end();
@@ -36,8 +41,10 @@ const vars = {
   PHONE_NUMBER_ID: "PNID", GRAPH_BASE: `http://127.0.0.1:${MOCK}`, ANTHROPIC_BASE_URL: `http://127.0.0.1:${MOCK}`,
   ANTHROPIC_API_KEY: "x", WHATSAPP_TOKEN: "x", WHATSAPP_APP_SECRET: SEGREDO, WHATSAPP_VERIFY_TOKEN: "verifica",
   ESPERA_SEGUNDOS: "1", IGNORAR_NUMEROS: "5581000000000",
+  API_PEDIDOS_TOKEN: "tok-pedidos", SISTEMA_WEBHOOK_URL: `http://127.0.0.1:${MOCK}/sistema`,
 };
-const dev = spawn("npx", ["wrangler", "dev", "--port", String(BOT), "--ip", "127.0.0.1", ...Object.entries(vars).flatMap(([k, v]) => ["--var", `${k}:${v}`])],
+const estado = fs.mkdtempSync(path.join(os.tmpdir(), "ngraph-teste-")); // começa sempre do zero
+const dev = spawn("npx", ["wrangler", "dev", "--port", String(BOT), "--ip", "127.0.0.1", "--persist-to", estado, ...Object.entries(vars).flatMap(([k, v]) => ["--var", `${k}:${v}`])],
   { env: { ...process.env, NO_PROXY: "127.0.0.1,localhost", no_proxy: "127.0.0.1,localhost" }, stdio: ["ignore", "pipe", "pipe"] });
 let log = "";
 dev.stdout.on("data", (d) => (log += d));
@@ -94,7 +101,11 @@ try {
   await postar(texto("5581111111111", "m4", "obrigada!"));
   await espera(2500);
   assert.equal(chamadasClaude.length, 2, "bot deve ficar quieto após a triagem");
-  console.log("✔ triagem completa: envia resumo na conversa e pausa");
+  assert.equal(avisosSistema.length, 1, "resumo enviado ao sistema da gráfica");
+  assert.equal(avisosSistema[0].corpo.evento, "triagem_completa");
+  assert.ok(avisosSistema[0].corpo.resumo.includes("fachada ACM"));
+  assert.equal(avisosSistema[0].auth, "Bearer tok-pedidos");
+  console.log("✔ triagem completa: envia resumo na conversa, avisa o sistema e pausa");
 
   // Atendente respondeu pelo celular (coexistência): bot fica quieto
   await postar(eco("5581222222222", "Oi, aqui é da equipe"));
@@ -125,12 +136,44 @@ try {
   assert.ok(enviados.at(-1).text.body.includes("alguém da nossa equipe"));
   console.log("✔ em caso de falha, avisa o cliente");
 
+  // Acompanhamento de pedidos
+  const pedido = (body, tok = "tok-pedidos") => fetch(`${base}/api/pedido`, { method: "POST", body: JSON.stringify(body), headers: { authorization: `Bearer ${tok}`, "content-type": "application/json" } });
+  r = await pedido({ telefone: "81995551234", nome: "Joana Souza", pedido: "123", etapa: "em_producao" }, "errado");
+  assert.equal(r.status, 401);
+  r = await pedido({ telefone: "81995551234", nome: "Joana", pedido: "123", etapa: "voando" });
+  assert.equal(r.status, 400);
+  r = await pedido({ telefone: "81995551234", nome: "Joana", pedido: "123", etapa: "instalacao_agendada" });
+  assert.equal(r.status, 400, "instalação exige data");
+  r = await pedido({ telefone: "(81) 99555-1234", nome: "Joana Souza", pedido: "123", etapa: "em_producao", descricao: "Banner 2x1m" });
+  assert.deepEqual(await r.json(), { ok: true, enviado: true });
+  assert.equal(templates.length, 1);
+  assert.equal(templates[0].to, "5581995551234");
+  assert.equal(templates[0].template.name, "ngraph_pedido_em_producao");
+  assert.deepEqual(templates[0].template.components[0].parameters.map((p) => p.text), ["Joana", "123"]);
+  r = await pedido({ telefone: "81995551234", nome: "Joana Souza", pedido: "123", etapa: "em_producao" });
+  assert.equal((await r.json()).repetido, true);
+  assert.equal(templates.length, 1, "não repete aviso igual");
+  console.log("✔ sistema avisa etapa → cliente recebe template (sem repetir)");
+
+  // Cliente responde (WhatsApp manda o número SEM o 9) e a Nina sabe a etapa
+  await postar(texto("558195551234", "p1", "oi, como está meu pedido?"));
+  await espera(3000);
+  const ped = JSON.stringify(chamadasClaude.at(-1).messages.at(-1));
+  assert.ok(ped.includes("Pedido 123") && ped.includes("Em produção") && ped.includes("Banner 2x1m"), ped);
+  assert.equal(enviados.at(-1).to, "558195551234", "responde no número que o WhatsApp usou");
+  r = await pedido({ telefone: "5581995551234", nome: "Joana Souza", pedido: "123", etapa: "instalacao_agendada", data_instalacao: "05/12 às 9h" });
+  assert.equal(templates.at(-1).to, "558195551234", "depois que o cliente falou, usa o número do WhatsApp");
+  assert.deepEqual(templates.at(-1).template.components[0].parameters.map((p) => p.text), ["Joana", "123", "05/12 às 9h"]);
+  assert.ok(chamadasClaude.at(-1).system[0].text.includes("Nina"));
+  console.log("✔ Nina responde a etapa do pedido (com ou sem o 9 no número)");
+
   console.log("\nTODOS OS TESTES PASSARAM");
 } catch (e) {
   console.error("FALHOU:", e.message, "\n--- log do wrangler ---\n", log.slice(-3000));
   process.exitCode = 1;
 } finally {
   dev.kill("SIGTERM");
+  fs.rmSync(estado, { recursive: true, force: true });
   mock.close();
   setTimeout(() => process.exit(), 500);
 }

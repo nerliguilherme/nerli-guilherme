@@ -2,7 +2,8 @@
 import { DurableObject } from "cloudflare:workers";
 import type Anthropic from "@anthropic-ai/sdk";
 import { pensar, type Historico } from "./claude";
-import { baixarImagem, enviarTexto, marcarLidaDigitando, type Evento } from "./whatsapp";
+import { baixarImagem, enviarTemplate, enviarTexto, marcarLidaDigitando, type Evento } from "./whatsapp";
+import { ETAPAS, parametrosTemplate, type AtualizacaoPedido, type PedidoSalvo } from "./pedidos";
 import type { Env } from "./index";
 
 type Pendente = Extract<Evento, { tipo: "mensagem_cliente" }>;
@@ -64,6 +65,7 @@ export class Conversa extends DurableObject<Env> {
     if (vistos.includes(ev.id)) return;
     await this.ctx.storage.put("vistos", [...vistos, ev.id].slice(-100));
     if (ev.nome) await this.ctx.storage.put("nome", ev.nome);
+    await this.ctx.storage.put("waId", ev.waId);
 
     const pausadoAte = await this.get<number>("pausadoAte", 0);
     if (pausadoAte > agora) {
@@ -85,7 +87,7 @@ export class Conversa extends DurableObject<Env> {
     const agora = Date.now();
     if ((await this.get<number>("pausadoAte", 0)) > agora) return;
 
-    const contato = pendentes[0].contato;
+    const contato = pendentes[pendentes.length - 1].waId;
     await marcarLidaDigitando(this.env, pendentes[pendentes.length - 1].id);
 
     // Nova conversa? (primeira vez, muito tempo parado, ou a anterior foi encerrada)
@@ -114,6 +116,20 @@ export class Conversa extends DurableObject<Env> {
     const blocos: Anthropic.Beta.BetaContentBlockParam[] = [];
     let cabecalho = `[${dataHoraRecife(agora)}${nome ? ` | nome no WhatsApp: ${nome}` : ""}]`;
     if (contexto) cabecalho += "\n" + contexto;
+    const pedidos = await this.get<PedidoSalvo[]>("pedidos", []);
+    if (pedidos.length) {
+      cabecalho +=
+        "\n[Pedidos deste cliente no sistema da NGraph:\n" +
+        pedidos
+          .map(
+            (p) =>
+              `- Pedido ${p.pedido}${p.descricao ? ` (${p.descricao})` : ""}: ${ETAPAS[p.etapa].rotulo}` +
+              `${p.data_instalacao && p.etapa === "instalacao_agendada" ? `, instalação ${p.data_instalacao}` : ""}` +
+              ` — atualizado em ${dataHoraRecife(p.atualizado)}`,
+          )
+          .join("\n") +
+        "]";
+    }
     blocos.push({ type: "text", text: cabecalho });
     let imagens = await this.get<number>("imagens", 0);
     for (const p of pendentes) {
@@ -145,7 +161,10 @@ export class Conversa extends DurableObject<Env> {
 
       if (decisao.situacao !== "em_andamento") {
         const titulo = decisao.situacao === "triagem_completa" ? "📋 *Resumo do pedido*" : "🙋 *Atendimento humano solicitado*";
-        if (decisao.resumo?.trim()) await enviarTexto(this.env, contato, `${titulo}\n\n${decisao.resumo.trim()}`);
+        if (decisao.resumo?.trim()) {
+          await enviarTexto(this.env, contato, `${titulo}\n\n${decisao.resumo.trim()}`);
+          this.ctx.waitUntil(this.avisarSistema(decisao.situacao, decisao.resumo.trim(), contato));
+        }
         await this.ctx.storage.put("pausadoAte", Date.now() + this.num("PAUSA_HORAS_TRIAGEM", 48) * HORA);
         await this.ctx.storage.put("encerrada", true);
       }
@@ -156,5 +175,42 @@ export class Conversa extends DurableObject<Env> {
       await this.ctx.storage.put("pausadoAte", Date.now() + this.num("PAUSA_HORAS_ATENDENTE", 12) * HORA);
       await this.ctx.storage.put("encerrada", true);
     }
+  }
+
+  /** Opcional: manda o resumo da triagem para o sistema da gráfica (SISTEMA_WEBHOOK_URL). */
+  private async avisarSistema(situacao: string, resumo: string, telefone: string) {
+    if (!this.env.SISTEMA_WEBHOOK_URL) return;
+    try {
+      const r = await fetch(this.env.SISTEMA_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.env.API_PEDIDOS_TOKEN}` },
+        body: JSON.stringify({ evento: situacao, telefone, nome: await this.get("nome", ""), resumo, quando: new Date().toISOString() }),
+      });
+      if (!r.ok) console.error("Sistema da gráfica recusou o resumo:", r.status, await r.text());
+    } catch (e) {
+      console.error("Falha ao avisar o sistema da gráfica:", e);
+    }
+  }
+
+  /** Chamado quando o sistema da gráfica muda a etapa de um pedido: avisa o cliente. */
+  async atualizarPedido(d: AtualizacaoPedido, para: string): Promise<{ enviado: boolean; repetido?: boolean }> {
+    const pedidos = await this.get<PedidoSalvo[]>("pedidos", []);
+    const atual = pedidos.find((p) => p.pedido === d.pedido);
+    // Não manda o mesmo aviso duas vezes (ex: o sistema salvou o pedido de novo)
+    if (atual && atual.etapa === d.etapa && (atual.data_instalacao ?? "") === (d.data_instalacao ?? "")) return { enviado: false, repetido: true };
+
+    // Usa o número exatamente como o WhatsApp conhece, se esse cliente já falou com a gente
+    const destino = (await this.get<string>("waId", "")) || para;
+    await enviarTemplate(this.env, destino, ETAPAS[d.etapa].template, parametrosTemplate(d));
+
+    const salvo: PedidoSalvo = { pedido: d.pedido, etapa: d.etapa, descricao: d.descricao ?? atual?.descricao, data_instalacao: d.data_instalacao, atualizado: Date.now() };
+    const restantes = pedidos.filter((p) => p.pedido !== d.pedido && p.etapa !== "entregue");
+    // Pedidos entregues ficam guardados só até o próximo aviso, para a Nina ainda saber responder
+    await this.ctx.storage.put("pedidos", [...restantes, salvo].slice(-10));
+    if (!(await this.get<string>("nome", ""))) await this.ctx.storage.put("nome", d.nome);
+    await this.anotar({ quem: "equipe", texto: `[aviso automático] Pedido ${d.pedido}: ${ETAPAS[d.etapa].rotulo}`, t: Date.now() });
+    // Se o cliente responder ao aviso, começa uma conversa nova já com esse contexto
+    await this.ctx.storage.put("encerrada", true);
+    return { enviado: true };
   }
 }

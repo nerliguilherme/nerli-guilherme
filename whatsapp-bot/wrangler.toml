@@ -34,6 +34,8 @@ PAUSA_HORAS_TRIAGEM = "48"
 NOVA_CONVERSA_HORAS = "24"
 # Números que o bot nunca responde (fornecedores, família...), separados por vírgula. Ex: 5581999999999
 IGNORAR_NUMEROS = ""
+# Opcional: endereço do sistema da gráfica que recebe o resumo da triagem (POST JSON). Vazio = desligado
+SISTEMA_WEBHOOK_URL = ""
 
 # Segredos (NÃO coloque aqui). Cadastre com: npx wrangler secret put NOME
-# ANTHROPIC_API_KEY, WHATSAPP_TOKEN, WHATSAPP_APP_SECRET, WHATSAPP_VERIFY_TOKEN
+# ANTHROPIC_API_KEY, WHATSAPP_TOKEN, WHATSAPP_APP_SECRET, WHATSAPP_VERIFY_TOKEN, API_PEDIDOS_TOKEN

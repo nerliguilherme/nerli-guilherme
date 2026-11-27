@@ -12,7 +12,8 @@ export interface WaEnv {
 export type Evento =
   | {
       tipo: "mensagem_cliente";
-      contato: string; // wa_id do cliente, ex: 5581999999999
+      contato: string; // número normalizado (chave da conversa), ex: 558199999999
+      waId: string; // número exatamente como o WhatsApp mandou (usado para responder)
       nome?: string;
       id: string;
       timestamp: number; // ms
@@ -50,6 +51,18 @@ const DESCRICAO_TIPO: Record<string, string> = {
   contacts: "[o cliente enviou um contato]",
 };
 
+/**
+ * Deixa o número num formato único para achar a conversa certa.
+ * Celular brasileiro às vezes vem com o 9 extra e às vezes sem (5581 9 9999-9999 vs 5581 9999-9999):
+ * guardamos sempre SEM o 9 extra. Também aceita número sem o 55.
+ */
+export function normalizarNumero(numero: string): string {
+  let n = String(numero).replace(/\D/g, "");
+  if (n.length === 10 || n.length === 11) n = "55" + n; // veio sem o código do país
+  if (n.length === 13 && n.startsWith("55") && n[4] === "9") n = n.slice(0, 4) + n.slice(5);
+  return n;
+}
+
 /** Converte o JSON do webhook da Meta numa lista de eventos simples. */
 export function extrairEventos(payload: any): Evento[] {
   const eventos: Evento[] = [];
@@ -63,7 +76,8 @@ export function extrairEventos(payload: any): Evento[] {
           if (!m?.from || !m?.id) continue;
           const ev: Evento & { tipo: "mensagem_cliente" } = {
             tipo: "mensagem_cliente",
-            contato: m.from,
+            contato: normalizarNumero(m.from),
+            waId: m.from,
             nome: nomes.get(m.from),
             id: m.id,
             timestamp: Number(m.timestamp) * 1000 || Date.now(),
@@ -101,7 +115,7 @@ export function extrairEventos(payload: any): Evento[] {
           if (!m?.to) continue;
           eventos.push({
             tipo: "mensagem_atendente",
-            contato: m.to,
+            contato: normalizarNumero(m.to),
             timestamp: Number(m.timestamp) * 1000 || Date.now(),
             texto: m.text?.body,
           });
@@ -130,6 +144,20 @@ export async function enviarTexto(env: WaEnv, para: string, texto: string): Prom
     const r = await postMensagem(env, { to: para, type: "text", text: { body: texto.slice(i, i + 4000), preview_url: false } });
     if (!r.ok) throw new Error(`WhatsApp recusou o envio (${r.status}): ${await r.text()}`);
   }
+}
+
+/** Envia uma mensagem-modelo (template) aprovada pela Meta — necessária para avisar o cliente por iniciativa da empresa. */
+export async function enviarTemplate(env: WaEnv, para: string, nome: string, parametros: string[], idioma = "pt_BR"): Promise<void> {
+  const r = await postMensagem(env, {
+    to: para,
+    type: "template",
+    template: {
+      name: nome,
+      language: { code: idioma },
+      components: parametros.length ? [{ type: "body", parameters: parametros.map((text) => ({ type: "text", text })) }] : [],
+    },
+  });
+  if (!r.ok) throw new Error(`WhatsApp recusou o template ${nome} (${r.status}): ${await r.text()}`);
 }
 
 /** Marca como lida e mostra "digitando..." (se a Meta recusar, não é grave). */

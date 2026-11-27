@@ -1,6 +1,8 @@
-# Assistente de WhatsApp da NGraph
+# Nina — assistente de WhatsApp da NGraph
 
-Bot que atende clientes no WhatsApp da NGraph, faz a **triagem do orçamento** com perguntas e entrega um **resumo pronto** na própria conversa, para a equipe só precisar orçar.
+A Nina atende clientes no WhatsApp da NGraph. Ela faz duas coisas:
+1. **Triagem do orçamento:** pergunta o que o cliente precisa e entrega um **resumo pronto** na própria conversa, para a equipe só precisar orçar.
+2. **Acompanhamento do pedido:** quando o sistema da gráfica muda a etapa (*Aprovado → Em produção → Pronto → Instalação agendada → Entregue*), ela avisa o cliente. Se o cliente perguntar "como está meu pedido?", ela responde. Veja [INTEGRACAO.md](INTEGRACAO.md) e [TEMPLATES.md](TEMPLATES.md).
 
 ## Como funciona
 
@@ -13,7 +15,7 @@ Cliente manda mensagem
 ```
 
 - **Nunca passa preço.** Só coleta as informações.
-- Se apresenta como **assistente virtual**.
+- Se apresenta como **Nina, assistente virtual da NGraph**.
 - **Vê fotos**, como a foto da fachada. Áudio e vídeo ele não abre: pede para o cliente escrever.
 - Se o cliente pedir uma pessoa, ou o assunto não for orçamento (pedido em andamento, reclamação, fornecedor), ele avisa que vai chamar a equipe e fica quieto.
 - **Se alguém da equipe responder pelo celular**, o bot fica quieto naquela conversa por 12h. Isso só funciona no modo coexistência (veja o passo 1).
@@ -35,6 +37,7 @@ Os ajustes finos ficam em `wrangler.toml`, na seção `[vars]`:
 | `PAUSA_HORAS_TRIAGEM` | Tempo quieto depois do resumo | 48 |
 | `NOVA_CONVERSA_HORAS` | Tempo parado até a conversa recomeçar do zero | 24 |
 | `IGNORAR_NUMEROS` | Números que o bot não responde (fornecedores, família) | vazio |
+| `SISTEMA_WEBHOOK_URL` | Endereço do seu sistema que recebe o resumo da triagem | vazio (desligado) |
 
 ---
 
@@ -51,8 +54,7 @@ Os ajustes finos ficam em `wrangler.toml`, na seção `[vars]`:
 2. Adicione o produto **WhatsApp**.
 3. **Comece pelo número de teste** que a Meta oferece de graça. Cadastre o seu celular como destinatário de teste e valide o bot inteiro antes de mexer no número real.
 4. Para o **número real**, há duas formas:
-   - **Coexistência** (o app do celular continua funcionando): a Meta exige que esse cadastro passe por um parceiro (Tech Provider ou Solution Partner).
-   - **Migrar o número para a API**: o número sai do app WhatsApp Business do celular.
+   - **Escolhido: provedor com coexistência** (o app do celular continua funcionando). A Meta exige que esse cadastro passe por um parceiro, como a 360dialog. Antes de contratar, confirme com o provedor: (a) acesso direto à API, para usar este código; (b) webhook `smb_message_echoes`, que avisa quando a equipe responde pelo celular; (c) preço mensal e cobrança das mensagens de resposta. ⚠️ O código ainda fala o formato da Meta, e cada provedor tem pequenas diferenças: **depois de escolher, o código precisa ser adaptado ao provedor**.
 5. Anote o **Phone Number ID**, que fica em WhatsApp → Configuração da API.
 
 ### 2. Token permanente da Meta
@@ -71,6 +73,7 @@ npx wrangler secret put ANTHROPIC_API_KEY   # cole a key da Anthropic
 npx wrangler secret put WHATSAPP_TOKEN      # cole o token permanente da Meta
 npx wrangler secret put WHATSAPP_APP_SECRET # cole a chave secreta do app
 npx wrangler secret put WHATSAPP_VERIFY_TOKEN  # invente uma senha qualquer e anote
+npx wrangler secret put API_PEDIDOS_TOKEN      # senha da integração com o sistema (openssl rand -hex 32)
 ```
 
 Em `wrangler.toml`, troque `PHONE_NUMBER_ID = "PREENCHER"` pelo ID anotado no passo 1. Depois rode:
@@ -89,6 +92,10 @@ No app da Meta, vá em **WhatsApp → Configuração → Webhook → Editar**:
 
 ### 5. Preencher `config/empresa.md`
 Troque tudo que está marcado com `[PREENCHER]` e publique de novo (`npm run deploy`, ou o passo 7).
+
+### 5b. Templates e integração com o sistema
+- Cadastre as 5 mensagens de aviso: [TEMPLATES.md](TEMPLATES.md)
+- No sistema da gráfica, chame `/api/pedido` quando a etapa mudar: [INTEGRACAO.md](INTEGRACAO.md)
 
 ### 6. Testar
 Mande mensagem do seu celular para o número (o de teste, no começo). Para ver os registros em tempo real:
@@ -111,7 +118,9 @@ Com isso, editar o `empresa.md` no site do GitHub já atualiza o bot.
 | Item | Custo |
 |---|---|
 | Cloudflare Workers + Durable Objects | Grátis no volume da NGraph |
-| WhatsApp Cloud API | Grátis para responder dentro da janela de 24h de quem te chamou |
+| Provedor com coexistência (ex: 360dialog) | Mensalidade por número (a confirmar, a partir de ~€49/mês) |
+| WhatsApp, respostas | Eram grátis na janela de 24h. Há indícios de mudança em out/2026: **confirme com o provedor** |
+| WhatsApp, avisos de pedido (templates de utilidade) | Centavos por mensagem |
 | Claude (API) | Cobrado por uso. Com `claude-opus-5-5`, estimativa de US$ 10–30/mês para 10 conversas por dia. Com `claude-haiku-5-5`, menos de US$ 1/mês |
 
 Para trocar de modelo, mude `MODEL` no `wrangler.toml` e publique de novo.
@@ -121,6 +130,7 @@ Para trocar de modelo, mude `MODEL` no `wrangler.toml` e publique de novo.
 - `src/index.ts`: recebe o webhook e confere a assinatura da Meta
 - `src/conversa.ts`: um Durable Object por cliente, com histórico, espera e pausas
 - `src/claude.ts`: prompt e chamada ao Claude (saída em JSON estruturado)
-- `src/whatsapp.ts`: envio de mensagens, download de mídia e leitura do webhook
+- `src/whatsapp.ts`: envio de mensagens e templates, download de mídia, leitura do webhook e normalização do número (o 9 extra)
+- `src/pedidos.ts`: etapas do pedido e nomes dos templates
 - `npm test`: teste de ponta a ponta com Meta e Claude simulados
 - `npm run check`: verificação de tipos
