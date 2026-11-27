@@ -1,0 +1,27 @@
+# Publica o assistente de WhatsApp na Cloudflare sempre que algo em whatsapp-bot/ muda na branch main.
+# Assim você edita config/empresa.md direto no site do GitHub e em ~1 minuto o bot já usa a versão nova.
+name: Deploy assistente WhatsApp
+
+on:
+  push:
+    branches: [main]
+    paths: ["whatsapp-bot/**"]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: whatsapp-bot
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run check
+      - run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

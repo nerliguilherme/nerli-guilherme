@@ -1,0 +1,39 @@
+name = "ngraph-whatsapp-bot"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+compatibility_flags = ["nodejs_compat"]
+
+# O arquivo da empresa entra no código como texto
+[[rules]]
+type = "Text"
+globs = ["**/*.md"]
+fallthrough = true
+
+# Um "Durable Object" por cliente guarda o histórico da conversa (plano grátis)
+[[durable_objects.bindings]]
+name = "CONVERSA"
+class_name = "Conversa"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Conversa"]
+
+[vars]
+# ID do número no painel da Meta (WhatsApp > Configuração da API)
+PHONE_NUMBER_ID = "PREENCHER"
+GRAPH_VERSION = "v23.0"
+# Modelo do Claude. claude-haiku-5-5 custa ~40x menos; claude-opus-5-5 é o mais capaz.
+MODEL = "claude-opus-5-5"
+# Espera alguns segundos para juntar mensagens picadas do cliente antes de responder
+ESPERA_SEGUNDOS = "8"
+# Quando alguém da equipe responde pelo celular, o bot fica quieto nessa conversa por X horas
+PAUSA_HORAS_ATENDENTE = "12"
+# Depois de concluir a triagem, o bot fica quieto por X horas (a equipe assume)
+PAUSA_HORAS_TRIAGEM = "48"
+# Conversa sem mensagens por X horas recomeça do zero
+NOVA_CONVERSA_HORAS = "24"
+# Números que o bot nunca responde (fornecedores, família...), separados por vírgula. Ex: 5581999999999
+IGNORAR_NUMEROS = ""
+
+# Segredos (NÃO coloque aqui). Cadastre com: npx wrangler secret put NOME
+# ANTHROPIC_API_KEY, WHATSAPP_TOKEN, WHATSAPP_APP_SECRET, WHATSAPP_VERIFY_TOKEN
